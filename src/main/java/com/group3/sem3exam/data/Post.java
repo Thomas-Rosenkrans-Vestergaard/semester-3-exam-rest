@@ -1,0 +1,102 @@
+package com.group3.sem3exam.data;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+
+import static javax.persistence.GenerationType.IDENTITY;
+
+@Entity(name = "post")
+public class Post
+{
+
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Integer id;
+
+    @Column(length = 65535, columnDefinition = "TEXT")
+    private String contents;
+
+    @ManyToOne
+    private User author;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    @Column(nullable = false)
+    private Calendar createdAt;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    public Post()
+    {
+
+    }
+
+    public Post(String contents, User author)
+    {
+        this.contents = contents;
+        this.author = author;
+    }
+
+    public Integer getId()
+    {
+        return this.id;
+    }
+
+    public void setId(Integer id)
+    {
+        this.id = id;
+    }
+
+    public String getContents()
+    {
+        return this.contents;
+    }
+
+    public void setContents(String contents)
+    {
+        this.contents = contents;
+    }
+
+    public User getAuthor()
+    {
+        return this.author;
+    }
+
+    public void setAuthor(User author)
+    {
+        this.author = author;
+    }
+
+    public Calendar getCreatedAt()
+    {
+        return this.createdAt;
+    }
+
+    public void setCreatedAt(Calendar createdAt)
+    {
+        this.createdAt = createdAt;
+    }
+
+    public List<Comment> getComments()
+    {
+        return this.comments;
+    }
+
+    public void setComments(List<Comment> comments)
+    {
+        this.comments = comments;
+        for (Comment comment : comments)
+            comment.setPost(this);
+    }
+
+    public void addComment(Comment comment)
+    {
+        this.comments.add(comment);
+        comment.setPost(this);
+    }
+}
