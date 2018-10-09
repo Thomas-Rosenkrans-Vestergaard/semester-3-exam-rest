@@ -35,7 +35,7 @@ public class User
     @OneToMany(fetch = FetchType.LAZY, cascade = MERGE, mappedBy = "author", orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = MERGE)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = MERGE, mappedBy = "friends")
     private List<User> friends = new ArrayList<>();
 
     public User()
