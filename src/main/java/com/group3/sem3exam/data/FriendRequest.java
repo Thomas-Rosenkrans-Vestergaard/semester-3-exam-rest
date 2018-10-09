@@ -1,9 +1,9 @@
 package com.group3.sem3exam.data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import org.hibernate.annotations.CreationTimestamp;
+
+import javax.persistence.*;
+import java.util.Calendar;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -20,6 +20,11 @@ public class FriendRequest
 
     @OneToOne(optional = false)
     private User receiver;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    @Column(nullable = false)
+    private Calendar createdAt;
 
     public FriendRequest()
     {
@@ -60,5 +65,15 @@ public class FriendRequest
     public void setReceiver(User receiver)
     {
         this.receiver = receiver;
+    }
+
+    public Calendar getCreatedAt()
+    {
+        return this.createdAt;
+    }
+
+    public void setCreatedAt(Calendar createdAt)
+    {
+        this.createdAt = createdAt;
     }
 }
