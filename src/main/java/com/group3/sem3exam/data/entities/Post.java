@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data;
+package com.group3.sem3exam.data.entities;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
-import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity(name = "post")
 public class Post

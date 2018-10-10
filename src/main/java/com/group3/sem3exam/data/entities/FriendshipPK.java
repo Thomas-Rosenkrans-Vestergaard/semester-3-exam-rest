@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data;
+package com.group3.sem3exam.data.entities;
 
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;

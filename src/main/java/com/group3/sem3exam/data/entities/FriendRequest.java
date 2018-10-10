@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data;
+package com.group3.sem3exam.data.entities;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import static javax.persistence.GenerationType.IDENTITY;
-import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity(name = "friend_request")
 public class FriendRequest
