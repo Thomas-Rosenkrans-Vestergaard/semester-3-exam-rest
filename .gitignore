@@ -1,3 +1,6 @@
+# Ignore persistence file
+persistence.xml
+
 # Created by https://www.gitignore.io/api/java,gradle,java-web,intellij+all
 
 ### Intellij+all ###
