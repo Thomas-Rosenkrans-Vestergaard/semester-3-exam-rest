@@ -3,9 +3,10 @@ package com.group3.sem3exam.data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
 import static javax.persistence.GenerationType.IDENTITY;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity(name = "comment")
 public class Comment
@@ -24,17 +25,16 @@ public class Comment
     @ManyToOne
     private Post post;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column
     @CreationTimestamp
-    @Column(nullable = false)
-    private Calendar createdAt;
+    private LocalDateTime createdAt;
 
     public Comment()
     {
 
     }
 
-    public Comment(String contents, User author, Post post, Calendar createdAt)
+    public Comment(String contents, User author, Post post, LocalDateTime createdAt)
     {
         this.contents = contents;
         this.author = author;
@@ -82,12 +82,12 @@ public class Comment
         this.post = post;
     }
 
-    public Calendar getCreatedAt()
+    public LocalDateTime getCreatedAt()
     {
         return this.createdAt;
     }
 
-    public void setCreatedAt(Calendar createdAt)
+    public void setCreatedAt(LocalDateTime createdAt)
     {
         this.createdAt = createdAt;
     }

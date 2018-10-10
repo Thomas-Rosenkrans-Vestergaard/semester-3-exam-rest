@@ -3,11 +3,13 @@ package com.group3.sem3exam.data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity(name = "user")
@@ -21,31 +23,29 @@ public class User
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
     private String passwordHash;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column
     @CreationTimestamp
-    @Column(nullable = false)
-    private Calendar createdAt;
+    private LocalDateTime createdAt;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = MERGE, mappedBy = "author", orphanRemoval = true)
+    @OneToMany(fetch = LAZY, cascade = MERGE, mappedBy = "author", orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = MERGE, mappedBy = "friends")
-    private List<User> friends = new ArrayList<>();
+    @OneToMany(fetch = LAZY, mappedBy = "pk.owner", cascade = ALL)
+    private List<Friendship> friendships = new ArrayList<>();
 
     public User()
     {
 
     }
 
-    public User(Integer id, String name, String email, String passwordHash)
+    public User(String name, String email, String passwordHash)
     {
-        this.id = id;
         this.name = name;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -91,12 +91,12 @@ public class User
         this.passwordHash = passwordHash;
     }
 
-    public Calendar getCreatedAt()
+    public LocalDateTime getCreatedAt()
     {
         return this.createdAt;
     }
 
-    public void setCreatedAt(Calendar createdAt)
+    public void setCreatedAt(LocalDateTime createdAt)
     {
         this.createdAt = createdAt;
     }
@@ -119,18 +119,19 @@ public class User
         post.setAuthor(this);
     }
 
-    public List<User> getFriends()
+    public List<Friendship> getFriendships()
     {
-        return this.friends;
+        return this.friendships;
     }
 
-    public void setFriends(List<User> friends)
+    public void setFriendships(List<Friendship> friendships)
     {
-        this.friends = friends;
+        this.friendships = friendships;
     }
 
-    public void addFriend(User friend)
+    public void addFriendship(Friendship friendship)
     {
-        this.friends.add(friend);
+        this.friendships.add(friendship);
+        friendship.setOwner(this);
     }
 }

@@ -1,5 +1,10 @@
 package com.group3.sem3exam.rest;
 
+import com.group3.sem3exam.data.Friendship;
+import com.group3.sem3exam.data.User;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,12 +15,71 @@ import javax.ws.rs.core.MediaType;
 public class UserResource
 {
 
+    EntityManagerFactory emf = Persistence.createEntityManagerFactory("rest-api-pu");
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String get()
+    public String get() throws Exception
     {
-        Persistence.createEntityManagerFactory("rest-api-pu");
+        EntityManager entityManager = emf.createEntityManager();
+        entityManager.getTransaction().begin();
+        User thomas = new User("Thomas", "tvestergaard@hotmail.com", "hash");
+        User kasper = new User("Kasper", "kvestergaard@hotmail.com", "hash");
+        User sanne  = new User("Sanne", "svestergaard@hotmail.com", "hash");
 
-        return "Hello world";
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+
+            entityManager.persist(thomas);
+            entityManager.persist(kasper);
+            entityManager.persist(sanne);
+
+            {
+                Friendship friendship = new Friendship(thomas, kasper);
+                entityManager.persist(friendship);
+                thomas.addFriendship(friendship);
+            }
+
+            {
+                Friendship friendship = new Friendship(thomas, sanne);
+                entityManager.persist(friendship);
+                thomas.addFriendship(friendship);
+            }
+
+            {
+                Friendship friendship = new Friendship(sanne, thomas);
+                entityManager.persist(friendship);
+                sanne.addFriendship(friendship);
+            }
+
+            {
+
+                Friendship friendship = new Friendship(kasper, thomas);
+                entityManager.persist(friendship);
+                kasper.addFriendship(friendship);
+            }
+
+            stringBuilder.append("Thomas\n");
+            for (Friendship friendship : thomas.getFriendships()) {
+                stringBuilder.append("    Since " + friendship.getSince() + "\n");
+                stringBuilder.append("    " + friendship.getFriend().getName() + "\n");
+            }
+            stringBuilder.append("Kasper\n");
+            for (Friendship friendship : kasper.getFriendships()) {
+                stringBuilder.append("    Since " + friendship.getSince() + "\n");
+                stringBuilder.append("    " + friendship.getFriend().getName() + "\n");
+            }
+            stringBuilder.append("Sanne\n");
+            for (Friendship friendship : sanne.getFriendships()) {
+                stringBuilder.append("    Since " + friendship.getSince() + "\n");
+                stringBuilder.append("    " + friendship.getFriend().getName() + "\n");
+            }
+        } finally {
+            entityManager.getTransaction().rollback();
+            entityManager.close();
+
+        }
+
+        return stringBuilder.toString();
     }
 }

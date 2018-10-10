@@ -3,9 +3,10 @@ package com.group3.sem3exam.data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
 import static javax.persistence.GenerationType.IDENTITY;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity(name = "friend_request")
 public class FriendRequest
@@ -21,10 +22,9 @@ public class FriendRequest
     @OneToOne(optional = false)
     private User receiver;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column
     @CreationTimestamp
-    @Column(nullable = false)
-    private Calendar createdAt;
+    private LocalDateTime createdAt;
 
     public FriendRequest()
     {
@@ -67,12 +67,12 @@ public class FriendRequest
         this.receiver = receiver;
     }
 
-    public Calendar getCreatedAt()
+    public LocalDateTime getCreatedAt()
     {
         return this.createdAt;
     }
 
-    public void setCreatedAt(Calendar createdAt)
+    public void setCreatedAt(LocalDateTime createdAt)
     {
         this.createdAt = createdAt;
     }

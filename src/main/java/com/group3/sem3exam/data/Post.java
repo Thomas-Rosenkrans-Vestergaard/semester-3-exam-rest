@@ -3,11 +3,12 @@ package com.group3.sem3exam.data;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
 @Entity(name = "post")
 public class Post
@@ -23,10 +24,9 @@ public class Post
     @ManyToOne
     private User author;
 
-    @Temporal(TemporalType.TIMESTAMP)
+    @Column
     @CreationTimestamp
-    @Column(nullable = false)
-    private Calendar createdAt;
+    private LocalDateTime createdAt;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
@@ -72,12 +72,12 @@ public class Post
         this.author = author;
     }
 
-    public Calendar getCreatedAt()
+    public LocalDateTime getCreatedAt()
     {
         return this.createdAt;
     }
 
-    public void setCreatedAt(Calendar createdAt)
+    public void setCreatedAt(LocalDateTime createdAt)
     {
         this.createdAt = createdAt;
     }
