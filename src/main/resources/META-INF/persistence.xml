@@ -7,7 +7,7 @@
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/semester-3-exam-rest"/>
             <property name="javax.persistence.jdbc.user" value="thomas"/>
             <property name="javax.persistence.jdbc.password" value=""/>
-            <!--<property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>-->
+            <property name="javax.persistence.schema-generation.database.action" value="create"/>
             <!--<property name="javax.persistence.sql-load-script-source" value="data.sql"/>-->
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL57Dialect"/>

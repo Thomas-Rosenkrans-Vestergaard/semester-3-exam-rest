@@ -59,23 +59,10 @@ public class UserResource
                 kasper.addFriendship(friendship);
             }
 
-            stringBuilder.append("Thomas\n");
-            for (Friendship friendship : thomas.getFriendships()) {
-                stringBuilder.append("    Since " + friendship.getSince() + "\n");
-                stringBuilder.append("    " + friendship.getFriend().getName() + "\n");
-            }
-            stringBuilder.append("Kasper\n");
-            for (Friendship friendship : kasper.getFriendships()) {
-                stringBuilder.append("    Since " + friendship.getSince() + "\n");
-                stringBuilder.append("    " + friendship.getFriend().getName() + "\n");
-            }
-            stringBuilder.append("Sanne\n");
-            for (Friendship friendship : sanne.getFriendships()) {
-                stringBuilder.append("    Since " + friendship.getSince() + "\n");
-                stringBuilder.append("    " + friendship.getFriend().getName() + "\n");
-            }
-        } finally {
+            entityManager.getTransaction().commit();
+        } catch (Exception e){
             entityManager.getTransaction().rollback();
+        } finally {
             entityManager.close();
 
         }
