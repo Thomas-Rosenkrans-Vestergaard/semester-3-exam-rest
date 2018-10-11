@@ -42,7 +42,7 @@ public class TransactionalUserRepository extends TransactionalCrudRepository<Use
     }
 
     @Override
-    public User withEmail(String email)
+    public User getByEmail(String email)
     {
         try {
             return getEntityManager()
