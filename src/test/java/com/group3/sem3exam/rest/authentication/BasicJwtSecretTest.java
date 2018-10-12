@@ -1,5 +1,7 @@
 package com.group3.sem3exam.rest.authentication;
 
+import com.group3.sem3exam.rest.authentication.jwt.BasicJwtSecret;
+import com.group3.sem3exam.rest.authentication.jwt.JwtSecret;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

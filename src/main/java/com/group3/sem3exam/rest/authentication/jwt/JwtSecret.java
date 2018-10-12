@@ -1,4 +1,6 @@
-package com.group3.sem3exam.rest.authentication;
+package com.group3.sem3exam.rest.authentication.jwt;
+
+import com.group3.sem3exam.rest.authentication.SecretGenerationException;
 
 /**
  * The secret used when generating and verifying JWT tokens.

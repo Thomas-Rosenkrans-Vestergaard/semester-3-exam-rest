@@ -1,4 +1,4 @@
-package com.group3.sem3exam.rest.authentication;
+package com.group3.sem3exam.rest.authentication.jwt;
 
 public class JwtTokenContents
 {

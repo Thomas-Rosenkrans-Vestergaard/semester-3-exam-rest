@@ -1,4 +1,6 @@
-package com.group3.sem3exam.rest.authentication;
+package com.group3.sem3exam.rest.authentication.jwt;
+
+import com.group3.sem3exam.rest.authentication.SecretGenerationException;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package com.group3.sem3exam.rest.authentication;
+package com.group3.sem3exam.rest.authentication.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
