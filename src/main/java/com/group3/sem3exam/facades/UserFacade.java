@@ -37,7 +37,10 @@ public class UserFacade
     public User createUser(String name, String email, String password)
     {
         try (TransactionalUserRepository tup = new TransactionalUserRepository(emf)) {
-            return tup.createUser(name, email, password);
+            tup.begin();
+            User user = tup.createUser(name, email, password);
+            tup.commit();
+            return user;
         }
     }
 
