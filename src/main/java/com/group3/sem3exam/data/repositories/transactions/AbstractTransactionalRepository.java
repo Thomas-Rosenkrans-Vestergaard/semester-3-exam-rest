@@ -29,46 +29,46 @@ public class AbstractTransactionalRepository implements TransactionalRepository
      *
      * @return this
      */
-    @Override public Transactional begin()
+    @Override
+    public void begin()
     {
         this.entityManager.getTransaction().begin();
-
-        return this;
     }
 
     /**
      * Closes the transaction.
-     *
-     * @return this
      */
-    @Override public Transactional close()
+    @Override
+    public void close()
     {
-        entityManager.close();
+        EntityTransaction transaction = entityManager.getTransaction();
+        if (transaction.isActive())
+            transaction.rollback();
 
-        return this;
+        entityManager.close();
     }
 
-    @Override public EntityManager getEntityManager()
+    @Override
+    public EntityManager getEntityManager()
     {
         return entityManager;
     }
 
-    @Override public void setEntityManager(EntityManager entityManager)
+    @Override
+    public void setEntityManager(EntityManager entityManager)
     {
         this.entityManager = entityManager;
     }
 
-    @Override public AbstractTransactionalRepository commit()
+    @Override
+    public void commit()
     {
         entityManager.getTransaction().commit();
-
-        return this;
     }
 
-    @Override public AbstractTransactionalRepository rollback()
+    @Override
+    public void rollback()
     {
         entityManager.getTransaction().rollback();
-
-        return this;
     }
 }

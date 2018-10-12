@@ -27,12 +27,11 @@ public class Transaction implements Transactional
      *
      * @return this
      */
-    @Override public Transactional begin()
+    @Override
+    public void begin()
     {
         if (!this.currentEntityManager.getTransaction().isActive())
             this.currentEntityManager.getTransaction().begin();
-
-        return this;
     }
 
     /**
@@ -40,11 +39,10 @@ public class Transaction implements Transactional
      *
      * @return this
      */
-    @Override public Transactional commit()
+    @Override
+    public void commit()
     {
         this.currentEntityManager.getTransaction().commit();
-
-        return this;
     }
 
     /**
@@ -52,11 +50,10 @@ public class Transaction implements Transactional
      *
      * @return this
      */
-    @Override public Transactional rollback()
+    @Override
+    public void rollback()
     {
         this.currentEntityManager.getTransaction().rollback();
-
-        return this;
     }
 
     /**
@@ -64,10 +61,9 @@ public class Transaction implements Transactional
      *
      * @return this
      */
-    @Override public Transactional close()
+    @Override
+    public void close()
     {
         this.currentEntityManager.close();
-
-        return this;
     }
 }
