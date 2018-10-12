@@ -28,8 +28,7 @@ public class UserResource
     public Response create(String content)
     {
         ReceivedCreateUser receivedUser = gson.fromJson(content, ReceivedCreateUser.class);
-        User createdUser = userFacade
-                .createUser(receivedUser.name, receivedUser.email, receivedUser.password);
+        User               createdUser  = userFacade.createUser(receivedUser.name, receivedUser.email, receivedUser.password);
         return Response.ok(createdUser).build();
     }
 
