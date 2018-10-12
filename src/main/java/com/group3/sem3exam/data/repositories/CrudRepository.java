@@ -16,7 +16,7 @@ public interface CrudRepository<E, ID>
      * Returns a *page* of entities in the repository. The entities retrieved, in a zero-based manor, are defined
      * from <code> (pageNumber - 1) * pageSize</code> to <code>(pageSize) * perPage</code>.
      *
-     * @param pageSize    The number of entities per page.
+     * @param pageSize   The number of entities per page.
      * @param pageNumber The page number to getCities. Starts at 1.
      * @return
      */

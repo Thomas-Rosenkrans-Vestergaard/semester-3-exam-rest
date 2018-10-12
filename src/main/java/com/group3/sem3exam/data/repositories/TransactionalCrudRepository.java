@@ -37,7 +37,8 @@ public class TransactionalCrudRepository<E, ID> extends AbstractTransactionalRep
                             .getResultList();
     }
 
-    @Override public List<E> get(int pageSize, int pageNumber)
+    @Override
+    public List<E> get(int pageSize, int pageNumber)
     {
         return getEntityManager().createQuery("SELECT e FROM " + c.getSimpleName() + " e", c)
                                  .setFirstResult((pageNumber - 1) * pageSize)
@@ -45,7 +46,8 @@ public class TransactionalCrudRepository<E, ID> extends AbstractTransactionalRep
                                  .getResultList();
     }
 
-    @Override public long count()
+    @Override
+    public long count()
     {
         EntityManager entityManager = getEntityManager();
 

@@ -5,20 +5,22 @@ import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.facades.UserFacade;
 import com.group3.sem3exam.rest.authentication.AuthenticationException;
-import com.group3.sem3exam.rest.authentication.UserAuthenticator;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("users")
 public class UserResource
 {
-    private        Gson                 gson              = new GsonBuilder().setPrettyPrinting().create();
-    private static EntityManagerFactory emf               = Persistence.createEntityManagerFactory("rest-api-pu");
-    private static UserFacade           userFacade        = new UserFacade(emf);
+    private        Gson                 gson       = new GsonBuilder().setPrettyPrinting().create();
+    private static EntityManagerFactory emf        = Persistence.createEntityManagerFactory("rest-api-pu");
+    private static UserFacade           userFacade = new UserFacade(emf);
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
