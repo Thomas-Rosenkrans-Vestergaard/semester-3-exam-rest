@@ -17,7 +17,8 @@ public interface JwtSecret
      * Regenerates the Jwt secret.
      *
      * @param bytes The number of bytes the secret string should be generated from.
-     * @return The old secret value.
+     * @return The newly generated value.
+     * @throws SecretGenerationException When a secret cannot be generated.
      */
-    String regenerate(int bytes) throws Exception;
+    String regenerate(int bytes) throws SecretGenerationException;
 }

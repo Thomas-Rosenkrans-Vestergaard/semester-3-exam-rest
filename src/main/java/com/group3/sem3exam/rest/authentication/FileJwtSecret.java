@@ -16,6 +16,9 @@ public class FileJwtSecret implements JwtSecret
      */
     private final File saveFile;
 
+    /**
+     * The source of randomness the secret is generated from.
+     */
     private static SecureRandom random = new SecureRandom();
 
     /**
@@ -23,9 +26,16 @@ public class FileJwtSecret implements JwtSecret
      */
     private String secret;
 
-    public FileJwtSecret(File saveFile, boolean regenerate)
+    /**
+     * Creates a new {@link FileJwtSecret}.
+     *
+     * @param saveFile The file to read and write the secret to.
+     * @throws IOException When the file cannot be read from.
+     */
+    public FileJwtSecret(File saveFile) throws IOException
     {
         this.saveFile = saveFile;
+        this.secret = readFile();
     }
 
     /**
@@ -43,11 +53,18 @@ public class FileJwtSecret implements JwtSecret
             regenerate(bytes);
     }
 
+    /**
+     * Reads the save file, returning its contents.
+     *
+     * @return The contents of the file.
+     * @throws IOException When en error prevents the file from being read.
+     */
     private String readFile() throws IOException
     {
-
-        Scanner stream   = new Scanner(new FileInputStream(saveFile));
-        String  contents = stream.nextLine();
+        Scanner stream = new Scanner(new FileInputStream(saveFile));
+        if (!stream.hasNextLine())
+            return "";
+        String contents = stream.nextLine();
         stream.close();
         return contents;
     }
@@ -67,19 +84,21 @@ public class FileJwtSecret implements JwtSecret
      * Regenerates the Jwt secret.
      *
      * @param bytes The number of bytes the secret string should be generated from.
-     * @return The old secret value.
+     * @return The newly generated value.
+     * @throws SecretGenerationException When a secret cannot be generated.
      */
     @Override
-    public String regenerate(int bytes) throws Exception
+    public String regenerate(int bytes) throws SecretGenerationException
     {
         try (FileWriter fileWriter = new FileWriter(saveFile)) {
             byte[] byteArray = new byte[bytes];
             random.nextBytes(byteArray);
-            String retired = this.secret;
             this.secret = Base64.getEncoder().encodeToString(byteArray);
             fileWriter.append(this.secret);
             fileWriter.flush();
-            return retired;
+            return this.secret;
+        } catch (IOException e) {
+            throw new SecretGenerationException(e);
         }
     }
 }

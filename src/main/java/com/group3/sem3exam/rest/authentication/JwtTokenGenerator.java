@@ -33,9 +33,9 @@ public class JwtTokenGenerator
      *
      * @param user The user to generate the JWT authentication token for.
      * @return The JWT token.
-     * @throws AuthenticationException
+     * @throws JwtGenerationException When the method could not generate a Jwt token.
      */
-    public String generate(User user) throws AuthenticationException
+    public String generate(User user) throws JwtGenerationException
     {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret.getValue());
@@ -45,7 +45,7 @@ public class JwtTokenGenerator
                       .withClaim("user", user.getId())
                       .sign(algorithm);
         } catch (JWTCreationException exception) {
-            throw new AuthenticationException("JWTCreationError", "Could not create jwt token.", 500, exception);
+            throw new JwtGenerationException(exception);
         }
     }
 }

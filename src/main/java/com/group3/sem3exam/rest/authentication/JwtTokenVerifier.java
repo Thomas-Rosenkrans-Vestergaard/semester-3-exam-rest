@@ -9,7 +9,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 /**
  * Verifies and unpacks the payload of a JWT authentication token.
  */
-public class JwtTokenUnpacker
+public class JwtTokenVerifier
 {
 
     /**
@@ -18,11 +18,11 @@ public class JwtTokenUnpacker
     private final JwtSecret secret;
 
     /**
-     * Creates a new {@link JwtTokenUnpacker}.
+     * Creates a new {@link JwtTokenVerifier}.
      *
      * @param secret The secret to use when verifying and unpacking JWT authentication tokens.
      */
-    public JwtTokenUnpacker(JwtSecret secret)
+    public JwtTokenVerifier(JwtSecret secret)
     {
         this.secret = secret;
     }
@@ -32,19 +32,15 @@ public class JwtTokenUnpacker
      *
      * @param token The token to authenticate and unpack.
      * @return The contents of the token.
-     * @throws AuthenticationException
+     * @throws JWTVerificationException When the provided token could not be verified.
      */
-    public JwtTokenContents unpack(String token) throws AuthenticationException
+    public JwtTokenContents unpack(String token) throws JWTVerificationException
     {
-        try {
-            Algorithm algorithm = Algorithm.HMAC256(secret.getValue());
-            JWTVerifier verifier = JWT.require(algorithm)
-                                      .withIssuer("group3")
-                                      .build();
-            DecodedJWT jwt = verifier.verify(token);
-            return new JwtTokenContents(jwt.getClaim("user").asInt());
-        } catch (JWTVerificationException exception) {
-            throw new AuthenticationException("JetVerificationError", "Could not unpack jwt token.", 401, exception);
-        }
+        Algorithm algorithm = Algorithm.HMAC256(secret.getValue());
+        JWTVerifier verifier = JWT.require(algorithm)
+                                  .withIssuer("group3")
+                                  .build();
+        DecodedJWT jwt = verifier.verify(token);
+        return new JwtTokenContents(jwt.getClaim("user").asInt());
     }
 }

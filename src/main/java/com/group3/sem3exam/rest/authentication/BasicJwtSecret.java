@@ -11,6 +11,9 @@ public class BasicJwtSecret implements JwtSecret
      */
     private String value;
 
+    /**
+     * The source of randomness the secret is generated from.
+     */
     private static SecureRandom random = new SecureRandom();
 
     /**
@@ -48,15 +51,13 @@ public class BasicJwtSecret implements JwtSecret
      * Regenerates the Jwt secret.
      *
      * @param bytes The number of bytes the secret string should be generated from.
-     * @return The retired secret value.
+     * @return The newly generated value.
      */
     @Override
     public String regenerate(int bytes)
     {
         byte[] byteArray = new byte[bytes];
         random.nextBytes(byteArray);
-        String retired = this.value;
-        this.value = Base64.getEncoder().encodeToString(byteArray);
-        return retired;
+        return this.value = Base64.getEncoder().encodeToString(byteArray);
     }
 }

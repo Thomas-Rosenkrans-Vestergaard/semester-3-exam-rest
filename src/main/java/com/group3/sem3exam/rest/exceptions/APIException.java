@@ -7,11 +7,11 @@ public class APIException extends Exception
 {
     private final String              errorName;
     private final String              errorMessage;
-    private final int                 responseCode;
+    private final Integer             responseCode;
     private final Throwable           cause;
     private final Map<String, Object> debugVariables = new HashMap<>();
 
-    public APIException(String errorName, String errorMessage, int responseCode, Throwable cause)
+    public APIException(String errorName, String errorMessage, Integer responseCode, Throwable cause)
     {
         this.errorName = errorName;
         this.errorMessage = errorMessage;
