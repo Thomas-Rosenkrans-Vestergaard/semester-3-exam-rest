@@ -34,7 +34,7 @@ public class UserAuthenticator
     {
         User user = this.repository.getByEmail(email);
         if (user == null)
-        throw new AuthenticationException(new IncorrectCredentialsException());
+            throw new AuthenticationException(new IncorrectCredentialsException());
 
         if (!checkHash(password, user.getPasswordHash()))
             throw new AuthenticationException(new IncorrectCredentialsException());
