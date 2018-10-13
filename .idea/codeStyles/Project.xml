@@ -19,7 +19,6 @@
       <option name="ALIGN_CONSECUTIVE_VARIABLE_DECLARATIONS" value="true" />
       <option name="ALIGN_SUBSEQUENT_SIMPLE_METHODS" value="true" />
       <option name="METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE" value="true" />
-      <option name="METHOD_CALL_CHAIN_WRAP" value="1" />
       <option name="WRAP_FIRST_METHOD_IN_CALL_CHAIN" value="true" />
       <option name="ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE" value="true" />
     </codeStyleSettings>

@@ -8,7 +8,10 @@ import com.group3.sem3exam.rest.authentication.AuthenticationException;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -19,22 +22,18 @@ public class UserResource
     private static EntityManagerFactory emf        = Persistence.createEntityManagerFactory("rest-api-pu");
     private static UserFacade           userFacade = new UserFacade(emf);
 
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String get() throws Exception
-    {
-        return "Hello World";
-    }
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(String content)
     {
-        ReceivedUser receivedUser = gson.fromJson(content, ReceivedUser.class);
-        User         createdUser  = userFacade.createUser(receivedUser.name, receivedUser.email, receivedUser.password);
+        ReceivedCreateUser receivedUser = gson.fromJson(content, ReceivedCreateUser.class);
+        User               createdUser  = userFacade.createUser(receivedUser.name, receivedUser.email, receivedUser.password);
         return Response.ok(createdUser).build();
     }
+
+
+
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -47,14 +46,18 @@ public class UserResource
     }
 
 
-    private class ReceivedAuthenticateUser
+
+
+    private class ReceivedCreateUser
+
     {
         public String name;
+        public String email;
         public String password;
     }
-    private class ReceivedUser
+
+    private class ReceivedAuthenticateUser
     {
-        public String name;
         public String email;
         public String password;
     }

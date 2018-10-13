@@ -28,21 +28,14 @@ public class TransactionalUserRepository extends TransactionalCrudRepository<Use
     public User createUser(String name, String email, String passwordHash)
     {
         User user = new User(name, email, passwordHash);
-
-        try {
-            getEntityManager().getTransaction().begin();
-            getEntityManager().persist(user);
-            getEntityManager().getTransaction().commit();
-        } catch (Exception e) {
-            getEntityManager().getTransaction().rollback();
-        } finally {
-            getEntityManager().close();
-            return user;
-        }
+        getEntityManager().getTransaction().begin();
+        getEntityManager().persist(user);
+        getEntityManager().getTransaction().commit();
+        return user;
     }
 
     @Override
-    public User withEmail(String email)
+    public User getByEmail(String email)
     {
         try {
             return getEntityManager()
