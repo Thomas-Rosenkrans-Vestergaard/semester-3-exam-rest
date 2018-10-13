@@ -32,12 +32,12 @@ public class UserAuthenticator
      */
     public User authenticate(String email, String password) throws AuthenticationException
     {
-        User user = this.repository.withEmail(email);
+        User user = this.repository.getByEmail(email);
         if (user == null)
-            throw new IncorrectCredentialsException(new IncorrectCredentialsException());
+            throw new AuthenticationException(new IncorrectCredentialsException());
 
         if (!checkHash(password, user.getPasswordHash()))
-            throw new IncorrectCredentialsException(new IncorrectCredentialsException());
+            throw new AuthenticationException(new IncorrectCredentialsException());
 
         return user;
     }

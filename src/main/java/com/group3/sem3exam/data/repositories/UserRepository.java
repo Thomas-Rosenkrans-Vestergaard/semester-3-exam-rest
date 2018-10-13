@@ -21,5 +21,5 @@ public interface UserRepository extends CrudRepository<User, Integer>
      * @param email The email fo the user to find and return.
      * @return The user with the provided email, {@code null} when no such user exists.
      */
-    User withEmail(String email);
+    User getByEmail(String email);
 }

@@ -1,6 +1,6 @@
 package com.group3.sem3exam.data.repositories.transactions;
 
-public interface Transactional
+public interface Transactional extends AutoCloseable
 {
 
     /**
@@ -8,26 +8,24 @@ public interface Transactional
      *
      * @return this
      */
-    Transactional begin();
+    void begin();
 
     /**
      * Commits the current transaction.
      *
      * @return this
      */
-    Transactional commit();
+    void commit();
 
     /**
      * Rolls back the current transaction.
      *
      * @return this
      */
-    Transactional rollback();
+    void rollback();
 
     /**
      * Closes the transaction.
-     *
-     * @return this
      */
-    Transactional close();
+    void close();
 }
