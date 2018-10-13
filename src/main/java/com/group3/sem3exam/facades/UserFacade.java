@@ -4,8 +4,12 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.TransactionalUserRepository;
 import com.group3.sem3exam.rest.authentication.AuthenticationException;
 import com.group3.sem3exam.rest.authentication.UserAuthenticator;
+import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
+import com.group3.sem3exam.rest.authentication.jwt.JwtTokenGenerator;
 
 import javax.persistence.EntityManagerFactory;
+import java.io.File;
+import java.io.IOException;
 
 
 public class UserFacade
@@ -52,11 +56,15 @@ public class UserFacade
      * @return The user entity who was authenticated.
      * @throws AuthenticationException When the credentials could not be used to authenticate the credentials.
      */
-    public User authenticate(String email, String password) throws AuthenticationException
+    public User authenticate(String email, String password) throws Exception
     {
+
         try (TransactionalUserRepository tup = new TransactionalUserRepository(emf)) {
             UserAuthenticator authenticator = new UserAuthenticator(tup);
             return authenticator.authenticate(email, password);
         }
     }
+
+
+
 }
