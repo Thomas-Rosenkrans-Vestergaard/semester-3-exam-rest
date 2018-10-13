@@ -21,6 +21,7 @@ public class AuthenticationResource
     private static AuthenticationFacade authenticationFacade = new AuthenticationFacade(Connection.emf);
 
     @POST
+    @Path("user")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response authenticateUser(String content) throws Exception
