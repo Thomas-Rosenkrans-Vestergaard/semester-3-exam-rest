@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.facades.UserFacade;
+import com.group3.sem3exam.rest.authentication.AuthenticationException;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -35,6 +36,22 @@ public class UserResource
         return Response.ok(createdUser).build();
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response authenticateUser(String content) throws AuthenticationException
+    {
+        ReceivedAuthenticateUser receivedUser = gson.fromJson(content, ReceivedAuthenticateUser.class);
+        userFacade.authenticate(receivedUser.email, receivedUser.password);
+        return Response.ok().build();
+    }
+
+
+    private class ReceivedAuthenticateUser
+    {
+        public String name;
+        public String password;
+    }
     private class ReceivedUser
     {
         public String name;
