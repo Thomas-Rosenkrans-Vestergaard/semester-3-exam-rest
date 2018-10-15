@@ -22,6 +22,11 @@ public class UserResource
     private static TransactionalUserRepository crudRepository = new TransactionalUserRepository();
 
 
+    /**
+     *
+     * @param content
+     * @return
+     */
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -33,6 +38,11 @@ public class UserResource
     }
 
 
+    /**
+     *
+     * @param id
+     * @return
+     */
     @GET
     @Path("/{id}")
     public Response getUser(@PathParam("id") int id)

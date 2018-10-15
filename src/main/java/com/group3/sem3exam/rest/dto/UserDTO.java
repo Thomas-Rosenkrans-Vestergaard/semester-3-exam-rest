@@ -24,13 +24,22 @@ public class UserDTO
     private Gender              gender;
     private LocalDate           dateOfBirth;
 
-
+    /**
+     *
+     * @param user
+     */
     public UserDTO(User user)
     {
         this(user, true, true);
     }
 
 
+    /**
+     *
+     * @param user
+     * @param showFriendships
+     * @param showPosts
+     */
     public UserDTO(User user, boolean showFriendships, boolean showPosts)
     {
         this.name = user.getName();
@@ -54,6 +63,11 @@ public class UserDTO
     }
 
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     public static UserDTO basic(User user)
     {
         return new UserDTO(user, false, false);
