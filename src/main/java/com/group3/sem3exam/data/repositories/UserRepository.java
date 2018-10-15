@@ -15,6 +15,9 @@ public interface UserRepository extends CrudRepository<User, Integer>
      * @param name         The name of the new user.
      * @param email        The email of the new user.
      * @param passwordHash The password hash of the new user.
+     * @param city         The city the new user resides in.
+     * @param gender       The gender of the new user.
+     * @param dateOfBirth  The date of birth of the new user.
      * @return The resulting new user.
      */
     User createUser(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth);

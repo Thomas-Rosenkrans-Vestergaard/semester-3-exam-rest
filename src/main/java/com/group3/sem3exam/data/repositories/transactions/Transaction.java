@@ -2,68 +2,86 @@ package com.group3.sem3exam.data.repositories.transactions;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.EntityTransaction;
+import java.util.function.Supplier;
 
 public class Transaction implements Transactional
 {
 
-    private final List<TransactionalRepository> repositories = new ArrayList<>();
-    private final EntityManagerFactory          entityManagerFactory;
-    private       EntityManager                 currentEntityManager;
+    /**
+     * The entity manager the transaction represents.
+     */
+    private EntityManager entityManager;
 
-    public Transaction(EntityManagerFactory entityManagerFactory, TransactionalRepository... repositories)
+    /**
+     * Creates a new {@link Transaction} that represents the provided entity manager.
+     *
+     * @param entityManager The entity manager the transaction should represent.
+     */
+    public Transaction(EntityManager entityManager)
     {
-        this.entityManagerFactory = entityManagerFactory;
-        this.currentEntityManager = entityManagerFactory.createEntityManager();
-        for (TransactionalRepository repository : repositories) {
-            this.repositories.add(repository);
-            repository.setEntityManager(this.currentEntityManager);
-        }
+        this.entityManager = entityManager;
+    }
+
+    /**
+     * Creates a new {@link Transaction} that represents the provided entity manager.
+     *
+     * @param factory The entity manager factory that created the entity manager the transaction should represent.
+     */
+    public Transaction(EntityManagerFactory factory)
+    {
+        this(factory.createEntityManager());
     }
 
     /**
      * Begins the transaction.
-     *
-     * @return this
      */
     @Override
     public void begin()
     {
-        if (!this.currentEntityManager.getTransaction().isActive())
-            this.currentEntityManager.getTransaction().begin();
+        EntityTransaction entityTransaction = this.entityManager.getTransaction();
+        if (!entityTransaction.isActive())
+            entityTransaction.begin();
     }
 
     /**
      * Commits the current transaction.
-     *
-     * @return this
      */
     @Override
     public void commit()
     {
-        this.currentEntityManager.getTransaction().commit();
+        EntityTransaction entityTransaction = this.entityManager.getTransaction();
+        if (entityTransaction.isActive())
+            entityTransaction.commit();
     }
 
     /**
      * Rolls back the current transaction.
-     *
-     * @return this
      */
     @Override
     public void rollback()
     {
-        this.currentEntityManager.getTransaction().rollback();
+        EntityTransaction entityTransaction = this.entityManager.getTransaction();
+        if (entityTransaction.isActive())
+            entityTransaction.rollback();
     }
 
     /**
      * Closes the transaction.
-     *
-     * @return this
      */
     @Override
     public void close()
     {
-        this.currentEntityManager.close();
+        this.entityManager.close();
+    }
+
+    /**
+     * Returns the current entity manager.
+     *
+     * @return The current entity manager.
+     */
+    public EntityManager getEntityManager()
+    {
+        return entityManager;
     }
 }

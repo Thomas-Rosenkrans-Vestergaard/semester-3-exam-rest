@@ -5,22 +5,16 @@ public interface Transactional extends AutoCloseable
 
     /**
      * Begins the transaction.
-     *
-     * @return this
      */
     void begin();
 
     /**
      * Commits the current transaction.
-     *
-     * @return this
      */
     void commit();
 
     /**
      * Rolls back the current transaction.
-     *
-     * @return this
      */
     void rollback();
 

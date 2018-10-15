@@ -1,7 +1,8 @@
 package com.group3.sem3exam.rest.dto;
 
-import com.group3.sem3exam.data.entities.*;
-
+import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -12,9 +13,6 @@ import java.util.stream.Collectors;
 public class UserDTO
 {
 
-
-
-
     private String              name;
     private String              email;
     private LocalDateTime       createdAt;
@@ -24,22 +22,11 @@ public class UserDTO
     private Gender              gender;
     private LocalDate           dateOfBirth;
 
-    /**
-     *
-     * @param user
-     */
     public UserDTO(User user)
     {
         this(user, true, true);
     }
 
-
-    /**
-     *
-     * @param user
-     * @param showFriendships
-     * @param showPosts
-     */
     public UserDTO(User user, boolean showFriendships, boolean showPosts)
     {
         this.name = user.getName();
@@ -58,16 +45,8 @@ public class UserDTO
                              .stream()
                              .map(friendship -> new PostDTO())
                              .collect(Collectors.toList());
-
-
     }
 
-
-    /**
-     *
-     * @param user
-     * @return
-     */
     public static UserDTO basic(User user)
     {
         return new UserDTO(user, false, false);

@@ -7,27 +7,45 @@ import javax.persistence.EntityTransaction;
 public class AbstractTransactionalRepository implements TransactionalRepository
 {
 
+    /**
+     * The entity manager that operations are performed upon.
+     */
     private EntityManager entityManager;
 
-    public AbstractTransactionalRepository()
-    {
-
-    }
-
+    /**
+     * Creates a new {@link AbstractTransactionalRepository}.
+     *
+     * @param entityManager The entity manager that operations are performed upon.
+     */
     public AbstractTransactionalRepository(EntityManager entityManager)
     {
         this.entityManager = entityManager;
     }
 
+    /**
+     * Creates a new {@link AbstractTransactionalRepository}.
+     *
+     * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
+     *                             performed upon - is created.
+     */
     public AbstractTransactionalRepository(EntityManagerFactory entityManagerFactory)
     {
         this(entityManagerFactory.createEntityManager());
     }
 
     /**
-     * Begins the transaction.
+     * Creates a new {@link AbstractTransactionalRepository}.
      *
-     * @return this
+     * @param transaction The transaction from which the entity manager - that operations are performed upon - is
+     *                    created.
+     */
+    public AbstractTransactionalRepository(Transaction transaction)
+    {
+        this(transaction.getEntityManager());
+    }
+
+    /**
+     * Begins the transaction.
      */
     @Override
     public void begin()
@@ -48,27 +66,43 @@ public class AbstractTransactionalRepository implements TransactionalRepository
         entityManager.close();
     }
 
-    @Override
-    public EntityManager getEntityManager()
-    {
-        return entityManager;
-    }
-
-    @Override
-    public void setEntityManager(EntityManager entityManager)
-    {
-        this.entityManager = entityManager;
-    }
-
+    /**
+     * Commits the current transaction.
+     */
     @Override
     public void commit()
     {
         entityManager.getTransaction().commit();
     }
 
+    /**
+     * Rolls back the current transaction.
+     */
     @Override
     public void rollback()
     {
         entityManager.getTransaction().rollback();
+    }
+
+    /**
+     * Returns the currently active entity manager instance.
+     *
+     * @return The currently active entity manager.
+     */
+    @Override
+    public EntityManager getEntityManager()
+    {
+        return entityManager;
+    }
+
+    /**
+     * Sets the currently active entity manager instance.
+     *
+     * @param entityManger The new active manager.
+     */
+    @Override
+    public void setEntityManager(EntityManager entityManger)
+    {
+        this.entityManager = entityManager;
     }
 }

@@ -14,8 +14,8 @@ public class FriendshipDTO
 
     public FriendshipDTO()
     {
-    }
 
+    }
 
     public LocalDateTime getSince()
     {
@@ -26,6 +26,4 @@ public class FriendshipDTO
     {
         this.since = since;
     }
-
-
 }
