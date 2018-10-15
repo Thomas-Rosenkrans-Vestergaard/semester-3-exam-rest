@@ -5,7 +5,7 @@
         <class>com.group3.sem3exam.data.entities.User</class>
         <class>com.group3.sem3exam.data.entities.Comment</class>
         <class>com.group3.sem3exam.data.entities.FriendRequest</class>
-        <class>com.group3.sem3exam.data.entities.FriendRequestPK</class>
+        <class>com.group3.sem3exam.data.entities.FriendshipPK</class>
         <class>com.group3.sem3exam.data.entities.Post</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
