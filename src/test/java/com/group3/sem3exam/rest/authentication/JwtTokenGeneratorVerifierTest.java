@@ -21,7 +21,7 @@ public class JwtTokenGeneratorVerifierTest
         JwtTokenVerifier  tokenVerifier  = new JwtTokenVerifier(secret);
 
         int  id   = 43252;
-        User user = new User();
+        User user = new User(name, email, passwordHash, city, gender);
         user.setId(id);
 
         String token = tokenGenerator.generate(user);
@@ -37,7 +37,7 @@ public class JwtTokenGeneratorVerifierTest
         JwtTokenVerifier  tokenVerifier  = new JwtTokenVerifier(secretB);
 
         int  id   = 43252;
-        User user = new User();
+        User user = new User(name, email, passwordHash, city, gender);
         user.setId(id);
 
         tokenVerifier.unpack(tokenGenerator.generate(user));
@@ -52,7 +52,7 @@ public class JwtTokenGeneratorVerifierTest
         JwtTokenVerifier  tokenVerifier  = new JwtTokenVerifier(secretB);
 
         int  id   = 43252;
-        User user = new User();
+        User user = new User(name, email, passwordHash, city, gender);
         user.setId(id);
 
         tokenVerifier.unpack("a" + tokenGenerator.generate(user)); // Illegal header format

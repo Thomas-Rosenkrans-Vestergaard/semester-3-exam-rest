@@ -3,6 +3,7 @@ package com.group3.sem3exam.data.entities;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +44,20 @@ public class User
     @JoinColumn(name = "city_id")
     private City city;
 
-    public User()
-    {
+    @Column(nullable = false)
+    private Gender gender;
 
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
+
+    public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
+    {
+        this.dateOfBirth = dateOfBirth;
+        this.name = name;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.city = city;
+        this.gender = gender;
     }
 
     public User(String name, String email, String passwordHash)
@@ -54,6 +66,7 @@ public class User
         this.email = email;
         this.passwordHash = passwordHash;
     }
+
 
     public Integer getId()
     {

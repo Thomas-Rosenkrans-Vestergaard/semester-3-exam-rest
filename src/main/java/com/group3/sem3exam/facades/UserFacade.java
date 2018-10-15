@@ -1,9 +1,13 @@
 package com.group3.sem3exam.facades;
 
+import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.TransactionalUserRepository;
+import jdk.vm.ci.meta.Local;
 
 import javax.persistence.EntityManagerFactory;
+import java.time.LocalDate;
 
 public class UserFacade
 {
@@ -31,11 +35,11 @@ public class UserFacade
      * @param password The password of the user to create.
      * @return The newly created user entity.
      */
-    public User createUser(String name, String email, String password)
+    public User createUser(String name, String email, String password, City city, Gender gender, LocalDate dateOfBirth)
     {
         try (TransactionalUserRepository tup = new TransactionalUserRepository(emf)) {
             tup.begin();
-            User user = tup.createUser(name, email, password);
+            User user = tup.createUser(name, email, password, city, gender, dateOfBirth);
             tup.commit();
             return user;
         }

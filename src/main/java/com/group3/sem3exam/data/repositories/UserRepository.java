@@ -1,6 +1,10 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
+
+import java.time.LocalDate;
 
 public interface UserRepository extends CrudRepository<User, Integer>
 {
@@ -13,7 +17,7 @@ public interface UserRepository extends CrudRepository<User, Integer>
      * @param passwordHash The password hash of the new user.
      * @return The resulting new user.
      */
-    User createUser(String name, String email, String passwordHash);
+    User createUser(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth);
 
     /**
      * Returns the user with the provided email.
