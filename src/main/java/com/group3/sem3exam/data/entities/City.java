@@ -2,6 +2,7 @@ package com.group3.sem3exam.data.entities;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity(name = "city")
@@ -18,11 +19,8 @@ public class City
     @Column(nullable = false, unique = true)
     private String zipCode;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = EAGER, optional = false)
     private Region region;
-
-
-
 
     public City(String name, String zipCode, Region region)
     {
