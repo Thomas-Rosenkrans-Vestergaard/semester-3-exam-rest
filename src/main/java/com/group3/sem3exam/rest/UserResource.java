@@ -32,7 +32,6 @@ public class UserResource
         return Response.ok(createdUser).build();
     }
 
-
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)

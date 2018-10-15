@@ -7,12 +7,15 @@
         <class>com.group3.sem3exam.data.entities.FriendRequest</class>
         <class>com.group3.sem3exam.data.entities.FriendshipPK</class>
         <class>com.group3.sem3exam.data.entities.Post</class>
+        <class>com.group3.sem3exam.data.entities.City</class>
+        <class>com.group3.sem3exam.data.entities.Region</class>
+        <class>com.group3.sem3exam.data.entities.Country</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/"/>
             <property name="javax.persistence.jdbc.user" value=""/>
             <property name="javax.persistence.jdbc.password" value=""/>
-            <property name="javax.persistence.schema-generation.database.action" value="create"/>
+            <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
             <property name="javax.persistence.sql-load-script-source" value="data.sql"/>
 
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL57Dialect"/>

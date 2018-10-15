@@ -36,25 +36,15 @@ public class User
     @OneToMany(fetch = LAZY, cascade = MERGE, mappedBy = "author", orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(fetch = LAZY,cascade = ALL, mappedBy = "pk.owner")
+    @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "pk.owner")
     private List<Friendship> friendships = new ArrayList<>();
 
-    @ManyToOne(optional = false)
+    @OneToOne(optional = false)
     private City city;
 
     public User()
     {
 
-    }
-
-    public City getCity()
-    {
-        return city;
-    }
-
-    public void setCity(City city)
-    {
-        this.city = city;
     }
 
     public User(String name, String email, String passwordHash)
@@ -146,5 +136,15 @@ public class User
     {
         this.friendships.add(friendship);
         friendship.setOwner(this);
+    }
+
+    public City getCity()
+    {
+        return city;
+    }
+
+    public void setCity(City city)
+    {
+        this.city = city;
     }
 }
