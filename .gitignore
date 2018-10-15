@@ -1,6 +1,10 @@
 # Ignore persistence file
 persistence.xml
 
+# Ignore test and secret files
+*.test
+*.secret
+
 # Created by https://www.gitignore.io/api/java,gradle,java-web,intellij+all
 
 ### Intellij+all ###

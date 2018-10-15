@@ -40,6 +40,7 @@ public class User
     private List<Friendship> friendships = new ArrayList<>();
 
     @OneToOne(optional = false)
+    @JoinColumn(name = "city_id")
     private City city;
 
     public User()
