@@ -4,7 +4,6 @@ import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.TransactionalUserRepository;
-import jdk.vm.ci.meta.Local;
 
 import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
@@ -43,6 +42,5 @@ public class UserFacade
             tup.commit();
             return user;
         }
-
     }
 }
