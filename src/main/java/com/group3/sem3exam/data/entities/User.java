@@ -67,6 +67,10 @@ public class User
         this.passwordHash = passwordHash;
     }
 
+    public User()
+    {
+    }
+
 
     public Integer getId()
     {
@@ -161,4 +165,25 @@ public class User
     {
         this.city = city;
     }
+
+    public Gender getGender()
+    {
+        return gender;
+    }
+
+    public void setGender(Gender gender)
+    {
+        this.gender = gender;
+    }
+
+    public LocalDate getDateOfBirth()
+    {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth)
+    {
+        this.dateOfBirth = dateOfBirth;
+    }
+
 }
