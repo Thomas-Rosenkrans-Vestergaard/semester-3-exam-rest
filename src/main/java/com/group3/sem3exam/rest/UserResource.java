@@ -38,6 +38,7 @@ public class UserResource
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id: [0-9]+}")
     public Response getUser(@PathParam("id") int id) throws UserNotFoundException
     {
