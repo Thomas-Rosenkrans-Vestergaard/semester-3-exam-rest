@@ -16,7 +16,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/cities")
-public class CityRessource
+public class CityResource
 {
     private static Gson       gson       = new GsonBuilder().setPrettyPrinting().create();
     private static CityFacade cityFacade = new CityFacade(JpaConnection.emf);

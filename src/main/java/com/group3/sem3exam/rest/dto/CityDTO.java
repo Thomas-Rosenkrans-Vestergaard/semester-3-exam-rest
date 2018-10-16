@@ -7,13 +7,21 @@ public class CityDTO
 {
     private String name;
     private String zipCode;
-    private Region region;
+    private RegionDTO region;
 
     public CityDTO(City city)
     {
+        this(city, true);
+    }
+
+
+    public CityDTO(City city, boolean showRegion)
+    {
         this.name = city.getName();
         this.zipCode = city.getZipCode();
-        this.region = city.getRegion();
+        if(showRegion)
+            this.region = new RegionDTO(city.getRegion(), false, false);
+
     }
 
     public String getName()
@@ -36,16 +44,15 @@ public class CityDTO
         this.zipCode = zipCode;
     }
 
-    public Region getRegion()
+    public RegionDTO getRegion()
     {
         return region;
     }
 
-    public void setRegion(Region region)
+    public void setRegion(RegionDTO region)
     {
         this.region = region;
     }
-
 
     public static CityDTO basic(City city)
     {

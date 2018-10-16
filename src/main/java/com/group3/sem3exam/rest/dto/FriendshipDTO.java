@@ -1,5 +1,7 @@
 package com.group3.sem3exam.rest.dto;
 
+import com.group3.sem3exam.data.entities.Friendship;
+
 import java.time.LocalDateTime;
 
 public class FriendshipDTO
@@ -7,14 +9,10 @@ public class FriendshipDTO
 
     private LocalDateTime since;
 
-    public FriendshipDTO(LocalDateTime since)
-    {
-        this.since = since;
-    }
 
-    public FriendshipDTO()
+    public FriendshipDTO(Friendship friendship)
     {
-
+        this.since = friendship.getSince();
     }
 
     public LocalDateTime getSince()

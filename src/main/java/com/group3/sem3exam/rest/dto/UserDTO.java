@@ -1,6 +1,7 @@
 package com.group3.sem3exam.rest.dto;
 
 import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 
@@ -38,12 +39,12 @@ public class UserDTO
         if (showFriendships)
             this.friendships = user.getFriendships()
                                    .stream()
-                                   .map(friendship -> new FriendshipDTO())
+                                   .map(friendship -> new FriendshipDTO(friendship))
                                    .collect(Collectors.toList());
         if (showPosts)
             this.posts = user.getPosts()
                              .stream()
-                             .map(friendship -> new PostDTO())
+                             .map(posts -> new PostDTO(posts))
                              .collect(Collectors.toList());
     }
 

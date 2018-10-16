@@ -3,24 +3,20 @@ package com.group3.sem3exam.rest.dto;
 import com.group3.sem3exam.data.entities.Post;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
 public class PostDTO
 {
 
-    private String    contents;
-    private LocalDate timeCreated;
+    private String        contents;
+    private LocalDateTime timeCreated;
 
-    public PostDTO(String contents, LocalDate timeCreated)
+    public PostDTO(Post post)
     {
-        this.contents = contents;
-        this.timeCreated = timeCreated;
+        this.contents = post.getContents();
+        this.timeCreated = post.getCreatedAt();
     }
 
-    public PostDTO()
-    {
-
-    }
 
     public String getContents()
     {
@@ -32,12 +28,12 @@ public class PostDTO
         this.contents = contents;
     }
 
-    public LocalDate getTimeCreated()
+    public LocalDateTime getTimeCreated()
     {
         return timeCreated;
     }
 
-    public void setTimeCreated(LocalDate timeCreated)
+    public void setTimeCreated(LocalDateTime timeCreated)
     {
         this.timeCreated = timeCreated;
     }
