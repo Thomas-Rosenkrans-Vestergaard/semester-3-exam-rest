@@ -5,6 +5,6 @@ public class UserNotFoundException extends APIException
 
     public UserNotFoundException(Integer id)
     {
-        super("UserNotFoundError", String.format("The user with the provided id %d could not be found.", id), 404, null);
+        super("UserNotFoundException", String.format("The user with the provided id %d could not be found.", id), 404, null);
     }
 }

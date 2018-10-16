@@ -5,6 +5,6 @@ public class CityNotFoundException extends APIException
 
     public CityNotFoundException(Integer id)
     {
-        super("CityNotFoundError", String.format("The city with the provided id %d could not be found.", id), 404, null);
+        super("CityNotFoundException", String.format("The city with the provided id %d could not be found.", id), 404, null);
     }
 }

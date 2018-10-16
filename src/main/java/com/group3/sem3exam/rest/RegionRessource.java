@@ -23,6 +23,7 @@ public class RegionRessource
 
 
     private static Gson       gson       = new GsonBuilder().setPrettyPrinting().create();
+    //skal ikke være en cityfacade men en region
     private static CityFacade cityFacade = new CityFacade(JpaConnection.emf);
 
 

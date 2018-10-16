@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.facades.CityFacade;
 import com.group3.sem3exam.rest.dto.CityDTO;
+import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
 
 
 import javax.ws.rs.GET;
@@ -29,10 +30,10 @@ public class CityResource
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id: [0-9]+}")
-    public Response getCity(@PathParam("id") int id)
+    public Response getCity(@PathParam("id") int id) throws CityNotFoundException
     {
         City city = cityFacade.get(id);
-        String JsonDTO = gson.toJson(CityDTO.basic(city));
-        return Response.ok(JsonDTO).build();
+        String jsonDTO = gson.toJson(CityDTO.basic(city));
+        return Response.ok(jsonDTO).build();
     }
 }

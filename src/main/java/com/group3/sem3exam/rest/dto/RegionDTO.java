@@ -48,13 +48,13 @@ public class RegionDTO
         this.cities = cities;
     }
 
-    public CountryDTO getCountryDTO()
+    public CountryDTO getCountry()
     {
-        return countryDTO;
+        return country;
     }
 
-    public void setCountryDTO(CountryDTO countryDTO)
+    public void setCountry(CountryDTO country)
     {
-        this.countryDTO = countryDTO;
+        this.country = country;
     }
 }
