@@ -2,7 +2,6 @@ package com.group3.sem3exam.rest;
 
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.facades.CityFacade;
 import com.group3.sem3exam.rest.dto.CityDTO;
@@ -22,7 +21,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class CityResource
 {
 
-    private static Gson       gson       = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson       gson       = SpecializedGson.create();
     private static CityFacade cityFacade = new CityFacade(JpaConnection.emf);
 
     @GET

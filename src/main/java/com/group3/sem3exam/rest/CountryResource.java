@@ -2,7 +2,6 @@ package com.group3.sem3exam.rest;
 
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.Country;
 import com.group3.sem3exam.facades.CountryFacade;
 import com.group3.sem3exam.rest.dto.CountryDTO;
@@ -22,7 +21,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class CountryResource
 {
 
-    private static Gson          gson          = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson          gson          = SpecializedGson.create();
     private static CountryFacade countryFacade = new CountryFacade(JpaConnection.emf);
 
     @GET

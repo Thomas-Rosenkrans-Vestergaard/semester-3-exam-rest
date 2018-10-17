@@ -1,7 +1,6 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.facades.AuthenticationFacade;
@@ -17,7 +16,7 @@ import javax.ws.rs.core.Response;
 public class AuthenticationResource
 {
 
-    private static Gson                 gson                 = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson                 gson                 = SpecializedGson.create();
     private static AuthenticationFacade authenticationFacade = new AuthenticationFacade(JpaConnection.emf);
 
     @POST

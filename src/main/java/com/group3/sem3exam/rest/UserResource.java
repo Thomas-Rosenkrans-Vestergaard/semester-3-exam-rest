@@ -1,7 +1,6 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.facades.UserFacade;
@@ -18,7 +17,7 @@ import java.time.LocalDate;
 public class UserResource
 {
 
-    private static Gson       gson       = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson       gson       = SpecializedGson.create();
     private static UserFacade userFacade = new UserFacade(JpaConnection.emf);
 
     @POST
