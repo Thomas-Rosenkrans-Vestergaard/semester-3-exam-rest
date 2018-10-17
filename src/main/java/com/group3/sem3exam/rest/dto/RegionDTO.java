@@ -36,9 +36,4 @@ public class RegionDTO
     {
         return new RegionDTO(region, true, false);
     }
-
-
-    public static RegionDTO basic (Region region){
-        return new RegionDTO(region);
-    }
 }

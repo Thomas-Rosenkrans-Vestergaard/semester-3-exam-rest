@@ -19,6 +19,9 @@ public class Region
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false, length = 16)
+    private String code;
+
     @OneToMany(fetch = LAZY, mappedBy = "region")
     private List<City> cities = new ArrayList();
 
@@ -30,9 +33,10 @@ public class Region
 
     }
 
-    public Region(String name)
+    public Region(String name, String code)
     {
         this.name = name;
+        this.code = code;
     }
 
     public Integer getId()
@@ -54,6 +58,16 @@ public class Region
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getCode()
+    {
+        return this.code;
+    }
+
+    public void setCode(String code)
+    {
+        this.code = code;
     }
 
     public List<City> getCities()

@@ -1,7 +1,6 @@
 package com.group3.sem3exam.data.entities;
 
 import javax.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,18 +18,22 @@ public class Country
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false, unique = true, length = 3)
+    private String code;
+
     @OneToMany(fetch = LAZY, mappedBy = "country")
     private List<Region> regions = new ArrayList();
 
-    public Country(String name)
+    public Country(String name, String code)
     {
         this.name = name;
+        this.code = code;
     }
 
     public Country()
     {
-    }
 
+    }
 
     public Integer getId()
     {
@@ -50,6 +53,16 @@ public class Country
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    public String getCode()
+    {
+        return this.code;
+    }
+
+    public void setCode(String code)
+    {
+        this.code = code;
     }
 
     public List<Region> getRegions()

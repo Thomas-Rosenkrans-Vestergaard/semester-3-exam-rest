@@ -16,23 +16,27 @@ public class City
     @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String zipCode;
+    @Column(nullable = false, length = 15)
+    private String latitude;
+
+    @Column(nullable = false, length = 15)
+    private String longitude;
 
     @ManyToOne(fetch = EAGER, optional = false)
     private Region region;
 
-    public City(String name, String zipCode, Region region)
+    public City(String name, String latitude, String longitude, Region region)
     {
         this.name = name;
-        this.zipCode = zipCode;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.region = region;
     }
 
     public City()
     {
-    }
 
+    }
 
     public Integer getId()
     {
@@ -54,14 +58,24 @@ public class City
         this.name = name;
     }
 
-    public String getZipCode()
+    public String getLatitude()
     {
-        return zipCode;
+        return this.latitude;
     }
 
-    public void setZipCode(String zipCode)
+    public void setLatitude(String latitude)
     {
-        this.zipCode = zipCode;
+        this.latitude = latitude;
+    }
+
+    public String getLongitude()
+    {
+        return this.longitude;
+    }
+
+    public void setLongitude(String longitude)
+    {
+        this.longitude = longitude;
     }
 
     public Region getRegion()
