@@ -16,7 +16,7 @@ public class Region
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
 
     @Column(nullable = false, length = 16)
