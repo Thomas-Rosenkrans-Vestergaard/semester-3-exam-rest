@@ -6,7 +6,8 @@ import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 
-@Entity(name = "image")
+@Entity
+@Table(name = "image")
 public class Image
 {
 

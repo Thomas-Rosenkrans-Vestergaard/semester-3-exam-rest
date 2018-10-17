@@ -7,7 +7,8 @@ import java.util.List;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity(name = "country")
+@Entity
+@Table(name = "country")
 public class Country
 {
 

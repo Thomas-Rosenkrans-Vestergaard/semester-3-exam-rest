@@ -5,7 +5,8 @@ import javax.persistence.*;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity(name = "city")
+@Entity
+@Table(name = "city")
 public class City
 {
 

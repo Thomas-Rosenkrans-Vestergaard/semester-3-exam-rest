@@ -1,12 +1,11 @@
 package com.group3.sem3exam.facades;
 
-import com.group3.sem3exam.data.entities.Country;
 import com.group3.sem3exam.data.entities.Region;
-import com.group3.sem3exam.data.repositories.TransactionalCountryRepository;
 import com.group3.sem3exam.data.repositories.TransactionalRegionRepository;
-import com.group3.sem3exam.rest.exceptions.CountryNotFoundException;
+import com.group3.sem3exam.rest.exceptions.RegionNotFoundException;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.List;
 
 public class RegionFacade
 {
@@ -18,16 +17,46 @@ public class RegionFacade
         this.emf = emf;
     }
 
+    /**
+     * Returns a complete list of the regions in the system
+     *
+     * @return The complete list of the regions in the system.
+     */
+    public List<Region> all()
+    {
+        try (TransactionalRegionRepository trr = new TransactionalRegionRepository(emf)) {
+            return trr.get();
+        }
+    }
 
-    public Region get(Integer id) throws CountryNotFoundException
+    /**
+     * Returns the region with the provided id.
+     *
+     * @param id The id of the region to return.
+     * @return The region with the provided id.
+     * @throws RegionNotFoundException When the region with the provided id does not exist.
+     */
+    public Region get(Integer id) throws RegionNotFoundException
     {
         try (TransactionalRegionRepository trr = new TransactionalRegionRepository(emf)) {
             Region region = trr.get(id);
-            if (region.equals(null)) {
-                throw new CountryNotFoundException(id);
-            }
+            if (region == null)
+                throw new RegionNotFoundException(id);
+
             return region;
         }
+    }
 
+    /**
+     * Returns the regions in the country with the provided id.
+     *
+     * @param country The id of the country to return the regions of.
+     * @return The regions in the country with the provided id.
+     */
+    public List<Region> getByCountry(int country)
+    {
+        try(TransactionalRegionRepository trr = new TransactionalRegionRepository(emf)){
+            return trr.getByCountry(country);
+        }
     }
 }

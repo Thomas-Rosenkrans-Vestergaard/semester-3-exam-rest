@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.List;
 
 public class TransactionalRegionRepository extends TransactionalCrudRepository<Region, Integer> implements RegionRepository
 {
@@ -34,5 +35,20 @@ public class TransactionalRegionRepository extends TransactionalCrudRepository<R
     public TransactionalRegionRepository(Transaction transaction)
     {
         super(transaction, Region.class);
+    }
+
+    /**
+     * Returns the regions in the country with the provide id.
+     *
+     * @param country The id of the country to return the regions of.
+     * @return The regions in the country with the provided id.
+     */
+    @Override
+    public List<Region> getByCountry(int country)
+    {
+        return getEntityManager()
+                .createQuery("SELECT r FROM Region r WHERE r.country.id = :country", Region.class)
+                .setParameter("country", country)
+                .getResultList();
     }
 }

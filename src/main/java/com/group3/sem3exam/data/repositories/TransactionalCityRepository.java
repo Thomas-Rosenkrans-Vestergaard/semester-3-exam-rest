@@ -1,11 +1,11 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.repositories.transactions.AbstractTransactionalRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.List;
 
 public class TransactionalCityRepository extends TransactionalCrudRepository<City, Integer> implements CityRepository
 {
@@ -40,5 +40,20 @@ public class TransactionalCityRepository extends TransactionalCrudRepository<Cit
     public TransactionalCityRepository(Transaction transaction)
     {
         super(transaction, City.class);
+    }
+
+    /**
+     * Returns the cities in the region with the provided id.
+     *
+     * @param region The id of the region to return the cities of.
+     * @return The cities in the region with the provided id.
+     */
+    @Override
+    public List<City> getByRegion(int region)
+    {
+        return getEntityManager()
+                .createQuery("SELECT c FROM City c WHERE c.region.id = :region")
+                .setParameter("region", region)
+                .getResultList();
     }
 }

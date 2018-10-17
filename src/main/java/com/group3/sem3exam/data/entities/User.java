@@ -14,7 +14,8 @@ import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity(name = "user")
+@Entity
+@Table(name = "user")
 public class User
 {
 

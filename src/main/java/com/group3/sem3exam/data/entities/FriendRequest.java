@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity(name = "friend_request")
+@Entity
+@Table(name = "friend_request")
 public class FriendRequest
 {
 

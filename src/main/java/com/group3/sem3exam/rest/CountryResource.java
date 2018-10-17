@@ -12,8 +12,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
 @Path("countries")
 public class CountryResource
@@ -23,12 +26,21 @@ public class CountryResource
     private static CountryFacade countryFacade = new CountryFacade(JpaConnection.emf);
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response getAllCountries()
+    {
+        List<Country> countries = countryFacade.all();
+        String        json      = gson.toJson(countries.stream().map(CountryDTO::basic).collect(Collectors.toList()));
+        return Response.ok(json).build();
+    }
+
+    @GET
+    @Produces(APPLICATION_JSON)
     @Path("{id: [0-9]+}")
-    public Response getCountry(@PathParam("id") int id) throws CountryNotFoundException
+    public Response getCountryById(@PathParam("id") int id) throws CountryNotFoundException
     {
         Country country = countryFacade.get(id);
-        String  jsonDTO = gson.toJson(CountryDTO.withRegions(country));
-        return Response.ok(jsonDTO).build();
+        String  json    = gson.toJson(CountryDTO.withRegions(country));
+        return Response.ok(json).build();
     }
 }

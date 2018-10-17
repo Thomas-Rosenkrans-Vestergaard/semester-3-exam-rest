@@ -7,7 +7,8 @@ import java.time.LocalDateTime;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity(name = "comment")
+@Entity
+@Table(name = "comment")
 public class Comment
 {
 

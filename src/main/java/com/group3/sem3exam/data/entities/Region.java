@@ -8,7 +8,8 @@ import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity(name = "region")
+@Entity
+@Table(name = "region")
 public class Region
 {
 

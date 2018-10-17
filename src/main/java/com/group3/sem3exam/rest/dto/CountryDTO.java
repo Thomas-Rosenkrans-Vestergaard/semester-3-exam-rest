@@ -3,6 +3,7 @@ package com.group3.sem3exam.rest.dto;
 import com.group3.sem3exam.data.entities.Country;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CountryDTO
 {
@@ -17,6 +18,8 @@ public class CountryDTO
         this.id = country.getId();
         this.name = country.getName();
         this.code = country.getCode();
+        if (withRegions)
+            this.regions = country.getRegions().stream().map(RegionDTO::basic).collect(Collectors.toList());
     }
 
     public static CountryDTO basic(Country country)

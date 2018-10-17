@@ -5,9 +5,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity(name = "friendship")
-@AssociationOverrides({@AssociationOverride(name = "pk.owner", joinColumns = @JoinColumn(name = "owner")),
-                       @AssociationOverride(name = "pk.friend", joinColumns = @JoinColumn(name = "friend"))
+@Entity
+@Table(name = "friendship")
+@AssociationOverrides({
+                              @AssociationOverride(name = "pk.owner", joinColumns = @JoinColumn(name = "owner")),
+                              @AssociationOverride(name = "pk.friend", joinColumns = @JoinColumn(name = "friend"))
                       })
 public class Friendship
 {
