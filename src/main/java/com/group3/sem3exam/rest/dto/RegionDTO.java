@@ -57,4 +57,9 @@ public class RegionDTO
     {
         this.country = country;
     }
+
+
+    public static RegionDTO basic (Region region){
+        return new RegionDTO(region);
+    }
 }

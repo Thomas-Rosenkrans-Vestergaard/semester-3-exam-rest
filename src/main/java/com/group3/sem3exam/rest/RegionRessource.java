@@ -2,12 +2,12 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Region;
 import com.group3.sem3exam.facades.CityFacade;
-import com.group3.sem3exam.facades.UserFacade;
-import com.group3.sem3exam.rest.dto.CityDTO;
+import com.group3.sem3exam.facades.RegionFacade;
+import com.group3.sem3exam.rest.dto.RegionDTO;
 import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
-import jdk.nashorn.internal.objects.annotations.Getter;
+import com.group3.sem3exam.rest.exceptions.CountryNotFoundException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,19 +22,19 @@ public class RegionRessource
 {
 
 
-    private static Gson       gson       = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson         gson         = new GsonBuilder().setPrettyPrinting().create();
     //skal ikke være en cityfacade men en region
-    private static CityFacade cityFacade = new CityFacade(JpaConnection.emf);
+    private static RegionFacade regionFacade = new RegionFacade(JpaConnection.emf);
 
 
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getRegion(@PathParam("id") int id) throws CityNotFoundException
+    public Response getRegion(@PathParam("id") int id) throws CityNotFoundException, CountryNotFoundException
     {
-        City city =cityFacade.get(id);
-        String jsonDTO = gson.toJson(CityDTO.basic(city));
+        Region region  =regionFacade.get(id);
+        String jsonDTO = gson.toJson(RegionDTO.basic(region));
         return Response.ok(jsonDTO).build();
 
 
