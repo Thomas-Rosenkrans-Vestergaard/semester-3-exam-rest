@@ -50,7 +50,7 @@ public class UserResource
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("{id: [0-9]+}")
-    public Response getUser(@PathParam("id") int id) throws UserNotFoundException
+    public Response getUserById(@PathParam("id") int id) throws UserNotFoundException
     {
         User   user    = userFacade.get(id);
         String jsonDTO = gson.toJson(UserDTO.basic(user));
