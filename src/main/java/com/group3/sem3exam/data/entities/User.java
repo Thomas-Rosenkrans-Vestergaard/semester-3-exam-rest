@@ -10,6 +10,7 @@ import java.util.List;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -30,6 +31,16 @@ public class User
     @Column(nullable = false)
     private String passwordHash;
 
+    @OneToOne(optional = false)
+    @JoinColumn(name = "city_id")
+    private City city;
+
+    @Column(nullable = false)
+    private Gender gender;
+
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
+
     @Column
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -40,18 +51,11 @@ public class User
     @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "pk.owner")
     private List<Friendship> friendships = new ArrayList<>();
 
-    @OneToMany(fetch = LAZY, cascade = ALL, mappedBy="user")
-    private List<ProfileImage> profilePictures = new ArrayList<>();
+    @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "user")
+    private List<Image> images = new ArrayList<>();
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "city_id")
-    private City city;
-
-    @Column(nullable = false)
-    private Gender gender;
-
-    @Column(nullable = false)
-    private LocalDate dateOfBirth;
+    @OneToOne(fetch = EAGER, cascade = ALL)
+    private Image profilePicture;
 
     public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
     {
@@ -63,17 +67,10 @@ public class User
         this.gender = gender;
     }
 
-    public User(String name, String email, String passwordHash)
-    {
-        this.name = name;
-        this.email = email;
-        this.passwordHash = passwordHash;
-    }
-
     public User()
     {
-    }
 
+    }
 
     public Integer getId()
     {
@@ -189,4 +186,28 @@ public class User
         this.dateOfBirth = dateOfBirth;
     }
 
+    public List<Image> getImages()
+    {
+        return this.images;
+    }
+
+    public void setImages(List<Image> images)
+    {
+        this.images = images;
+    }
+
+    public void addImage(Image image)
+    {
+        this.images.add(image);
+    }
+
+    public Image getProfilePicture()
+    {
+        return this.profilePicture;
+    }
+
+    public void setProfilePicture(Image profilePicture)
+    {
+        this.profilePicture = profilePicture;
+    }
 }

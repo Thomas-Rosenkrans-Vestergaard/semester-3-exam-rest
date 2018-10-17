@@ -27,13 +27,13 @@ public class Region
 
     public Region()
     {
+
     }
 
     public Region(String name)
     {
         this.name = name;
     }
-
 
     public Integer getId()
     {
@@ -76,7 +76,3 @@ public class Region
         this.country = country;
     }
 }
-
-
-
-
