@@ -15,23 +15,20 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/countries")
+@Path("countries")
 public class CountryResource
 {
 
     private static Gson          gson          = new GsonBuilder().setPrettyPrinting().create();
     private static CountryFacade countryFacade = new CountryFacade(JpaConnection.emf);
 
-
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{id}")
+    @Path("{id: [0-9]+}")
     public Response getCountry(@PathParam("id") int id) throws CountryNotFoundException
     {
         Country country = countryFacade.get(id);
-        String jsonDTO = gson.toJson(new CountryDTO(country));
+        String  jsonDTO = gson.toJson(CountryDTO.withRegions(country));
         return Response.ok(jsonDTO).build();
-
-
-}
+    }
 }

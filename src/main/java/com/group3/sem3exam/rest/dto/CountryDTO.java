@@ -7,19 +7,25 @@ import java.util.List;
 public class CountryDTO
 {
 
-    private String name;
-    private List<RegionDTO> regions;
+    public Integer         id;
+    public String          name;
+    public String          code;
+    public List<RegionDTO> regions;
 
-
-    public CountryDTO(Country country){
-        this(country, true);
-    }
-
-    public CountryDTO(Country country, boolean withRegions){
+    public CountryDTO(Country country, boolean withRegions)
+    {
+        this.id = country.getId();
         this.name = country.getName();
+        this.code = country.getCode();
     }
 
-    public static CountryDTO basic(Country country){
+    public static CountryDTO basic(Country country)
+    {
         return new CountryDTO(country, false);
+    }
+
+    public static CountryDTO withRegions(Country country)
+    {
+        return new CountryDTO(country, true);
     }
 }

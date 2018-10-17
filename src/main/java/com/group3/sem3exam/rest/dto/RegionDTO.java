@@ -2,59 +2,38 @@ package com.group3.sem3exam.rest.dto;
 
 import com.group3.sem3exam.data.entities.Region;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class RegionDTO
 {
-    private String        name;
-    private List<CityDTO> cities;
-    private CountryDTO    country;
 
-    public RegionDTO(Region region)
-    {
-        this(region, true, true);
-    }
+    public Integer       id;
+    public String        name;
+    public String        code;
+    public List<CityDTO> cities = new ArrayList();
+    public CountryDTO    country;
 
-    public RegionDTO(Region region, boolean showCities, boolean showCountry)
+    public RegionDTO(Region region, boolean withCities, boolean withCountry)
     {
         this.name = region.getName();
-        if (showCities)
+        if (withCities)
             this.cities = region.getCities()
                                 .stream()
-                                .map(city -> new CityDTO(city))
+                                .map(city -> CityDTO.basic(city))
                                 .collect(Collectors.toList());
-        if (showCountry)
-            this.country = new CountryDTO(region.getCountry());
+        if (withCountry)
+            this.country = CountryDTO.basic(region.getCountry());
     }
 
-    public String getName()
+    public static RegionDTO basic(Region region)
     {
-        return name;
+        return new RegionDTO(region, false, false);
     }
 
-    public void setName(String name)
+    public static RegionDTO withCities(Region region)
     {
-        this.name = name;
-    }
-
-    public List<CityDTO> getCities()
-    {
-        return cities;
-    }
-
-    public void setCities(List<CityDTO> cities)
-    {
-        this.cities = cities;
-    }
-
-    public CountryDTO getCountry()
-    {
-        return country;
-    }
-
-    public void setCountry(CountryDTO country)
-    {
-        this.country = country;
+        return new RegionDTO(region, true, false);
     }
 }

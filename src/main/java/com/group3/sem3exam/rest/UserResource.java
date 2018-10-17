@@ -37,24 +37,6 @@ public class UserResource
         return Response.ok(createdUser).build();
     }
 
-/*
-    @GET
-    @Produces({"image/jpeg"})
-    @Path("/{id: [0-9]+}")
-    public Response getPicture(){
-
-    }
-*/
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{id: [0-9]+}")
-    public Response getUser(@PathParam("id") int id) throws UserNotFoundException
-    {
-        User   user    = userFacade.get(id);
-        String jsonDTO = gson.toJson(UserDTO.basic(user));
-        return Response.ok(jsonDTO).build();
-    }
-
     private class ReceivedCreateUser
     {
         public String    name;
@@ -63,5 +45,15 @@ public class UserResource
         public Integer   city;
         public Gender    gender;
         public LocalDate dateOfBirth;
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("{id: [0-9]+}")
+    public Response getUser(@PathParam("id") int id) throws UserNotFoundException
+    {
+        User   user    = userFacade.get(id);
+        String jsonDTO = gson.toJson(UserDTO.basic(user));
+        return Response.ok(jsonDTO).build();
     }
 }
