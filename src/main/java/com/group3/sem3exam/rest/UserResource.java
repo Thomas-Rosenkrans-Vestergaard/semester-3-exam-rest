@@ -37,6 +37,14 @@ public class UserResource
         return Response.ok(createdUser).build();
     }
 
+/*
+    @GET
+    @Produces({"image/jpeg"})
+    @Path("/{id: [0-9]+}")
+    public Response getPicture(){
+
+    }
+*/
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id: [0-9]+}")

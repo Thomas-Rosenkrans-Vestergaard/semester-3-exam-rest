@@ -40,6 +40,9 @@ public class User
     @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "pk.owner")
     private List<Friendship> friendships = new ArrayList<>();
 
+    @OneToMany(fetch = LAZY, cascade = ALL, mappedBy="user")
+    private List<ProfileImage> profilePictures = new ArrayList<>();
+
     @OneToOne(optional = false)
     @JoinColumn(name = "city_id")
     private City city;
