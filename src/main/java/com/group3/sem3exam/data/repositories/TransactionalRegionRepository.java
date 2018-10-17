@@ -1,6 +1,5 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Region;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
@@ -9,6 +8,7 @@ import javax.persistence.EntityManagerFactory;
 
 public class TransactionalRegionRepository extends TransactionalCrudRepository<Region, Integer> implements RegionRepository
 {
+
     public TransactionalRegionRepository(EntityManager entityManager)
     {
         super(entityManager, Region.class);
@@ -35,6 +35,4 @@ public class TransactionalRegionRepository extends TransactionalCrudRepository<R
     {
         super(transaction, Region.class);
     }
-}
-
 }
