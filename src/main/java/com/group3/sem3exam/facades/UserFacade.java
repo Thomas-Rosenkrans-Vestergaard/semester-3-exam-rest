@@ -63,9 +63,7 @@ public class UserFacade
     public User createUser(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
     throws CityNotFoundException
     {
-        Transaction transaction = new Transaction(emf);
-
-        try {
+        try (Transaction transaction = new Transaction(emf)) {
 
             transaction.begin();
             TransactionalUserRepository tur = new TransactionalUserRepository(transaction);
@@ -78,11 +76,6 @@ public class UserFacade
             User user = tur.createUser(name, email, password, retrievedCity, gender, dateOfBirth);
             transaction.commit();
             return user;
-        } catch (Exception e) {
-            transaction.rollback();
-            throw e;
-        } finally {
-            transaction.close();
         }
     }
 }

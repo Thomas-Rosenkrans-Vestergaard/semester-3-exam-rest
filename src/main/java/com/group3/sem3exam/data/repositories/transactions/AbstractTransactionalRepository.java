@@ -54,7 +54,8 @@ public class AbstractTransactionalRepository implements TransactionalRepository
     }
 
     /**
-     * Closes the transaction.
+     * Closes the transaction. When the transaction is still active, meaning the result has not yet been committed or
+     * rolled back, the transaction is rolled back.
      */
     @Override
     public void close()
