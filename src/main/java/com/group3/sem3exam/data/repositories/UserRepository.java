@@ -20,7 +20,7 @@ public interface UserRepository extends CrudRepository<User, Integer>
      * @param dateOfBirth  The date of birth of the new user.
      * @return The resulting new user.
      */
-    User createUser(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth);
+    User create(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth);
 
     /**
      * Returns the user with the provided email.

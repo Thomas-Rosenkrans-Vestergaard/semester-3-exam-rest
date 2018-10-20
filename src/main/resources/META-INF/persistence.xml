@@ -11,6 +11,8 @@
         <class>com.group3.sem3exam.data.entities.Region</class>
         <class>com.group3.sem3exam.data.entities.Country</class>
         <class>com.group3.sem3exam.data.entities.Image</class>
+        <class>com.group3.sem3exam.data.entities.ThirdParty</class>
+        <class>com.group3.sem3exam.data.entities.PrivilegeMapping</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/semester-3-exam-rest"/>

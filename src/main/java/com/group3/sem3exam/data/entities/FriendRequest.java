@@ -16,10 +16,10 @@ public class FriendRequest
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private User requester;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private User receiver;
 
     @Column

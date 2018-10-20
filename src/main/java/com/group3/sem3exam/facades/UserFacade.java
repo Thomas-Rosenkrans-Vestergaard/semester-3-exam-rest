@@ -73,7 +73,7 @@ public class UserFacade
             if (retrievedCity == null)
                 throw new CityNotFoundException(city);
 
-            User user = tur.createUser(name, email, password, retrievedCity, gender, dateOfBirth);
+            User user = tur.create(name, email, password, retrievedCity, gender, dateOfBirth);
             transaction.commit();
             return user;
         }

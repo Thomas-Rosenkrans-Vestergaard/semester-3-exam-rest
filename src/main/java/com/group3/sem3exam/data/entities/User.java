@@ -32,7 +32,7 @@ public class User
     @Column(nullable = false)
     private String passwordHash;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "city_id")
     private City city;
 
@@ -55,7 +55,7 @@ public class User
     @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "user")
     private List<Image> images = new ArrayList<>();
 
-    @OneToOne(fetch = EAGER, cascade = ALL)
+    @ManyToOne(fetch = EAGER, cascade = ALL)
     private Image profilePicture;
 
     public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
