@@ -1,7 +1,7 @@
 package com.group3.sem3exam.facades;
 
-import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.TransactionalUserRepository;
+import com.group3.sem3exam.rest.authentication.AuthenticationContext;
 import com.group3.sem3exam.rest.authentication.AuthenticationException;
 import com.group3.sem3exam.rest.authentication.UserAuthenticator;
 import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
@@ -29,18 +29,18 @@ public class AuthenticationFacade
     }
 
     /**
-     * Generates a JWT authentication token for the provided user.
+     * Generates a JWT authentication token for the provided authentication context.
      *
-     * @param user The user to generate the JWT token for.
+     * @param authenticationContext The authentication context to generate the JWT token from.
      * @return The resulting JWT token.
-     * @throws Exception
+     * @throws Exception When
      */
-    public String generateAuthenticationToken(User user) throws Exception
+    public String generateAuthenticationToken(AuthenticationContext authenticationContext) throws Exception
     {
         File              file      = new File("jwt.secret");
         FileJwtSecret     jwtSecret = new FileJwtSecret(file, 256 / 8);
         JwtTokenGenerator generator = new JwtTokenGenerator(jwtSecret);
-        return generator.generate(user);
+        return generator.generate(authenticationContext);
     }
 
     /**
@@ -48,10 +48,10 @@ public class AuthenticationFacade
      *
      * @param email    The email of the user to authenticate.
      * @param password The password of the user to authenticate.
-     * @return The user entity who was authenticated.
+     * @return The authentication context.
      * @throws AuthenticationException When the credentials could not be used to authenticate the credentials.
      */
-    public User authenticate(String email, String password) throws Exception
+    public AuthenticationContext authenticate(String email, String password) throws Exception
     {
         try (TransactionalUserRepository tup = new TransactionalUserRepository(emf)) {
             UserAuthenticator authenticator = new UserAuthenticator(tup);

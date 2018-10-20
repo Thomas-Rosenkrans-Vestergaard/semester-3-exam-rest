@@ -2,8 +2,8 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.facades.AuthenticationFacade;
+import com.group3.sem3exam.rest.authentication.AuthenticationContext;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -25,10 +25,10 @@ public class AuthenticationResource
     @Consumes(MediaType.APPLICATION_JSON)
     public Response authenticateUser(String content) throws Exception
     {
-        ReceivedAuthenticateUser receivedUser = gson.fromJson(content, ReceivedAuthenticateUser.class);
-        User                     user         = authenticationFacade.authenticate(receivedUser.email, receivedUser.password);
-        String                   token        = authenticationFacade.generateAuthenticationToken(user);
-        JsonObject               result       = new JsonObject();
+        ReceivedAuthenticateUser receivedUser          = gson.fromJson(content, ReceivedAuthenticateUser.class);
+        AuthenticationContext    authenticationContext = authenticationFacade.authenticate(receivedUser.email, receivedUser.password);
+        String                   token                 = authenticationFacade.generateAuthenticationToken(authenticationContext);
+        JsonObject               result                = new JsonObject();
         result.addProperty("token", token);
         result.addProperty("owner", true);
         return Response.ok(result.toString()).build();

@@ -1,9 +1,11 @@
 package com.group3.sem3exam.rest.authentication.jwt;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.rest.authentication.AuthenticationContext;
 
 import java.util.Date;
 
@@ -12,6 +14,8 @@ import java.util.Date;
  */
 public class JwtTokenGenerator
 {
+
+    private static final String ISS = "Social";
 
     /**
      * The secret to use when generating JWT authentication tokens.
@@ -29,23 +33,36 @@ public class JwtTokenGenerator
     }
 
     /**
-     * Generates a new JWT token for the provided user using the configured secret.
+     * Generates a new JWT token for the provided authentication context, signed using the configured secret.
      *
-     * @param user The user to generate the JWT authentication token for.
+     * @param authenticationContext The authentication context to tokenize.
      * @return The JWT token.
      * @throws JwtGenerationException When the method could not generate a Jwt token.
      */
-    public String generate(User user) throws JwtGenerationException
+    public String generate(AuthenticationContext authenticationContext) throws JwtGenerationException
     {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(secret.getValue());
-            return JWT.create()
-                      .withIssuer("group3")
-                      .withIssuedAt(new Date())
-                      .withClaim("user", user.getId())
-                      .sign(algorithm);
+            Algorithm          algorithm = Algorithm.HMAC256(secret.getValue());
+            JWTCreator.Builder builder   = JWT.create().withIssuer(ISS).withIssuedAt(new Date());
+            withClaims(authenticationContext, builder);
+            return builder.sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new JwtGenerationException(exception);
         }
+    }
+
+    /**
+     * Adds the necessary claims to the provided builder.
+     *
+     * @param authenticationContext The authentication context.
+     * @param builder               The builder to add claims to.
+     */
+    private void withClaims(AuthenticationContext authenticationContext, JWTCreator.Builder builder)
+    {
+        builder.withClaim("type", authenticationContext.getType().name());
+
+        User user = authenticationContext.getUser();
+        if (user != null)
+            builder.withClaim("user", user.getId());
     }
 }

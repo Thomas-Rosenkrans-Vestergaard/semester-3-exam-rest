@@ -30,7 +30,7 @@ public class UserAuthenticator
      * @return The user who was authenticated, {@code null} when the user could not be authenticated.
      * @throws AuthenticationException When the user could not be authenticated.
      */
-    public User authenticate(String email, String password) throws AuthenticationException
+    public AuthenticationContext authenticate(String email, String password) throws AuthenticationException
     {
         User user = this.repository.getByEmail(email);
         if (user == null)
@@ -39,7 +39,7 @@ public class UserAuthenticator
         if (!checkHash(password, user.getPasswordHash()))
             throw new AuthenticationException(new IncorrectCredentialsException());
 
-        return user;
+        return AuthenticationContext.user(user);
     }
 
     /**
