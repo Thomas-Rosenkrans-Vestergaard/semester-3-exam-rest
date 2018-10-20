@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class TransactionalPrivilegeRepository extends TransactionalCrudRepository<PrivilegeMapping, Integer>
         implements PrivilegeRepository
@@ -59,17 +58,15 @@ public class TransactionalPrivilegeRepository extends TransactionalCrudRepositor
     @Override
     public boolean can(ThirdParty thirdParty, User user, Privilege privilege)
     {
-        /*long count = getEntityManager()
+        long count = getEntityManager()
                 .createQuery("SELECT count(*) FROM PrivilegeMapping pm " +
-                             "WHERE pm.thirdParty = :thirdParty AND pm.user = :user AND pm.privilege = :privilege")
+                             "WHERE pm.thirdParty = :thirdParty AND pm.user = :user AND pm.privilege = :privilege", Long.class)
                 .setParameter("thirdParty", thirdParty)
                 .setParameter("user", user)
                 .setParameter("privilege", privilege)
-                .getFirstResult();
+                .getSingleResult();
 
-        return count > 0;*/
-
-        return get(thirdParty, user).contains(privilege);
+        return count > 0;
     }
 
     /**
@@ -168,10 +165,10 @@ public class TransactionalPrivilegeRepository extends TransactionalCrudRepositor
     {
         return new HashSet<>(
                 getEntityManager()
-                        .createQuery("SELECT pm FROM PrivilegeMapping pm " +
-                                     "WHERE pm.thirdParty.id = :tp AND pm.user.id = :user", PrivilegeMapping.class)
+                        .createQuery("SELECT pm.privilege FROM PrivilegeMapping pm " +
+                                     "WHERE pm.thirdParty.id = :tp AND pm.user.id = :user", Privilege.class)
                         .setParameter("tp", thirdParty.getId())
                         .setParameter("user", user.getId())
-                        .getResultList().stream().map(PrivilegeMapping::getPrivilege).collect(Collectors.toList()));
+                        .getResultList());
     }
 }
