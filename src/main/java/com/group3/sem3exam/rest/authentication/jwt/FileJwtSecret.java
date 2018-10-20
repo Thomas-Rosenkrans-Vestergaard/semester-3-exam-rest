@@ -1,7 +1,5 @@
 package com.group3.sem3exam.rest.authentication.jwt;
 
-import com.group3.sem3exam.rest.authentication.SecretGenerationException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -87,10 +85,10 @@ public class FileJwtSecret implements JwtSecret
      *
      * @param bytes The number of bytes the secret string should be generated from.
      * @return The newly generated value.
-     * @throws SecretGenerationException When a secret cannot be generated.
+     * @throws JwtSecretGenerationException When a secret cannot be generated.
      */
     @Override
-    public String regenerate(int bytes) throws SecretGenerationException
+    public String regenerate(int bytes) throws JwtSecretGenerationException
     {
         try (FileWriter fileWriter = new FileWriter(saveFile)) {
             byte[] byteArray = new byte[bytes];
@@ -100,7 +98,7 @@ public class FileJwtSecret implements JwtSecret
             fileWriter.flush();
             return this.secret;
         } catch (IOException e) {
-            throw new SecretGenerationException(e);
+            throw new JwtSecretGenerationException(e);
         }
     }
 }
