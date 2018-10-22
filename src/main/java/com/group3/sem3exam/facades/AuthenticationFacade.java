@@ -49,9 +49,9 @@ public class AuthenticationFacade
      * @param email    The email of the user to authenticate.
      * @param password The password of the user to authenticate.
      * @return The authentication context.
-     * @throws AuthenticationException When the credentials could not be used to authenticate the credentials.
+     * @throws AuthenticationException When the credentials could not be used to authenticate the user.
      */
-    public AuthenticationContext authenticate(String email, String password) throws Exception
+    public AuthenticationContext authenticate(String email, String password) throws AuthenticationException
     {
         try (TransactionalUserRepository tup = new TransactionalUserRepository(emf)) {
             UserAuthenticator authenticator = new UserAuthenticator(tup);
