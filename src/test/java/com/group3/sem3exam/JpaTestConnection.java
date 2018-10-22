@@ -5,10 +5,13 @@ import javax.persistence.Persistence;
 
 public class JpaTestConnection
 {
-    public static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("rest-api-test-pu");
+    private static EntityManagerFactory emf;
 
-    public static void main(String[] args)
+    public static EntityManagerFactory create()
     {
-        emf.close();
+        if (emf == null)
+            emf = Persistence.createEntityManagerFactory("rest-api-test-pu");
+
+        return emf;
     }
 }

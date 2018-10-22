@@ -18,7 +18,7 @@ public class UserResource
 {
 
     private static Gson       gson       = SpecializedGson.create();
-    private static UserFacade userFacade = new UserFacade(JpaConnection.emf);
+    private static UserFacade userFacade = new UserFacade(JpaConnection.create());
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

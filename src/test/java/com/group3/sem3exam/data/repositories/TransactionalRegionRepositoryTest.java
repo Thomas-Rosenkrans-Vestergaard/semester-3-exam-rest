@@ -20,7 +20,7 @@ class TransactionalRegionRepositoryTest
     {
         TransactionalReadCrudRepositoryTester<Region, Integer, TransactionalRegionRepository> tester =
                 new TransactionalReadCrudRepositoryTester<>(
-                        () -> new TransactionalRegionRepository(JpaTestConnection.emf),
+                        () -> new TransactionalRegionRepository(JpaTestConnection.create()),
                         (repository) -> createRegionMap(repository),
                         -1
                 );
@@ -40,7 +40,7 @@ class TransactionalRegionRepositoryTest
     @Test
     void getByCountry()
     {
-        try (TransactionalRegionRepository trr = new TransactionalRegionRepository(JpaTestConnection.emf)) {
+        try (TransactionalRegionRepository trr = new TransactionalRegionRepository(JpaTestConnection.create())) {
             List<Region> result = trr.getByCountry(5);
             assertEquals(3, result.size());
             assertEquals(5, (int) result.get(0).getId());

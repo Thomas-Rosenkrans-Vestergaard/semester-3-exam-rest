@@ -23,7 +23,7 @@ public class TransactionalUserRepositoryTest
     {
         TransactionalCrudRepositoryTester<User, Integer, TransactionalUserRepository> tester =
                 new TransactionalCrudRepositoryTester<User, Integer, TransactionalUserRepository>(
-                        () -> new TransactionalUserRepository(JpaTestConnection.emf),
+                        () -> new TransactionalUserRepository(JpaTestConnection.create()),
                         (repository) -> createUserMap(repository),
                         -1
                 );
@@ -59,7 +59,7 @@ public class TransactionalUserRepositoryTest
     @Test
     void getByEmail()
     {
-        try (TransactionalUserRepository tur = new TransactionalUserRepository(JpaTestConnection.emf)) {
+        try (TransactionalUserRepository tur = new TransactionalUserRepository(JpaTestConnection.create())) {
             tur.begin();
             City city = new TransactionalCityRepository(tur.getEntityManager()).get(1);
             assertNull(tur.getByEmail("does_not_exist"));
