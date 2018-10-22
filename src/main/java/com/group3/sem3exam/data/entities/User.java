@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
@@ -32,7 +33,7 @@ public class User
     @Column(nullable = false)
     private String passwordHash;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "city_id")
     private City city;
 
@@ -210,5 +211,27 @@ public class User
     public void setProfilePicture(Image profilePicture)
     {
         this.profilePicture = profilePicture;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return Objects.equals(getId(), user.getId()) &&
+               Objects.equals(getName(), user.getName()) &&
+               Objects.equals(getEmail(), user.getEmail()) &&
+               Objects.equals(getPasswordHash(), user.getPasswordHash()) &&
+               Objects.equals(getCity(), user.getCity()) &&
+               getGender() == user.getGender() &&
+               Objects.equals(getDateOfBirth(), user.getDateOfBirth()) &&
+               Objects.equals(getCreatedAt(), user.getCreatedAt());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(getId(), getName(), getEmail(), getPasswordHash(), getCity(), getGender(), getDateOfBirth(), getCreatedAt());
     }
 }

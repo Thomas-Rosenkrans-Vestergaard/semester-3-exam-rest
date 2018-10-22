@@ -60,9 +60,7 @@ public class TransactionalUserRepository extends TransactionalCrudRepository<Use
     public User createUser(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
     {
         User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
-        getEntityManager().getTransaction().begin();
         getEntityManager().persist(user);
-        getEntityManager().getTransaction().commit();
         return user;
     }
 
@@ -78,6 +76,7 @@ public class TransactionalUserRepository extends TransactionalCrudRepository<Use
         try {
             return getEntityManager()
                     .createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                    .setParameter("email", email)
                     .getSingleResult();
         } catch (NoResultException e) {
             return null;

@@ -1,17 +1,18 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Country;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.List;
 
-public class TransactionalCountryRepository extends TransactionalCrudRepository<Country, Integer> implements CountryRepository
+public class TransactionalCountryRepository extends TransactionalReadCrudRepository<Country, Integer>
+        implements CountryRepository
 {
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link TransactionalCountryRepository}.
      *
      * @param entityManager The entity manager that operations are performed upon.
      */
@@ -21,7 +22,7 @@ public class TransactionalCountryRepository extends TransactionalCrudRepository<
     }
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link TransactionalCountryRepository}.
      *
      * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
      *                             performed upon - is created.
@@ -32,7 +33,7 @@ public class TransactionalCountryRepository extends TransactionalCrudRepository<
     }
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link TransactionalCountryRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
@@ -40,5 +41,18 @@ public class TransactionalCountryRepository extends TransactionalCrudRepository<
     public TransactionalCountryRepository(Transaction transaction)
     {
         super(transaction, Country.class);
+    }
+
+    /**
+     * Returns a complete list of the countries in the repository.
+     *
+     * @return The complete list of the countries in the repository.
+     */
+    @Override
+    public List<Country> get()
+    {
+        return getEntityManager()
+                .createQuery("SELECT c FROM Country c", Country.class)
+                .getResultList();
     }
 }

@@ -4,7 +4,7 @@ import com.group3.sem3exam.data.entities.Region;
 
 import java.util.List;
 
-public interface RegionRepository extends CrudRepository<Region, Integer>
+public interface RegionRepository extends ReadCrudRepository<Region, Integer>
 {
 
     /**

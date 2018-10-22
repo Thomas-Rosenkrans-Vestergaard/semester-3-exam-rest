@@ -1,48 +1,56 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.repositories.transactions.AbstractTransactionalRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
-public class TransactionalCrudRepository<E, ID> extends TransactionalReadCrudRepository<E, ID>
-        implements CrudRepository<E, ID>
+public class TransactionalReadCrudRepository<E, ID> extends AbstractTransactionalRepository implements ReadCrudRepository<E, ID>
 {
 
     /**
-     * Creates a new {@link TransactionalCrudRepository} using the provided entity manager.
+     * The type of entity the operations are performed upon.
+     */
+    protected final Class<E> c;
+
+    /**
+     * Creates a new {@link TransactionalReadCrudRepository} using the provided entity manager.
      *
      * @param entityManager The entity manager to perform operations upon.
      * @param c             The type of entity the operations are performed upon.
      */
-    public TransactionalCrudRepository(EntityManager entityManager, Class<E> c)
+    public TransactionalReadCrudRepository(EntityManager entityManager, Class<E> c)
     {
-        super(entityManager, c);
+        super(entityManager);
+        this.c = c;
     }
 
     /**
-     * Creates a new {@link TransactionalCrudRepository} using the provided entity manager factory.
+     * Creates a new {@link TransactionalReadCrudRepository} using the provided entity manager factory.
      *
      * @param entityManagerFactory The entity manager factory used to create the entity manager to perform operations
      *                             upon.
      * @param c                    The type of entity the operations are performed upon.
      */
-    public TransactionalCrudRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
+    public TransactionalReadCrudRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
     {
-        super(entityManagerFactory, c);
+        super(entityManagerFactory);
+        this.c = c;
     }
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link TransactionalReadCrudRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      * @param c           The type of entity the operations are performed upon.
      */
-    public TransactionalCrudRepository(Transaction transaction, Class<E> c)
+    public TransactionalReadCrudRepository(Transaction transaction, Class<E> c)
     {
-        super(transaction, c);
+        super(transaction);
+        this.c = c;
     }
 
     /**
@@ -102,37 +110,6 @@ public class TransactionalCrudRepository<E, ID> extends TransactionalReadCrudRep
     public E get(ID id)
     {
         return getEntityManager().find(c, id);
-    }
-
-    /**
-     * Forces the entity to update.
-     *
-     * @param entity The entity to update.
-     * @return The updated entity.
-     */
-    @Override
-    public E update(E entity)
-    {
-        EntityManager entityManager = this.getEntityManager();
-        return (E) entityManager.merge(entityManager.contains(entity) ? entity : entityManager.merge(entity));
-    }
-
-    /**
-     * Deletes the entity with the provided id.
-     *
-     * @param id The id of the entity to delete.
-     * @return The deleted entity, or {@code null} when no entity was deleted.
-     */
-    @Override
-    public E delete(ID id)
-    {
-        EntityManager entityManager = this.getEntityManager();
-        E             find          = entityManager.find(c, id);
-        if (find == null)
-            return null;
-
-        entityManager.remove(find);
-        return find;
     }
 
     /**
