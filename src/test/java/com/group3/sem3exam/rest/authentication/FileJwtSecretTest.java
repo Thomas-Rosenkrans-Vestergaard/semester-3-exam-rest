@@ -2,23 +2,23 @@ package com.group3.sem3exam.rest.authentication;
 
 import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
 import com.group3.sem3exam.rest.authentication.jwt.JwtSecret;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.Scanner;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class FileJwtSecretTest
 {
 
     private final File saveFile = new File("./src/test/java/com/group3/sem3exam/rest/authentication/saveFile.test");
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception
     {
         try (FileWriter fileWriter = new FileWriter(saveFile)) {

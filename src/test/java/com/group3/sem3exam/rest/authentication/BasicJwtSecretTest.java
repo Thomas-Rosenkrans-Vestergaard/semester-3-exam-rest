@@ -2,10 +2,10 @@ package com.group3.sem3exam.rest.authentication;
 
 import com.group3.sem3exam.rest.authentication.jwt.BasicJwtSecret;
 import com.group3.sem3exam.rest.authentication.jwt.JwtSecret;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class BasicJwtSecretTest
 {
@@ -15,7 +15,7 @@ public class BasicJwtSecretTest
     {
         String    value    = "secret";
         JwtSecret instance = new BasicJwtSecret(value);
-        assertSame(value, instance.getValue());
+        assertEquals(value, instance.getValue());
     }
 
     @Test
