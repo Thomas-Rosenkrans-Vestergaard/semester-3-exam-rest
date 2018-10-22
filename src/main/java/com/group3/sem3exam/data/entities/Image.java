@@ -20,7 +20,7 @@ public class Image
 
     @Column(nullable = false)
     @Lob
-    private String data;
+    private byte[] data;
 
     @ManyToOne(fetch = EAGER, optional = false)
     private User user;
@@ -30,7 +30,7 @@ public class Image
 
     }
 
-    public Image(String title, String data, User user)
+    public Image(String title, byte[] data, User user)
     {
         this.title = title;
         this.data = data;
@@ -57,12 +57,12 @@ public class Image
         this.title = title;
     }
 
-    public String getData()
+    public byte[] getData()
     {
         return this.data;
     }
 
-    public void setData(String data)
+    public void setData(byte[] data)
     {
         this.data = data;
     }

@@ -1,6 +1,5 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Country;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
