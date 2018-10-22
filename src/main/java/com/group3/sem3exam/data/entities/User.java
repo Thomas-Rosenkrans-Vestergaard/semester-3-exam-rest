@@ -32,7 +32,7 @@ public class User
     @Column(nullable = false)
     private String passwordHash;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "city_id")
     private City city;
 
