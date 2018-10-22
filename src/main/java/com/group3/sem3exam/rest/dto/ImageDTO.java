@@ -23,5 +23,45 @@ public class ImageDTO
     public static ImageDTO basic(Image image){
         return new ImageDTO(image, true);
     }
+
+    public Integer getId()
+    {
+        return id;
+    }
+
+    public void setId(Integer id)
+    {
+        this.id = id;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    public byte[] getData()
+    {
+        return data;
+    }
+
+    public void setData(byte[] data)
+    {
+        this.data = data;
+    }
+
+    public User getUser()
+    {
+        return user;
+    }
+
+    public void setUser(User user)
+    {
+        this.user = user;
+    }
 }
 
