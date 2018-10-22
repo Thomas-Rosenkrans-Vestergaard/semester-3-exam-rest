@@ -20,7 +20,7 @@ public interface CrudRepository<E, ID>
      * @param pageNumber The page number to getCities. Starts at 1.
      * @return
      */
-    List<E> get(int pageSize, int pageNumber);
+    List<E> getPaginated(int pageSize, int pageNumber);
 
     /**
      * Returns the number of defined entities.

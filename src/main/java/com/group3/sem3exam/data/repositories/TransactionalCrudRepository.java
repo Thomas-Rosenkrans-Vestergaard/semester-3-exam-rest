@@ -75,7 +75,7 @@ public class TransactionalCrudRepository<E, ID> extends AbstractTransactionalRep
      * @return
      */
     @Override
-    public List<E> get(int pageSize, int pageNumber)
+    public List<E> getPaginated(int pageSize, int pageNumber)
     {
         return getEntityManager()
                 .createQuery("SELECT e FROM " + c.getSimpleName() + " e", c)
