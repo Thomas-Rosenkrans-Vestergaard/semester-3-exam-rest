@@ -59,9 +59,16 @@ public class TransactionalUserRepository extends TransactionalCrudRepository<Use
     @Override
     public User createUser(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
     {
-        User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
-        getEntityManager().persist(user);
-        return user;
+        try {
+            User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
+            if (autoCommit)
+                begin();
+            getEntityManager().persist(user);
+            return user;
+        } finally {
+            if (autoCommit)
+                commit();
+        }
     }
 
     /**

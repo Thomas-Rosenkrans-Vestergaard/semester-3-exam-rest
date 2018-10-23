@@ -50,7 +50,8 @@ public class AbstractTransactionalRepository implements TransactionalRepository
     @Override
     public void begin()
     {
-        this.entityManager.getTransaction().begin();
+        if (!this.entityManager.getTransaction().isActive())
+            this.entityManager.getTransaction().begin();
     }
 
     /**

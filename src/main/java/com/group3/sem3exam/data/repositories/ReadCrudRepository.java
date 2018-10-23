@@ -6,6 +6,7 @@ import java.util.Set;
 
 public interface ReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
 {
+
     /**
      * Returns all the entities in the repository.
      *

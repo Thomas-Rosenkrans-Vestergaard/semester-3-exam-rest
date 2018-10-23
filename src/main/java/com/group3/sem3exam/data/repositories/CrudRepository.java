@@ -4,6 +4,13 @@ public interface CrudRepository<E extends RepositoryEntity<K>, K extends Compara
 {
 
     /**
+     * Indicates to the repository that all write operations should be committed to the database immediately.
+     *
+     * @return this
+     */
+    void autoCommit();
+
+    /**
      * Forces the entity to update.
      *
      * @param entity The entity to update.
