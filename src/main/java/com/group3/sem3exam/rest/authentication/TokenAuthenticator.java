@@ -1,6 +1,7 @@
 package com.group3.sem3exam.rest.authentication;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
 import com.group3.sem3exam.rest.authentication.jwt.JwtTokenUnpacker;
@@ -42,10 +43,15 @@ public class TokenAuthenticator
             DecodedJWT         jwt      = unpacker.unpack(token);
             AuthenticationType type     = AuthenticationType.valueOf(jwt.getClaim("type").asString());
 
-            if (type == AuthenticationType.USER)
-                return AuthenticationContext.user(userRepository.get(jwt.getClaim("user").asInt()));
+            if (type == AuthenticationType.USER) {
+                User user = userRepository.get(jwt.getClaim("user").asInt());
+                if (user == null)
+                    throw new AuthenticationException("Unknown user in authorization token.");
 
-            throw new RuntimeException("Unsupported authentication type.");
+                return AuthenticationContext.user(userRepository.get(jwt.getClaim("user").asInt()));
+            }
+
+            throw new AuthenticationException("Unsupported authentication type.");
 
         } catch (IOException e) {
             throw new AuthenticationException(e);
