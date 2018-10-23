@@ -64,6 +64,6 @@ public class TransactionalImageRepository extends TransactionalCrudRepository<Im
     @Override
     public List<Image> getByUserPaginated(Integer user, int pageSize, int pageNumber)
     {
-        
+
     }
 }
