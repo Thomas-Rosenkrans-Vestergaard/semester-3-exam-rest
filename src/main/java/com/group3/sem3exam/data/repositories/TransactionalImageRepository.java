@@ -2,11 +2,13 @@ package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.Region;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.AbstractTransactionalRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import java.util.List;
 
 public class TransactionalImageRepository extends TransactionalCrudRepository<Image, Integer> implements ImageRepository
@@ -41,18 +43,27 @@ public class TransactionalImageRepository extends TransactionalCrudRepository<Im
     }
 
 
-    /**
-     *
-     * @param user
-     * @return
-     */
+    @Override
+    public Image create(String title, String uri, User user)
+    {
+        Image image = new Image(title, uri, user);
+        getEntityManager().persist(image);
+        return image;
+    }
 
-   public Image getByUser(int user){
-       return getEntityManager()
-               .createQuery("Select i FROM Image i WHERE i.user.id = :user", Image.class)
-               .setParameter("user", user)
-               .getSingleResult();
-}
+    @Override
+    public List<Image> getByUser(Integer user){
+            return getEntityManager()
+                    .createQuery("SELECT i FROM Image i WHERE i.user.id = :user", Image.class)
+                    .setParameter("user", user)
+                    .getResultList();
+
+        }
 
 
+    @Override
+    public List<Image> getByUserPaginated(Integer user, int pageSize, int pageNumber)
+    {
+        
+    }
 }

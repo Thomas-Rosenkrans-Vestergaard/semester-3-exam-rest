@@ -8,14 +8,14 @@ public class ImageDTO
 
     private Integer id;
     private String title;
-    private byte[] data;
+    private String uri;
     private User user;
 
 
     public ImageDTO(Image image, boolean withUser){
         this.id = image.getId();
         this.title = image.getTitle();
-        this.data = image.getData();
+        this.uri = image.getUri();
         if(withUser)
             this.user = image.getUser();
     }
@@ -44,14 +44,14 @@ public class ImageDTO
         this.title = title;
     }
 
-    public byte[] getData()
+    public String getUri()
     {
-        return data;
+        return uri;
     }
 
-    public void setData(byte[] data)
+    public void setData(String uri)
     {
-        this.data = data;
+        this.uri = uri;
     }
 
     public User getUser()

@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.repositories.TransactionalImageRepository;
 import com.group3.sem3exam.rest.exceptions.ImageNotFoundException;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.List;
 
 public class ImageFacade
 {
@@ -30,14 +31,14 @@ public class ImageFacade
 
 
 
-    public Image getByUser(Integer user) throws ImageNotFoundException{
+    public List<Image> getByUser(Integer user) throws ImageNotFoundException{
 
         try(TransactionalImageRepository tir = new TransactionalImageRepository(emf)) {
-            Image image = tir.getByUser(user);
-            if (image == null) {
+            List<Image> images = tir.getByUser(user);
+            if (images == null) {
                 throw new ImageNotFoundException(user);
             }
-            return image;
+            return images;
         }
     }
 }

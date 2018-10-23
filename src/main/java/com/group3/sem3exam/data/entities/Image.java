@@ -20,9 +20,8 @@ public class Image implements RepositoryEntity<Integer>
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
-    @Lob
-    private byte[] data;
+    @Column(columnDefinition = "MEDIUMTEXT", nullable = false)
+    private String uri;
 
     @ManyToOne(fetch = EAGER, optional = false)
     private User user;
@@ -32,10 +31,10 @@ public class Image implements RepositoryEntity<Integer>
 
     }
 
-    public Image(String title, byte[] data, User user)
+    public Image(String title, String uri, User user)
     {
         this.title = title;
-        this.data = data;
+        this.uri = uri;
         this.user = user;
     }
 
@@ -59,14 +58,14 @@ public class Image implements RepositoryEntity<Integer>
         this.title = title;
     }
 
-    public byte[] getData()
+    public String getUri()
     {
-        return this.data;
+        return this.uri;
     }
 
-    public void setData(byte[] data)
+    public void setData(String uri)
     {
-        this.data = data;
+        this.uri = uri;
     }
 
     public User getUser()
