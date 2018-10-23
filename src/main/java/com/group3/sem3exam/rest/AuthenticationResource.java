@@ -17,7 +17,7 @@ public class AuthenticationResource
 {
 
     private static Gson                 gson                 = SpecializedGson.create();
-    private static AuthenticationFacade authenticationFacade = new AuthenticationFacade(JpaConnection.emf);
+    private static AuthenticationFacade authenticationFacade = new AuthenticationFacade(JpaConnection.create());
 
     @POST
     @Path("user")

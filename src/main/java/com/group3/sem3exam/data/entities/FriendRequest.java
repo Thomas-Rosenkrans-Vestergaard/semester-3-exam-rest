@@ -1,5 +1,6 @@
 package com.group3.sem3exam.data.entities;
 
+import com.group3.sem3exam.data.repositories.RepositoryEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -9,17 +10,17 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "friend_request")
-public class FriendRequest
+public class FriendRequest implements RepositoryEntity<Integer>
 {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private User requester;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private User receiver;
 
     @Column

@@ -4,7 +4,7 @@ import com.group3.sem3exam.data.entities.City;
 
 import java.util.List;
 
-public interface CityRepository extends CrudRepository<City, Integer>
+public interface CityRepository extends ReadCrudRepository<City, Integer>
 {
 
     /**

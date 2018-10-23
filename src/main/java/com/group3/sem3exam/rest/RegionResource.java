@@ -22,7 +22,7 @@ public class RegionResource
 {
 
     private static Gson         gson         = SpecializedGson.create();
-    private static RegionFacade regionFacade = new RegionFacade(JpaConnection.emf);
+    private static RegionFacade regionFacade = new RegionFacade(JpaConnection.create());
 
     @GET
     @Path("{id: [0-9]+}")

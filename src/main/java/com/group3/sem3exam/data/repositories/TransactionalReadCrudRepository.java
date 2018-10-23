@@ -1,49 +1,61 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.repositories.transactions.AbstractTransactionalRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class TransactionalCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
-        extends TransactionalReadCrudRepository<E, K>
-        implements CrudRepository<E, K>
+public class TransactionalReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
+        extends AbstractTransactionalRepository
+        implements ReadCrudRepository<E, K>
 {
 
     /**
-     * Creates a new {@link TransactionalCrudRepository} using the provided entity manager.
+     * The type of entity the operations are performed upon.
+     */
+    protected final Class<E> c;
+
+    /**
+     * Creates a new {@link TransactionalReadCrudRepository} using the provided entity manager.
      *
      * @param entityManager The entity manager to perform operations upon.
      * @param c             The type of entity the operations are performed upon.
      */
-    public TransactionalCrudRepository(EntityManager entityManager, Class<E> c)
+    public TransactionalReadCrudRepository(EntityManager entityManager, Class<E> c)
     {
-        super(entityManager, c);
+        super(entityManager);
+        this.c = c;
     }
 
     /**
-     * Creates a new {@link TransactionalCrudRepository} using the provided entity manager factory.
+     * Creates a new {@link TransactionalReadCrudRepository} using the provided entity manager factory.
      *
      * @param entityManagerFactory The entity manager factory used to create the entity manager to perform operations
      *                             upon.
      * @param c                    The type of entity the operations are performed upon.
      */
-    public TransactionalCrudRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
+    public TransactionalReadCrudRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
     {
-        super(entityManagerFactory, c);
+        super(entityManagerFactory);
+        this.c = c;
     }
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link TransactionalReadCrudRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      * @param c           The type of entity the operations are performed upon.
      */
-    public TransactionalCrudRepository(Transaction transaction, Class<E> c)
+    public TransactionalReadCrudRepository(Transaction transaction, Class<E> c)
     {
-        super(transaction, c);
+        super(transaction);
+        this.c = c;
     }
 
     /**
@@ -106,34 +118,26 @@ public class TransactionalCrudRepository<E extends RepositoryEntity<K>, K extend
     }
 
     /**
-     * Forces the entity to update.
+     * Returns all the entities with the provided ids. When an entity with a provided id does not exist, the
+     * {@code null} value is not inserted in the return map.
      *
-     * @param entity The entity to update.
-     * @return The updated entity.
+     * @param ids The ids of entity to return.
+     * @return The returned entities mapped to their id. The returned map is an HashMap, and the order of the returned
+     * entities is not consistent.
      */
     @Override
-    public E update(E entity)
+    public Map<K, E> get(Set<K> ids)
     {
-        EntityManager entityManager = this.getEntityManager();
-        return (E) entityManager.merge(entityManager.contains(entity) ? entity : entityManager.merge(entity));
-    }
+        List<E> results = getEntityManager()
+                .createQuery("SELECT e FROM " + c.getSimpleName() + " e WHERE e.id IN :ids", c)
+                .setParameter("ids", ids)
+                .getResultList();
 
-    /**
-     * Deletes the entity with the provided id.
-     *
-     * @param id The id of the entity to delete.
-     * @return The deleted entity, or {@code null} when no entity was deleted.
-     */
-    @Override
-    public E delete(K id)
-    {
-        EntityManager entityManager = this.getEntityManager();
-        E             find          = entityManager.find(c, id);
-        if (find == null)
-            return null;
+        Map<K, E> returnMap = new HashMap<>();
+        for (E entity : results)
+            returnMap.put(entity.getId(), entity);
 
-        entityManager.remove(find);
-        return find;
+        return returnMap;
     }
 
     /**

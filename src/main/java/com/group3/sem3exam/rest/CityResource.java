@@ -22,7 +22,7 @@ public class CityResource
 {
 
     private static Gson       gson       = SpecializedGson.create();
-    private static CityFacade cityFacade = new CityFacade(JpaConnection.emf);
+    private static CityFacade cityFacade = new CityFacade(JpaConnection.create());
 
     @GET
     @Path("{id: [0-9]+}")

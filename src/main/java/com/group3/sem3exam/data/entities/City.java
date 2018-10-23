@@ -1,5 +1,7 @@
 package com.group3.sem3exam.data.entities;
 
+import com.group3.sem3exam.data.repositories.RepositoryEntity;
+
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.EAGER;
@@ -7,7 +9,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "city")
-public class City
+public class City implements RepositoryEntity<Integer>
 {
 
     @Id

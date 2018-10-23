@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
-public class TransactionalCityRepository extends TransactionalCrudRepository<City, Integer> implements CityRepository
+public class TransactionalCityRepository extends TransactionalReadCrudRepository<City, Integer> implements CityRepository
 {
 
     /**
