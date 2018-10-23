@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.facades.DataUriEncoder;
 import com.group3.sem3exam.facades.ImageFacade;
+import com.group3.sem3exam.rest.authentication.Authenticator;
 import com.group3.sem3exam.rest.dto.CityDTO;
 import com.group3.sem3exam.rest.dto.ImageDTO;
 import com.group3.sem3exam.rest.exceptions.ImageNotFoundException;
@@ -20,9 +21,10 @@ import java.util.stream.Collectors;
 public class ImageResource
 {
 
-    private static Gson           gson        = SpecializedGson.create();
-    private static ImageFacade    imageFacade = new ImageFacade(JpaConnection.create());
-    private static DataUriEncoder encoder     = new DataUriEncoder();
+    private static Gson           gson          = SpecializedGson.create();
+    private static ImageFacade    imageFacade   = new ImageFacade(JpaConnection.create());
+    private static DataUriEncoder encoder       = new DataUriEncoder();
+    private static Authenticator  authenticator = new Authenticator();
 
     @POST
     @Path("create")
