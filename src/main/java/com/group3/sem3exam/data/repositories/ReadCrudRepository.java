@@ -19,7 +19,7 @@ public interface ReadCrudRepository<E extends RepositoryEntity<K>, K extends Com
      *
      * @param pageSize   The number of entities per page.
      * @param pageNumber The page number to getCities. Starts at 1.
-     * @return
+     *                   return The images on the selected page.
      */
     List<E> getPaginated(int pageSize, int pageNumber);
 
@@ -34,7 +34,7 @@ public interface ReadCrudRepository<E extends RepositoryEntity<K>, K extends Com
      * Returns the entity with the provided id.
      *
      * @param id The id of the entity to return.
-     * @return The entity with the provided id, or {@code null} when no such entity exsits.
+     * @return The entity with the provided id, or {@code null} when no such entity exists.
      */
     E get(K id);
 
