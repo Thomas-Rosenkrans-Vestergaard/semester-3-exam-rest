@@ -8,17 +8,17 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TransactionalReadCrudRepositoryTester<
+public class JpaReadCrudRepositoryTester<
         E extends RepositoryEntity<K>,
         K extends Comparable<K>,
-        I extends TransactionalReadCrudRepository<E, K>>
+        I extends JpaReadCrudRepository<E, K>>
 {
 
     protected final Supplier<I>                constructor;
     protected final Function<I, TreeMap<K, E>> dataProducer;
     protected final K                          unknownKey;
 
-    public TransactionalReadCrudRepositoryTester(
+    public JpaReadCrudRepositoryTester(
             Supplier<I> constructor,
             Function<I, TreeMap<K, E>> dataProducer,
             K unknownKey)

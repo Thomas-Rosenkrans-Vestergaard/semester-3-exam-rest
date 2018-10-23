@@ -1,44 +1,44 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.Country;
-import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
-public class TransactionalCountryRepository extends TransactionalReadCrudRepository<Country, Integer>
+public class JpaCountryRepository extends JpaReadCrudRepository<Country, Integer>
         implements CountryRepository
 {
 
     /**
-     * Creates a new {@link TransactionalCountryRepository}.
+     * Creates a new {@link JpaCountryRepository}.
      *
      * @param entityManager The entity manager that operations are performed upon.
      */
-    public TransactionalCountryRepository(EntityManager entityManager)
+    public JpaCountryRepository(EntityManager entityManager)
     {
         super(entityManager, Country.class);
     }
 
     /**
-     * Creates a new {@link TransactionalCountryRepository}.
+     * Creates a new {@link JpaCountryRepository}.
      *
      * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
      *                             performed upon - is created.
      */
-    public TransactionalCountryRepository(EntityManagerFactory entityManagerFactory)
+    public JpaCountryRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, Country.class);
     }
 
     /**
-     * Creates a new {@link TransactionalCountryRepository}.
+     * Creates a new {@link JpaCountryRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      */
-    public TransactionalCountryRepository(Transaction transaction)
+    public JpaCountryRepository(JpaTransaction transaction)
     {
         super(transaction, Country.class);
     }

@@ -1,43 +1,43 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
-public class TransactionalCityRepository extends TransactionalReadCrudRepository<City, Integer> implements CityRepository
+public class JpaCityRepository extends JpaReadCrudRepository<City, Integer> implements CityRepository
 {
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link JpaCityRepository}.
      *
      * @param entityManager The entity manager that operations are performed upon.
      */
-    public TransactionalCityRepository(EntityManager entityManager)
+    public JpaCityRepository(EntityManager entityManager)
     {
         super(entityManager, City.class);
     }
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link JpaCityRepository}.
      *
      * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
      *                             performed upon - is created.
      */
-    public TransactionalCityRepository(EntityManagerFactory entityManagerFactory)
+    public JpaCityRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, City.class);
     }
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link JpaCityRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      */
-    public TransactionalCityRepository(Transaction transaction)
+    public JpaCityRepository(JpaTransaction transaction)
     {
         super(transaction, City.class);
     }

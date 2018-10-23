@@ -3,10 +3,11 @@ package com.group3.sem3exam.data.repositories;
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.transactions.TransactionalRepository;
 
 import java.time.LocalDate;
 
-public interface UserRepository extends CrudRepository<User, Integer>
+public interface UserRepository extends CrudRepository<User, Integer>, TransactionalRepository
 {
 
     /**
@@ -29,6 +30,4 @@ public interface UserRepository extends CrudRepository<User, Integer>
      * @return The user with the provided email, {@code null} when no such user exists.
      */
     User getByEmail(String email);
-
-
 }

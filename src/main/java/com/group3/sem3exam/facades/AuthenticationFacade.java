@@ -1,31 +1,31 @@
 package com.group3.sem3exam.facades;
 
-import com.group3.sem3exam.data.repositories.TransactionalUserRepository;
+import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.rest.authentication.AuthenticationContext;
 import com.group3.sem3exam.rest.authentication.AuthenticationException;
 import com.group3.sem3exam.rest.authentication.UserAuthenticator;
 import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
 import com.group3.sem3exam.rest.authentication.jwt.JwtTokenGenerator;
 
-import javax.persistence.EntityManagerFactory;
 import java.io.File;
+import java.util.function.Supplier;
 
 public class AuthenticationFacade
 {
 
     /**
-     * The entity manager factory that is used when authenticating users.
+     * The factory that produces user repositories used by this facade.
      */
-    private final EntityManagerFactory emf;
+    private final Supplier<UserRepository> userRepositoryFactory;
 
     /**
      * Creates a new {@link AuthenticationFacade}.
      *
-     * @param emf The entity manager factory that is used when authenticating users.
+     * @param userRepositoryFactory The factory that produces user repositories used by this facade.
      */
-    public AuthenticationFacade(EntityManagerFactory emf)
+    public AuthenticationFacade(Supplier<UserRepository> userRepositoryFactory)
     {
-        this.emf = emf;
+        this.userRepositoryFactory = userRepositoryFactory;
     }
 
     /**
@@ -53,7 +53,7 @@ public class AuthenticationFacade
      */
     public AuthenticationContext authenticate(String email, String password) throws AuthenticationException
     {
-        try (TransactionalUserRepository tup = new TransactionalUserRepository(emf)) {
+        try (UserRepository tup = userRepositoryFactory.get()) {
             UserAuthenticator authenticator = new UserAuthenticator(tup);
             return authenticator.authenticate(email, password);
         }

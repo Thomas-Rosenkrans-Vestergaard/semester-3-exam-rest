@@ -1,20 +1,28 @@
 package com.group3.sem3exam.facades;
 
 import com.group3.sem3exam.data.entities.Region;
-import com.group3.sem3exam.data.repositories.TransactionalRegionRepository;
+import com.group3.sem3exam.data.repositories.RegionRepository;
 import com.group3.sem3exam.rest.exceptions.RegionNotFoundException;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class RegionFacade
 {
 
-    private EntityManagerFactory emf;
+    /**
+     * The factory that produces region repositories used by this facade.
+     */
+    private final Supplier<RegionRepository> regionRepositoryFactory;
 
-    public RegionFacade(EntityManagerFactory emf)
+    /**
+     * Creates a new {@link RegionFacade}.
+     *
+     * @param regionRepositoryFactory The factory that produces region repositories used by this facade.
+     */
+    public RegionFacade(Supplier<RegionRepository> regionRepositoryFactory)
     {
-        this.emf = emf;
+        this.regionRepositoryFactory = regionRepositoryFactory;
     }
 
     /**
@@ -24,8 +32,8 @@ public class RegionFacade
      */
     public List<Region> all()
     {
-        try (TransactionalRegionRepository trr = new TransactionalRegionRepository(emf)) {
-            return trr.get();
+        try (RegionRepository rr = regionRepositoryFactory.get()) {
+            return rr.get();
         }
     }
 
@@ -38,8 +46,8 @@ public class RegionFacade
      */
     public Region get(Integer id) throws RegionNotFoundException
     {
-        try (TransactionalRegionRepository trr = new TransactionalRegionRepository(emf)) {
-            Region region = trr.get(id);
+        try (RegionRepository rr = regionRepositoryFactory.get()) {
+            Region region = rr.get(id);
             if (region == null)
                 throw new RegionNotFoundException(id);
 
@@ -55,8 +63,8 @@ public class RegionFacade
      */
     public List<Region> getByCountry(int country)
     {
-        try(TransactionalRegionRepository trr = new TransactionalRegionRepository(emf)){
-            return trr.getByCountry(country);
+        try (RegionRepository rr = regionRepositoryFactory.get()) {
+            return rr.getByCountry(country);
         }
     }
 }

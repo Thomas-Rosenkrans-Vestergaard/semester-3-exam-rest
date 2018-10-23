@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface ReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
+public interface ReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>> extends Repository
 {
 
     /**

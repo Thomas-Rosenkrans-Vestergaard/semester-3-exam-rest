@@ -3,32 +3,34 @@ package com.group3.sem3exam.facades;
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.TransactionalCityRepository;
-import com.group3.sem3exam.data.repositories.TransactionalUserRepository;
-import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.data.repositories.JpaCityRepository;
+import com.group3.sem3exam.data.repositories.JpaUserRepository;
+import com.group3.sem3exam.data.repositories.UserRepository;
+import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.rest.JpaConnection;
 import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
 import com.group3.sem3exam.rest.exceptions.UserNotFoundException;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
+import java.util.function.Supplier;
 
 public class UserFacade
 {
 
     /**
-     * The entity manager factory used to access the database.
+     * The factory that produces user repositories used by this facade.
      */
-    private EntityManagerFactory emf;
+    private final Supplier<UserRepository> userRepositoryFactory;
 
     /**
      * Creates a new {@link UserFacade}.
      *
-     * @param emf The entity manager factory used to access the database.
+     * @param userRepositoryFactory The factory that produces user repositories used by this facade.
      */
-    public UserFacade(EntityManagerFactory emf)
+    public UserFacade(Supplier<UserRepository> userRepositoryFactory)
     {
-        this.emf = emf;
+        this.userRepositoryFactory = userRepositoryFactory;
     }
 
     /**
@@ -40,8 +42,8 @@ public class UserFacade
      */
     public User get(Integer id) throws UserNotFoundException
     {
-        try (TransactionalUserRepository tur = new TransactionalUserRepository(emf)) {
-            User user = tur.get(id);
+        try (UserRepository ur = userRepositoryFactory.get()) {
+            User user = ur.get(id);
             if (user == null)
                 throw new UserNotFoundException(id);
 
@@ -64,11 +66,11 @@ public class UserFacade
     public User createUser(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
     throws CityNotFoundException
     {
-        try (Transaction transaction = new Transaction(emf)) {
+        try (JpaTransaction transaction = new JpaTransaction(JpaConnection.create())) {
 
             transaction.begin();
-            TransactionalUserRepository tur = new TransactionalUserRepository(transaction);
-            TransactionalCityRepository tcr = new TransactionalCityRepository(transaction);
+            JpaUserRepository tur = new JpaUserRepository(transaction);
+            JpaCityRepository tcr = new JpaCityRepository(transaction);
 
             City retrievedCity = tcr.get(city);
             if (retrievedCity == null)

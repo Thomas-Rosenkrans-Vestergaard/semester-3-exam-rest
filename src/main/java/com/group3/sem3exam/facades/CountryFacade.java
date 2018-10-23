@@ -1,20 +1,28 @@
 package com.group3.sem3exam.facades;
 
 import com.group3.sem3exam.data.entities.Country;
-import com.group3.sem3exam.data.repositories.TransactionalCountryRepository;
+import com.group3.sem3exam.data.repositories.CountryRepository;
 import com.group3.sem3exam.rest.exceptions.CountryNotFoundException;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class CountryFacade
 {
 
-    private EntityManagerFactory emf;
+    /**
+     * The factory that produces country repositories used by this facade.
+     */
+    private final Supplier<CountryRepository> countryRepositoryFactory;
 
-    public CountryFacade(EntityManagerFactory emf)
+    /**
+     * Creates a new {@link CountryFacade}.
+     *
+     * @param countryRepositoryFactory The factory that produces country repositories used by this facade.
+     */
+    public CountryFacade(Supplier<CountryRepository> countryRepositoryFactory)
     {
-        this.emf = emf;
+        this.countryRepositoryFactory = countryRepositoryFactory;
     }
 
     /**
@@ -26,8 +34,8 @@ public class CountryFacade
      */
     public Country get(Integer id) throws CountryNotFoundException
     {
-        try (TransactionalCountryRepository tcr = new TransactionalCountryRepository(emf)) {
-            Country country = tcr.get(id);
+        try (CountryRepository cr = countryRepositoryFactory.get()) {
+            Country country = cr.get(id);
             if (country == null)
                 throw new CountryNotFoundException(id);
 
@@ -42,8 +50,8 @@ public class CountryFacade
      */
     public List<Country> all()
     {
-        try (TransactionalCountryRepository tcr = new TransactionalCountryRepository(emf)) {
-            return tcr.get();
+        try (CountryRepository cr = countryRepositoryFactory.get()) {
+            return cr.get();
         }
     }
 }

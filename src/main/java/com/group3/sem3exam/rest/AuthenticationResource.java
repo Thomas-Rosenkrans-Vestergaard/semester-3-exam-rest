@@ -1,6 +1,7 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
+import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.facades.AuthenticationFacade;
 import com.group3.sem3exam.rest.authentication.AuthenticationContext;
 import com.group3.sem3exam.rest.dto.AuthenticationDTO;
@@ -17,7 +18,7 @@ public class AuthenticationResource
 {
 
     private static Gson                 gson                 = SpecializedGson.create();
-    private static AuthenticationFacade authenticationFacade = new AuthenticationFacade(JpaConnection.create());
+    private static AuthenticationFacade authenticationFacade = new AuthenticationFacade(() -> new JpaUserRepository(JpaConnection.create()));
 
     @POST
     @Path("user")
