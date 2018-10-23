@@ -8,6 +8,7 @@ import com.group3.sem3exam.data.repositories.TransactionalUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
 import com.group3.sem3exam.rest.exceptions.UserNotFoundException;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
@@ -73,9 +74,20 @@ public class UserFacade
             if (retrievedCity == null)
                 throw new CityNotFoundException(city);
 
-            User user = tur.createUser(name, email, password, retrievedCity, gender, dateOfBirth);
+            User user = tur.createUser(name, email, hash(password), retrievedCity, gender, dateOfBirth);
             transaction.commit();
             return user;
         }
+    }
+
+    /**
+     * Hashes the provided password using the bcrypt algorithm.
+     *
+     * @param password The password to hash.
+     * @return The resulting hash.
+     */
+    private String hash(String password)
+    {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }

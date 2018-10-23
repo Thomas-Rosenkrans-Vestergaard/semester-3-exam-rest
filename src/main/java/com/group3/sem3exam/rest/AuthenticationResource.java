@@ -1,9 +1,9 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.group3.sem3exam.facades.AuthenticationFacade;
 import com.group3.sem3exam.rest.authentication.AuthenticationContext;
+import com.group3.sem3exam.rest.dto.AuthenticationDTO;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -28,10 +28,7 @@ public class AuthenticationResource
         ReceivedAuthenticateUser receivedUser          = gson.fromJson(content, ReceivedAuthenticateUser.class);
         AuthenticationContext    authenticationContext = authenticationFacade.authenticate(receivedUser.email, receivedUser.password);
         String                   token                 = authenticationFacade.generateAuthenticationToken(authenticationContext);
-        JsonObject               result                = new JsonObject();
-        result.addProperty("token", token);
-        result.addProperty("owner", true);
-        return Response.ok(result.toString()).build();
+        return Response.ok(gson.toJson(AuthenticationDTO.basic(token))).build();
     }
 
     private class ReceivedAuthenticateUser
