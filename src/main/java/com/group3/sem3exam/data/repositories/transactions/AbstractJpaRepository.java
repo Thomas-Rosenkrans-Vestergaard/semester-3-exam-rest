@@ -4,7 +4,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
-public class AbstractTransactionalRepository implements TransactionalRepository
+public class AbstractJpaRepository implements TransactionalRepository
 {
 
     /**
@@ -13,33 +13,38 @@ public class AbstractTransactionalRepository implements TransactionalRepository
     private EntityManager entityManager;
 
     /**
-     * Creates a new {@link AbstractTransactionalRepository}.
+     * Whether or not the repository committed write operations to the database immediately.
+     */
+    protected boolean autoCommit = false;
+
+    /**
+     * Creates a new {@link AbstractJpaRepository}.
      *
      * @param entityManager The entity manager that operations are performed upon.
      */
-    public AbstractTransactionalRepository(EntityManager entityManager)
+    public AbstractJpaRepository(EntityManager entityManager)
     {
         this.entityManager = entityManager;
     }
 
     /**
-     * Creates a new {@link AbstractTransactionalRepository}.
+     * Creates a new {@link AbstractJpaRepository}.
      *
      * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
      *                             performed upon - is created.
      */
-    public AbstractTransactionalRepository(EntityManagerFactory entityManagerFactory)
+    public AbstractJpaRepository(EntityManagerFactory entityManagerFactory)
     {
         this(entityManagerFactory.createEntityManager());
     }
 
     /**
-     * Creates a new {@link AbstractTransactionalRepository}.
+     * Creates a new {@link AbstractJpaRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      */
-    public AbstractTransactionalRepository(Transaction transaction)
+    public AbstractJpaRepository(JpaTransaction transaction)
     {
         this(transaction.getEntityManager());
     }
@@ -50,7 +55,8 @@ public class AbstractTransactionalRepository implements TransactionalRepository
     @Override
     public void begin()
     {
-        this.entityManager.getTransaction().begin();
+        if (!this.entityManager.getTransaction().isActive())
+            this.entityManager.getTransaction().begin();
     }
 
     /**
@@ -105,5 +111,16 @@ public class AbstractTransactionalRepository implements TransactionalRepository
     public void setEntityManager(EntityManager entityManger)
     {
         this.entityManager = entityManager;
+    }
+
+    /**
+     * Indicates to the repository that all write operations should be committed to the database immediately.
+     *
+     * @return this
+     */
+    @Override
+    public void autoCommit()
+    {
+        this.autoCommit = true;
     }
 }

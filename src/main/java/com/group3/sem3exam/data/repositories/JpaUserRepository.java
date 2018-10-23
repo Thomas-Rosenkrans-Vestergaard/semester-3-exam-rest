@@ -3,44 +3,44 @@ package com.group3.sem3exam.data.repositories;
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.time.LocalDate;
 
-public class TransactionalUserRepository extends TransactionalCrudRepository<User, Integer> implements UserRepository
+public class JpaUserRepository extends JpaCrudRepository<User, Integer> implements UserRepository
 {
 
     /**
-     * Creates a new {@link TransactionalUserRepository}.
+     * Creates a new {@link JpaUserRepository}.
      *
      * @param entityManager The entity manager that operations are performed upon.
      */
-    public TransactionalUserRepository(EntityManager entityManager)
+    public JpaUserRepository(EntityManager entityManager)
     {
         super(entityManager, User.class);
     }
 
     /**
-     * Creates a new {@link TransactionalUserRepository}.
+     * Creates a new {@link JpaUserRepository}.
      *
      * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
      *                             performed upon - is created.
      */
-    public TransactionalUserRepository(EntityManagerFactory entityManagerFactory)
+    public JpaUserRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, User.class);
     }
 
     /**
-     * Creates a new {@link TransactionalUserRepository}.
+     * Creates a new {@link JpaUserRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      */
-    public TransactionalUserRepository(Transaction transaction)
+    public JpaUserRepository(JpaTransaction transaction)
     {
         super(transaction, User.class);
     }
@@ -59,9 +59,16 @@ public class TransactionalUserRepository extends TransactionalCrudRepository<Use
     @Override
     public User createUser(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
     {
-        User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
-        getEntityManager().persist(user);
-        return user;
+        try {
+            User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
+            if (autoCommit)
+                begin();
+            getEntityManager().persist(user);
+            return user;
+        } finally {
+            if (autoCommit)
+                commit();
+        }
     }
 
     /**

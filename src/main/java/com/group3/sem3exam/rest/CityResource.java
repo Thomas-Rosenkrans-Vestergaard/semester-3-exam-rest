@@ -3,6 +3,7 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.facades.CityFacade;
 import com.group3.sem3exam.rest.dto.CityDTO;
 import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
@@ -22,7 +23,7 @@ public class CityResource
 {
 
     private static Gson       gson       = SpecializedGson.create();
-    private static CityFacade cityFacade = new CityFacade(JpaConnection.create());
+    private static CityFacade cityFacade = new CityFacade(() -> new JpaCityRepository(JpaConnection.create()));
 
 
     @GET

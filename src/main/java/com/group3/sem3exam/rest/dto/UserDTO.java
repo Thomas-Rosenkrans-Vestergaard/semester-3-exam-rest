@@ -1,6 +1,5 @@
 package com.group3.sem3exam.rest.dto;
 
-import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 
@@ -16,7 +15,7 @@ public class UserDTO
     private Integer             id;
     private String              name;
     private String              email;
-    private City                city;
+    private CityDTO             city;
     private Gender              gender;
     private LocalDate           dateOfBirth;
     private LocalDateTime       createdAt;
@@ -28,7 +27,7 @@ public class UserDTO
         this.name = user.getName();
         this.email = user.getEmail();
         this.createdAt = user.getCreatedAt();
-        this.city = user.getCity();
+        this.city = CityDTO.basic(user.getCity());
         this.gender = user.getGender();
         this.dateOfBirth = user.getDateOfBirth();
         if (showFriendships)

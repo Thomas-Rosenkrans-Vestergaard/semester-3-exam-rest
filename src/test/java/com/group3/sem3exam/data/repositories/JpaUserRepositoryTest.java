@@ -15,15 +15,15 @@ import java.util.TreeMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class TransactionalUserRepositoryTest
+public class JpaUserRepositoryTest
 {
 
     @TestFactory
     public Collection<DynamicTest> testCrudRepositoryMethods()
     {
-        TransactionalCrudRepositoryTester<User, Integer, TransactionalUserRepository> tester =
-                new TransactionalCrudRepositoryTester<>(
-                        () -> new TransactionalUserRepository(JpaTestConnection.create()),
+        JpaCrudRepositoryTester<User, Integer, JpaUserRepository> tester =
+                new JpaCrudRepositoryTester<>(
+                        () -> new JpaUserRepository(JpaTestConnection.create()),
                         (repository) -> createUserMap(repository),
                         -1
                 );
@@ -31,10 +31,10 @@ public class TransactionalUserRepositoryTest
         return tester.getDynamicTests();
     }
 
-    private TreeMap<Integer, User> createUserMap(TransactionalUserRepository repository)
+    private TreeMap<Integer, User> createUserMap(JpaUserRepository repository)
     {
         TreeMap<Integer, User> map  = new TreeMap<>();
-        City                   city = new TransactionalCityRepository(repository.getEntityManager()).get(1);
+        City                   city = new JpaCityRepository(repository.getEntityManager()).get(1);
 
         User user;
 
@@ -59,9 +59,9 @@ public class TransactionalUserRepositoryTest
     @Test
     void getByEmail()
     {
-        try (TransactionalUserRepository tur = new TransactionalUserRepository(JpaTestConnection.create())) {
+        try (JpaUserRepository tur = new JpaUserRepository(JpaTestConnection.create())) {
             tur.begin();
-            City city = new TransactionalCityRepository(tur.getEntityManager()).get(1);
+            City city = new JpaCityRepository(tur.getEntityManager()).get(1);
             assertNull(tur.getByEmail("does_not_exist"));
 
             assertNull(tur.getByEmail("some@email.com"));

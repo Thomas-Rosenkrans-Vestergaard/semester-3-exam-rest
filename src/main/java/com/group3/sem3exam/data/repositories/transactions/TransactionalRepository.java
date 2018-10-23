@@ -1,8 +1,10 @@
 package com.group3.sem3exam.data.repositories.transactions;
 
+import com.group3.sem3exam.data.repositories.Repository;
+
 import javax.persistence.EntityManager;
 
-public interface TransactionalRepository extends Transactional
+public interface TransactionalRepository extends Transactional, Repository
 {
 
     /**

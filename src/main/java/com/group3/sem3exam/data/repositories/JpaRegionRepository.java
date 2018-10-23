@@ -1,39 +1,38 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.Region;
-import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
-public class TransactionalRegionRepository extends TransactionalReadCrudRepository<Region, Integer>
-        implements RegionRepository
+public class JpaRegionRepository extends JpaReadCrudRepository<Region, Integer> implements RegionRepository
 {
 
-    public TransactionalRegionRepository(EntityManager entityManager)
+    public JpaRegionRepository(EntityManager entityManager)
     {
         super(entityManager, Region.class);
     }
 
     /**
-     * Creates a new {@link TransactionalRegionRepository}.
+     * Creates a new {@link JpaRegionRepository}.
      *
      * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
      *                             performed upon - is created.
      */
-    public TransactionalRegionRepository(EntityManagerFactory entityManagerFactory)
+    public JpaRegionRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, Region.class);
     }
 
     /**
-     * Creates a new {@link TransactionalCityRepository}.
+     * Creates a new {@link JpaCityRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      */
-    public TransactionalRegionRepository(Transaction transaction)
+    public JpaRegionRepository(JpaTransaction transaction)
     {
         super(transaction, Region.class);
     }

@@ -7,7 +7,12 @@ public class AuthenticationException extends APIException
 
     public AuthenticationException()
     {
-        this(null);
+        this((Throwable) null);
+    }
+
+    public AuthenticationException(String errorMessage)
+    {
+        this("AuthenticationError", errorMessage, 401, null);
     }
 
     public AuthenticationException(Throwable cause)

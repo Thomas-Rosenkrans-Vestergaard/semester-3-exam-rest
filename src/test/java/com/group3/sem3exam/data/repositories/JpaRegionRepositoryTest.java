@@ -12,15 +12,15 @@ import java.util.TreeMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TransactionalRegionRepositoryTest
+class JpaRegionRepositoryTest
 {
 
     @TestFactory
     public Collection<DynamicTest> testCrudRepositoryMethods()
     {
-        TransactionalReadCrudRepositoryTester<Region, Integer, TransactionalRegionRepository> tester =
-                new TransactionalReadCrudRepositoryTester<>(
-                        () -> new TransactionalRegionRepository(JpaTestConnection.create()),
+        JpaReadCrudRepositoryTester<Region, Integer, JpaRegionRepository> tester =
+                new JpaReadCrudRepositoryTester<>(
+                        () -> new JpaRegionRepository(JpaTestConnection.create()),
                         (repository) -> createRegionMap(repository),
                         -1
                 );
@@ -28,7 +28,7 @@ class TransactionalRegionRepositoryTest
         return tester.getDynamicTests();
     }
 
-    private TreeMap<Integer, Region> createRegionMap(TransactionalRegionRepository repository)
+    private TreeMap<Integer, Region> createRegionMap(JpaRegionRepository repository)
     {
         TreeMap<Integer, Region> map = new TreeMap<>();
         for (Region Region : repository.get())
@@ -40,7 +40,7 @@ class TransactionalRegionRepositoryTest
     @Test
     void getByCountry()
     {
-        try (TransactionalRegionRepository trr = new TransactionalRegionRepository(JpaTestConnection.create())) {
+        try (JpaRegionRepository trr = new JpaRegionRepository(JpaTestConnection.create())) {
             List<Region> result = trr.getByCountry(5);
             assertEquals(3, result.size());
             assertEquals(5, (int) result.get(0).getId());

@@ -16,7 +16,7 @@ public class Authenticator
 
     public String getToken (String token) throws JwtUnpackingException
     {
-       AuthenticationContext  authenticationContext = jwt.unpack(token);
+
 
     }
 

@@ -1,20 +1,28 @@
 package com.group3.sem3exam.facades;
 
 import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.repositories.TransactionalCityRepository;
+import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class CityFacade
 {
 
-    private EntityManagerFactory emf;
+    /**
+     * The factory that produces city repositories used by this facade.
+     */
+    private final Supplier<CityRepository> cityRepositoryFactory;
 
-    public CityFacade(EntityManagerFactory emf)
+    /**
+     * Creates a new {@link CityFacade}.
+     *
+     * @param cityRepositoryFactory The factory that produces city repositories used by this facade.
+     */
+    public CityFacade(Supplier<CityRepository> cityRepositoryFactory)
     {
-        this.emf = emf;
+        this.cityRepositoryFactory = cityRepositoryFactory;
     }
 
     /**
@@ -26,8 +34,8 @@ public class CityFacade
      */
     public City get(Integer id) throws CityNotFoundException
     {
-        try (TransactionalCityRepository tcr = new TransactionalCityRepository(emf)) {
-            City city = tcr.get(id);
+        try (CityRepository cr = cityRepositoryFactory.get()) {
+            City city = cr.get(id);
             if (city == null)
                 throw new CityNotFoundException(id);
 
@@ -43,8 +51,8 @@ public class CityFacade
      */
     public List<City> getByRegion(int region)
     {
-        try (TransactionalCityRepository tcr = new TransactionalCityRepository(emf)) {
-            return tcr.getByRegion(region);
+        try (CityRepository cr = cityRepositoryFactory.get()) {
+            return cr.getByRegion(region);
         }
     }
 }
