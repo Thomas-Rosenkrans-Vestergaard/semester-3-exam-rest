@@ -1,5 +1,6 @@
 package com.group3.sem3exam.data.entities;
 
+import com.group3.sem3exam.data.repositories.RepositoryEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "post")
-public class Post
+public class Post implements RepositoryEntity<Integer>
 {
 
     @Id

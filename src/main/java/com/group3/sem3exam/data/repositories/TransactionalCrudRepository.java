@@ -6,8 +6,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
-public class TransactionalCrudRepository<E, ID> extends TransactionalReadCrudRepository<E, ID>
-        implements CrudRepository<E, ID>
+public class TransactionalCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
+        extends TransactionalReadCrudRepository<E, K>
+        implements CrudRepository<E, K>
 {
 
     /**
@@ -99,7 +100,7 @@ public class TransactionalCrudRepository<E, ID> extends TransactionalReadCrudRep
      * @return The entity with the provided id, or {@code null} when no such entity exsits.
      */
     @Override
-    public E get(ID id)
+    public E get(K id)
     {
         return getEntityManager().find(c, id);
     }
@@ -124,7 +125,7 @@ public class TransactionalCrudRepository<E, ID> extends TransactionalReadCrudRep
      * @return The deleted entity, or {@code null} when no entity was deleted.
      */
     @Override
-    public E delete(ID id)
+    public E delete(K id)
     {
         EntityManager entityManager = this.getEntityManager();
         E             find          = entityManager.find(c, id);
@@ -142,7 +143,7 @@ public class TransactionalCrudRepository<E, ID> extends TransactionalReadCrudRep
      * @return {@code true} when an entity with the provided id exists, {@code false} otherwise.
      */
     @Override
-    public boolean exists(ID id)
+    public boolean exists(K id)
     {
         Long count = getEntityManager()
                 .createQuery("SELECT count(e.id) FROM " + c.getSimpleName() + " e WHERE e.id = :id", Long.class)

@@ -9,13 +9,16 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TransactionalCrudRepositoryTester<E, K, T extends TransactionalCrudRepository<E, K>>
-        extends TransactionalReadCrudRepositoryTester<E, K, T>
+public class TransactionalCrudRepositoryTester<
+        E extends RepositoryEntity<K>,
+        K extends Comparable<K>,
+        I extends TransactionalCrudRepository<E, K>>
+        extends TransactionalReadCrudRepositoryTester<E, K, I>
 {
 
     public TransactionalCrudRepositoryTester(
-            Supplier<T> constructor,
-            Function<T, TreeMap<K, E>> dataProducer,
+            Supplier<I> constructor,
+            Function<I, TreeMap<K, E>> dataProducer,
             K unknownKey)
     {
         super(constructor, dataProducer, unknownKey);
@@ -33,7 +36,7 @@ public class TransactionalCrudRepositoryTester<E, K, T extends TransactionalCrud
     private DynamicTest createUpdateTest()
     {
         return DynamicTest.dynamicTest("update", () -> {
-            try (T instance = constructor.get()) {
+            try (I instance = constructor.get()) {
                 instance.begin();
                 TreeMap<K, E> data = dataProducer.apply(instance);
 
@@ -44,7 +47,7 @@ public class TransactionalCrudRepositoryTester<E, K, T extends TransactionalCrud
     private DynamicTest createDeleteTest()
     {
         return DynamicTest.dynamicTest("delete", () -> {
-            try (T instance = constructor.get()) {
+            try (I instance = constructor.get()) {
                 instance.begin();
                 TreeMap<K, E> data = dataProducer.apply(instance);
                 for (K key : data.keySet()) {

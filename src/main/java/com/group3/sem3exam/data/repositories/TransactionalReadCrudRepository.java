@@ -5,9 +5,14 @@ import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-public class TransactionalReadCrudRepository<E, ID> extends AbstractTransactionalRepository implements ReadCrudRepository<E, ID>
+public class TransactionalReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
+        extends AbstractTransactionalRepository
+        implements ReadCrudRepository<E, K>
 {
 
     /**
@@ -107,9 +112,32 @@ public class TransactionalReadCrudRepository<E, ID> extends AbstractTransactiona
      * @return The entity with the provided id, or {@code null} when no such entity exsits.
      */
     @Override
-    public E get(ID id)
+    public E get(K id)
     {
         return getEntityManager().find(c, id);
+    }
+
+    /**
+     * Returns all the entities with the provided ids. When an entity with a provided id does not exist, the
+     * {@code null} value is not inserted in the return map.
+     *
+     * @param ids The ids of entity to return.
+     * @return The returned entities mapped to their id. The returned map is an HashMap, and the order of the returned
+     * entities is not consistent.
+     */
+    @Override
+    public Map<K, E> get(Set<K> ids)
+    {
+        List<E> results = getEntityManager()
+                .createQuery("SELECT e FROM " + c.getSimpleName() + " e WHERE e.id IN :ids", c)
+                .setParameter("ids", ids)
+                .getResultList();
+
+        Map<K, E> returnMap = new HashMap<>();
+        for (E entity : results)
+            returnMap.put(entity.getId(), entity);
+
+        return returnMap;
     }
 
     /**
@@ -119,7 +147,7 @@ public class TransactionalReadCrudRepository<E, ID> extends AbstractTransactiona
      * @return {@code true} when an entity with the provided id exists, {@code false} otherwise.
      */
     @Override
-    public boolean exists(ID id)
+    public boolean exists(K id)
     {
         Long count = getEntityManager()
                 .createQuery("SELECT count(e.id) FROM " + c.getSimpleName() + " e WHERE e.id = :id", Long.class)

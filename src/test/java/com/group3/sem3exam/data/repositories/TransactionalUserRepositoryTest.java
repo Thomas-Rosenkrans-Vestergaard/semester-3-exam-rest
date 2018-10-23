@@ -22,7 +22,7 @@ public class TransactionalUserRepositoryTest
     public Collection<DynamicTest> testCrudRepositoryMethods()
     {
         TransactionalCrudRepositoryTester<User, Integer, TransactionalUserRepository> tester =
-                new TransactionalCrudRepositoryTester<User, Integer, TransactionalUserRepository>(
+                new TransactionalCrudRepositoryTester<>(
                         () -> new TransactionalUserRepository(JpaTestConnection.create()),
                         (repository) -> createUserMap(repository),
                         -1
