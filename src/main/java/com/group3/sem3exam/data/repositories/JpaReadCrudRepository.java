@@ -77,7 +77,7 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
      *
      * @param pageSize   The number of entities per page.
      * @param pageNumber The page number to getCities. Starts at 1.
-     * @return The images on the selected page.
+     * @return The image on the selected page.
      */
     @Override
     public List<E> getPaginated(int pageSize, int pageNumber)

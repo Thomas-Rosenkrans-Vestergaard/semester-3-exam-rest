@@ -56,4 +56,6 @@ public class UserResource
         String jsonDTO = gson.toJson(UserDTO.basic(user));
         return Response.ok(jsonDTO).build();
     }
+
+
 }

@@ -32,7 +32,6 @@ public class ImageResource
     private static DataUriEncoder     encoder       = new DataUriEncoder();
 
 
-
     @POST
     @Path("create")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -49,25 +48,14 @@ public class ImageResource
         throw new AuthenticationException("Unsupported usertype");
     }
 
-
-    @GET
-    @Path("get")
-    public Response get (){
-
-    }
-
-
-
     @GET
     @Path("get/{user: [0-9]+}")
     public Response getByUser(@PathParam("user")int user, @HeaderParam("Authorization") String content) throws ImageNotFoundException
     {
-
     List<Image> images = imageFacade.getByUser(user);
     String json = gson.toJson(images.stream().map(ImageDTO::basic).collect(Collectors.toList()));
     return Response.ok(json).build();
     }
-
 
     private class ReceivedCreateImage
     {
