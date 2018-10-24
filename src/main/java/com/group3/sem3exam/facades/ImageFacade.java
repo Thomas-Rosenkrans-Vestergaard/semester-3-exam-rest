@@ -1,7 +1,7 @@
 package com.group3.sem3exam.facades;
 
 import com.group3.sem3exam.data.entities.Image;
-import com.group3.sem3exam.data.repositories.TransactionalImageRepository;
+import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.rest.exceptions.ImageNotFoundException;
 
 import javax.persistence.EntityManagerFactory;
@@ -20,7 +20,7 @@ public class ImageFacade
 
     public Image get(Integer id) throws ImageNotFoundException{
 
-        try(TransactionalImageRepository tir = new TransactionalImageRepository(emf)){
+        try(JpaImageRepository tir = new JpaImageRepository(emf)){
             Image image = tir.get(id);
             if(image == null){
                 throw new ImageNotFoundException(id);
@@ -33,7 +33,7 @@ public class ImageFacade
 
     public List<Image> getByUser(Integer user) throws ImageNotFoundException{
 
-        try(TransactionalImageRepository tir = new TransactionalImageRepository(emf)) {
+        try(JpaImageRepository tir = new JpaImageRepository(emf)) {
             List<Image> images = tir.getByUser(user);
             if (images == null) {
                 throw new ImageNotFoundException(user);

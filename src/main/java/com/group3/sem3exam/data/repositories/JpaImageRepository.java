@@ -11,11 +11,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.util.List;
 
-public class TransactionalImageRepository extends TransactionalCrudRepository<Image, Integer> implements ImageRepository
+public class JpaImageRepository extends TransactionalCrudRepository<Image, Integer> implements ImageRepository
 {
 
 
-    public TransactionalImageRepository(EntityManager entityManager)
+    public JpaImageRepository(EntityManager entityManager)
     {
         super(entityManager, Image.class);
     }
@@ -26,7 +26,7 @@ public class TransactionalImageRepository extends TransactionalCrudRepository<Im
      * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
      *                             performed upon - is created.
      */
-    public TransactionalImageRepository(EntityManagerFactory entityManagerFactory)
+    public JpaImageRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, Image.class);
     }
@@ -37,7 +37,7 @@ public class TransactionalImageRepository extends TransactionalCrudRepository<Im
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      */
-    public TransactionalImageRepository(Transaction transaction)
+    public JpaImageRepository(Transaction transaction)
     {
         super(transaction, Image.class);
     }

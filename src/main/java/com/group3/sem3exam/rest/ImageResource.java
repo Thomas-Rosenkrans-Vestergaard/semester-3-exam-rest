@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static com.group3.sem3exam.rest.authentication.AuthenticationType.USER;
+
 @Path("images")
 public class ImageResource
 {
@@ -28,7 +30,7 @@ public class ImageResource
     private static Gson               gson          = SpecializedGson.create();
     private static ImageFacade        imageFacade   = new ImageFacade(JpaConnection.create());
     private static DataUriEncoder     encoder       = new DataUriEncoder();
-    private static TokenAuthenticator authenticator = new TokenAuthenticator(() -> new JpaUserRepository(JpaConnection.create()));
+
 
 
     @POST
@@ -36,13 +38,15 @@ public class ImageResource
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@HeaderParam("Authorization")String token, String content) throws IOException, AuthenticationException
     {
+        TokenAuthenticator authenticator = new TokenAuthenticator(() -> new JpaUserRepository(JpaConnection.create()));
         AuthenticationContext  authenticationContext = authenticator.authenticate(token);
-        if(authenticationContext.getType().equals("USER")) {
+        if(authenticationContext.getType() == USER) {
             ReceivedCreateImage image = gson.fromJson(content, ReceivedCreateImage.class);
             byte[]              data  = Base64.getDecoder().decode(image.data);
             String              URI   = encoder.bytesToDataURI(data);
             return Response.ok(URI).build();
         }
+        throw new AuthenticationException("Unsupported usertype");
     }
 
 

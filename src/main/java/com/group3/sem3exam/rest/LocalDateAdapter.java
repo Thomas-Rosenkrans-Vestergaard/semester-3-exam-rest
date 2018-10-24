@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 class LocalDateAdapter implements JsonSerializer<LocalDate>, JsonDeserializer<LocalDate>
 {
 
+    @Override
     public JsonElement serialize(LocalDate date, Type typeOfSrc, JsonSerializationContext context)
     {
         return new JsonPrimitive(date.format(DateTimeFormatter.ISO_LOCAL_DATE));
