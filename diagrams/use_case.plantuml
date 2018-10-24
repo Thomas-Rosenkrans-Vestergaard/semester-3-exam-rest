@@ -1,0 +1,50 @@
+@startuml
+
+actor User
+actor Admin
+
+left to right direction
+
+rectangle "System" {
+
+(Create account) as ca
+(Sign in) as si
+(Search users) as su
+(Send friend request) as sfr
+(Respond to friend request) as rfr
+(CRUD post) as crudpost
+(CRUD comment) as crudcomment
+(View timeline) as viewtimeline
+(View profile) as vp
+(CRUD image) as crudimage
+
+(Delete user) as du
+(Delete comment) as dc
+(Delete post) as dp
+(Delete image) as di
+
+}
+
+User --> ca
+User --> si
+User --> su
+User --> sfr
+User --> rfr
+User --> crudpost
+User --> crudcomment
+User --> viewtimeline
+User --> vp
+User --> crudimage
+
+
+Admin -down-> du
+Admin -down-> dc
+Admin -down-> dp
+Admin -down-> di
+
+ca -[hidden]- du
+si -[hidden]- dc
+su -[hidden]- dp
+sfr -[hidden]- di
+
+@enduml
