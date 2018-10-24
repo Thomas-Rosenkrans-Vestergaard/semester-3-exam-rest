@@ -4,22 +4,24 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.util.function.Supplier;
+
 public class UserAuthenticator
 {
 
     /**
-     * The repository that users are retrieved from.
+     * The factory that produces user repositories used by this object.
      */
-    private final UserRepository repository;
+    private final Supplier<UserRepository> repositoryFactory;
 
     /**
      * Creates a new {@link UserAuthenticator}.
      *
-     * @param repository The repository that users are retrieved from.
+     * @param repositoryFactory The factory that produces user repositories used by this object.
      */
-    public UserAuthenticator(UserRepository repository)
+    public UserAuthenticator(Supplier<UserRepository> repositoryFactory)
     {
-        this.repository = repository;
+        this.repositoryFactory = repositoryFactory;
     }
 
     /**
@@ -32,14 +34,16 @@ public class UserAuthenticator
      */
     public AuthenticationContext authenticate(String email, String password) throws AuthenticationException
     {
-        User user = this.repository.getByEmail(email);
-        if (user == null)
-            throw new AuthenticationException(new IncorrectCredentialsException());
+        try (UserRepository repository = repositoryFactory.get()) {
+            User user = repository.getByEmail(email);
+            if (user == null)
+                throw new AuthenticationException(new IncorrectCredentialsException());
 
-        if (!checkHash(password, user.getPasswordHash()))
-            throw new AuthenticationException(new IncorrectCredentialsException());
+            if (!checkHash(password, user.getPasswordHash()))
+                throw new AuthenticationException(new IncorrectCredentialsException());
 
-        return AuthenticationContext.user(user);
+            return AuthenticationContext.user(user);
+        }
     }
 
     /**
@@ -50,7 +54,7 @@ public class UserAuthenticator
      * @param hashedPassword The hashed password.
      * @return {@code true} when the provided {@code plainPassword} matches the provided {@code hashedPassword}.
      */
-    public boolean checkHash(String plainPassword, String hashedPassword)
+    private boolean checkHash(String plainPassword, String hashedPassword)
     {
         return BCrypt.checkpw(plainPassword, hashedPassword);
     }

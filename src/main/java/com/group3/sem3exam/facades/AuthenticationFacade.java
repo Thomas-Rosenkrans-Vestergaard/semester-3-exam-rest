@@ -53,9 +53,7 @@ public class AuthenticationFacade
      */
     public AuthenticationContext authenticate(String email, String password) throws AuthenticationException
     {
-        try (UserRepository tup = userRepositoryFactory.get()) {
-            UserAuthenticator authenticator = new UserAuthenticator(tup);
-            return authenticator.authenticate(email, password);
-        }
+        UserAuthenticator authenticator = new UserAuthenticator(userRepositoryFactory);
+        return authenticator.authenticate(email, password);
     }
 }
