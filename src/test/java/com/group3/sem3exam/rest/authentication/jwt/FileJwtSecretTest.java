@@ -1,4 +1,4 @@
-package com.group3.sem3exam.rest.authentication;
+package com.group3.sem3exam.rest.authentication.jwt;
 
 import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
 import com.group3.sem3exam.rest.authentication.jwt.JwtSecret;
@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class FileJwtSecretTest
 {
 
-    private final File saveFile = new File("./src/test/java/com/group3/sem3exam/rest/authentication/saveFile.test");
+    private final File saveFile = new File("./src/test/java/com/group3/sem3exam/rest/authentication/jwt/saveFile.test");
 
     @AfterEach
     public void tearDown() throws Exception

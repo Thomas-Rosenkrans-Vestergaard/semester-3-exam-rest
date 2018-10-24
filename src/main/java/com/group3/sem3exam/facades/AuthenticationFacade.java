@@ -37,7 +37,7 @@ public class AuthenticationFacade
      */
     public String generateAuthenticationToken(AuthenticationContext authenticationContext) throws Exception
     {
-        File              file      = new File("jwt.secret");
+        File              file      = new File("../temp/jwt.secret");
         FileJwtSecret     jwtSecret = new FileJwtSecret(file, 256 / 8);
         JwtTokenGenerator generator = new JwtTokenGenerator(jwtSecret);
         return generator.generate(authenticationContext);
@@ -53,9 +53,7 @@ public class AuthenticationFacade
      */
     public AuthenticationContext authenticate(String email, String password) throws AuthenticationException
     {
-        try (UserRepository tup = userRepositoryFactory.get()) {
-            UserAuthenticator authenticator = new UserAuthenticator(tup);
-            return authenticator.authenticate(email, password);
-        }
+        UserAuthenticator authenticator = new UserAuthenticator(userRepositoryFactory);
+        return authenticator.authenticate(email, password);
     }
 }
