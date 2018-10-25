@@ -3,34 +3,50 @@ package com.group3.sem3exam.facades;
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.JpaCityRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
+import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
-import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.rest.JpaConnection;
+import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
 import com.group3.sem3exam.rest.exceptions.UserNotFoundException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDate;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class UserFacade
+public class UserFacade<T extends Transaction>
 {
+
+    /**
+     * The factory that produces transactions used by this facade.
+     */
+    private final Supplier<T> transactionFactory;
 
     /**
      * The factory that produces user repositories used by this facade.
      */
-    private final Supplier<UserRepository> userRepositoryFactory;
+    private final Function<T, UserRepository> userRepositoryFactory;
+
+    /**
+     * The factory that produces city repositories used by this facade.
+     */
+    private final Function<T, CityRepository> cityRepositoryFactory;
 
     /**
      * Creates a new {@link UserFacade}.
      *
+     * @param transactionFactory    The factory that produces transactions used by this facade.
      * @param userRepositoryFactory The factory that produces user repositories used by this facade.
+     * @param cityRepositoryFactory The factory that produces city repositories used by this facade.
      */
-    public UserFacade(Supplier<UserRepository> userRepositoryFactory)
+    public UserFacade(
+            Supplier<T> transactionFactory,
+            Function<T, UserRepository> userRepositoryFactory,
+            Function<T, CityRepository> cityRepositoryFactory)
     {
+        this.transactionFactory = transactionFactory;
         this.userRepositoryFactory = userRepositoryFactory;
+        this.cityRepositoryFactory = cityRepositoryFactory;
     }
 
     /**
@@ -42,7 +58,7 @@ public class UserFacade
      */
     public User get(Integer id) throws UserNotFoundException
     {
-        try (UserRepository ur = userRepositoryFactory.get()) {
+        try (UserRepository ur = userRepositoryFactory.apply(transactionFactory.get())) {
             User user = ur.get(id);
             if (user == null)
                 throw new UserNotFoundException(id);
@@ -66,17 +82,17 @@ public class UserFacade
     public User createUser(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
     throws CityNotFoundException
     {
-        try (JpaTransaction transaction = new JpaTransaction(JpaConnection.create())) {
+        try (T transaction = transactionFactory.get()) {
 
             transaction.begin();
-            JpaUserRepository tur = new JpaUserRepository(transaction);
-            JpaCityRepository tcr = new JpaCityRepository(transaction);
+            UserRepository ur = userRepositoryFactory.apply(transaction);
+            CityRepository cr = cityRepositoryFactory.apply(transaction);
 
-            City retrievedCity = tcr.get(city);
+            City retrievedCity = cr.get(city);
             if (retrievedCity == null)
                 throw new CityNotFoundException(city);
 
-            User user = tur.createUser(name, email, hash(password), retrievedCity, gender, dateOfBirth);
+            User user = ur.createUser(name, email, hash(password), retrievedCity, gender, dateOfBirth);
             transaction.commit();
             return user;
         }
