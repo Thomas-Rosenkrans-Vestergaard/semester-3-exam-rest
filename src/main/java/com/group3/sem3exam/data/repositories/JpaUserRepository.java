@@ -59,16 +59,9 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
     @Override
     public User createUser(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
     {
-        try {
-            User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
-            if (autoCommit)
-                begin();
-            getEntityManager().persist(user);
-            return user;
-        } finally {
-            if (autoCommit)
-                commit();
-        }
+        User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
+        getEntityManager().persist(user);
+        return user;
     }
 
     /**
