@@ -61,36 +61,32 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
     {
         try {
             User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
-            if (autoCommit) {
+            if (autoCommit)
                 begin();
-            }
             getEntityManager().persist(user);
             return user;
-
         } finally {
-            if (autoCommit) {
+            if (autoCommit)
                 commit();
-            }
         }
     }
 
-
-        /**
-         * Returns the user with the provided email.
-         *
-         * @param email The email fo the user to find and return.
-         * @return The user with the provided email, {@code null} when no such user exists.
-         */
-        @Override
-        public User getByEmail (String email)
-        {
-            try {
-                return getEntityManager()
-                        .createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
-                        .setParameter("email", email)
-                        .getSingleResult();
-            } catch (NoResultException e) {
-                return null;
-            }
+    /**
+     * Returns the user with the provided email.
+     *
+     * @param email The email fo the user to find and return.
+     * @return The user with the provided email, {@code null} when no such user exists.
+     */
+    @Override
+    public User getByEmail(String email)
+    {
+        try {
+            return getEntityManager()
+                    .createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         }
     }
+}

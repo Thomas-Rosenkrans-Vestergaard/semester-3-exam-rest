@@ -1,19 +1,11 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Image;
-import com.group3.sem3exam.data.entities.Region;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.transactions.AbstractTransactionalRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.data.repositories.transactions.Transaction;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implements ImageRepository
 {
