@@ -57,4 +57,23 @@ public class TokenAuthenticator
             throw new AuthenticationException(e);
         }
     }
+
+
+    /**
+     *
+     * @param header
+     * @return the given AuthenticationContext
+     * @throws AuthenticationException
+     */
+
+    public AuthenticationContext authenticateBearerHeader(String header) throws AuthenticationException
+    {
+            header = header.trim();
+        if(header.startsWith("Bearer ")) {
+            header =header.substring(7);
+          return this.authenticate(header);
+
+        }
+        throw new AuthenticationException("Unsupported HTTP Authorization type.");
+    }
 }

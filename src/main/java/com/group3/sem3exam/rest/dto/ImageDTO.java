@@ -3,6 +3,10 @@ package com.group3.sem3exam.rest.dto;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 
+import javax.ejb.Stateless;
+
+
+@Stateless
 public class ImageDTO
 {
 

@@ -3,7 +3,6 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
-import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.facades.DataUriEncoder;
 import com.group3.sem3exam.facades.ImageFacade;
 import com.group3.sem3exam.rest.authentication.AuthenticationContext;
@@ -18,7 +17,6 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.group3.sem3exam.rest.authentication.AuthenticationType.USER;
@@ -38,7 +36,7 @@ public class ImageResource
     public Response create(@HeaderParam("Authorization")String token, String content) throws IOException, AuthenticationException
     {
         TokenAuthenticator authenticator = new TokenAuthenticator(() -> new JpaUserRepository(JpaConnection.create()));
-        AuthenticationContext  authenticationContext = authenticator.authenticate(token);
+        AuthenticationContext  authenticationContext = authenticator.authenticateBearerHeader(token);
         if(authenticationContext.getType() == USER) {
             ReceivedCreateImage image = gson.fromJson(content, ReceivedCreateImage.class);
             byte[]              data  = Base64.getDecoder().decode(image.data);

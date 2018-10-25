@@ -2,9 +2,11 @@ package com.group3.sem3exam.rest.dto;
 
 import com.group3.sem3exam.data.entities.Post;
 
+import javax.ejb.Stateless;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@Stateless
 public class PostDTO
 {
 
