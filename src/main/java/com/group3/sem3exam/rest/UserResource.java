@@ -3,7 +3,9 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
+import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.facades.UserFacade;
 import com.group3.sem3exam.rest.dto.UserDTO;
 import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
@@ -18,8 +20,12 @@ import java.time.LocalDate;
 public class UserResource
 {
 
-    private static Gson       gson       = SpecializedGson.create();
-    private static UserFacade userFacade = new UserFacade(() -> new JpaUserRepository(JpaConnection.create()));
+    private static Gson                       gson       = SpecializedGson.create();
+    private static UserFacade<JpaTransaction> userFacade = new UserFacade<>(
+            () -> new JpaTransaction(JpaConnection.create()),
+            transaction -> new JpaUserRepository(transaction),
+            transaction -> new JpaCityRepository(transaction)
+    );
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

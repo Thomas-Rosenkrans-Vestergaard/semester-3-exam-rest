@@ -55,14 +55,7 @@ public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparab
     public E update(E entity)
     {
         EntityManager entityManager = this.getEntityManager();
-        try {
-            if (autoCommit)
-                begin();
-            return (E) entityManager.merge(entityManager.contains(entity) ? entity : entityManager.merge(entity));
-        } finally {
-            if (autoCommit)
-                commit();
-        }
+        return (E) entityManager.merge(entityManager.contains(entity) ? entity : entityManager.merge(entity));
     }
 
     /**
@@ -79,14 +72,7 @@ public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparab
         if (find == null)
             return null;
 
-        try {
-            if (autoCommit)
-                begin();
-            entityManager.remove(find);
-            return find;
-        } finally {
-            if (autoCommit)
-                commit();
-        }
+        entityManager.remove(find);
+        return find;
     }
 }

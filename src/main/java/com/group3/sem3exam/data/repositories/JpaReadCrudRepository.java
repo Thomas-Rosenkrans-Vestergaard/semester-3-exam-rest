@@ -1,6 +1,5 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.repositories.transactions.AbstractJpaRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;

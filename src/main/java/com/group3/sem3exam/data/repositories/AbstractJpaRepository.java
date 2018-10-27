@@ -1,4 +1,7 @@
-package com.group3.sem3exam.data.repositories.transactions;
+package com.group3.sem3exam.data.repositories;
+
+import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.data.repositories.transactions.TransactionalRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -11,11 +14,6 @@ public class AbstractJpaRepository implements TransactionalRepository
      * The entity manager that operations are performed upon.
      */
     private EntityManager entityManager;
-
-    /**
-     * Whether or not the repository committed write operations to the database immediately.
-     */
-    protected boolean autoCommit = false;
 
     /**
      * Creates a new {@link AbstractJpaRepository}.
@@ -111,16 +109,5 @@ public class AbstractJpaRepository implements TransactionalRepository
     public void setEntityManager(EntityManager entityManger)
     {
         this.entityManager = entityManager;
-    }
-
-    /**
-     * Indicates to the repository that all write operations should be committed to the database immediately.
-     *
-     * @return this
-     */
-    @Override
-    public void autoCommit()
-    {
-        this.autoCommit = true;
     }
 }

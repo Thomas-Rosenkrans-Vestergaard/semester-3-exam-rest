@@ -8,11 +8,4 @@ public interface Repository extends AutoCloseable
      */
     @Override
     void close();
-
-    /**
-     * Indicates to the repository that all write operations should be committed to the database immediately.
-     *
-     * @return this
-     */
-    void autoCommit();
 }
