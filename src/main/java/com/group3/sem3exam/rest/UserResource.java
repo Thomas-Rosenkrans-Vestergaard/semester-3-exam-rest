@@ -2,6 +2,7 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
@@ -39,6 +40,9 @@ public class UserResource
                                                  receivedUser.city,
                                                  receivedUser.gender,
                                                  receivedUser.dateOfBirth);
+        if(createdUser == null){
+            throw new WebApplicationException(Response.Status.NOT_FOUND);
+        }
 
         return Response.ok(gson.toJson(UserDTO.basic(createdUser))).build();
     }

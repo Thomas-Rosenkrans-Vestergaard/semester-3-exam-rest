@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import java.util.List;
 
 public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implements ImageRepository
@@ -45,13 +46,19 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
     @Override
     public Image create(String title, String uri, User user)
     {
-        return null;
+
+            Image image = new Image(title, uri, user);
+            getEntityManager().persist(image);
+            return image;
     }
 
     @Override
     public List<Image> getByUser(Integer user)
     {
-        return null;
+        return getEntityManager()
+                .createQuery("SELECT i FROM Image i WHERE Image.user.id = :user", Image.class)
+                .setParameter("user", user)
+                .getResultList();
     }
 
     @Override
