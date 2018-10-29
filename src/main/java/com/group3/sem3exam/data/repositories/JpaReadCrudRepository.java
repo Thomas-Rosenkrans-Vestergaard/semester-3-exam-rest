@@ -9,6 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * An implementation of {@cide ReadCrudRepository}, implementing common read operations for some entity type using a
+ * backing JPA data source.
+ *
+ * @param <E> The type of the entity managed by the repository.
+ * @param <K> The type of the key of the entities managed by the repository.
+ */
 public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
         extends AbstractJpaRepository
         implements ReadCrudRepository<E, K>

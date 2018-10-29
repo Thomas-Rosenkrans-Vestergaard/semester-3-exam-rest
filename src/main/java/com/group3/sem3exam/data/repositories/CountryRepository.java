@@ -4,6 +4,9 @@ import com.group3.sem3exam.data.entities.Country;
 
 import java.util.List;
 
+/**
+ * Represents a data source of users. Defines read operations on the data source.
+ */
 public interface CountryRepository extends ReadCrudRepository<Country, Integer>
 {
 

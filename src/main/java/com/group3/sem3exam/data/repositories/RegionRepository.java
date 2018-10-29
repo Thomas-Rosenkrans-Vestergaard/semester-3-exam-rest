@@ -4,6 +4,9 @@ import com.group3.sem3exam.data.entities.Region;
 
 import java.util.List;
 
+/**
+ * Represents a data source of regions. Defines read operations on the data source.
+ */
 public interface RegionRepository extends ReadCrudRepository<Region, Integer>
 {
 

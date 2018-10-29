@@ -7,9 +7,17 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
+/**
+ * An implementation of the {@code RegionRepository} interface, backed by a JPA data source.
+ */
 public class JpaRegionRepository extends JpaReadCrudRepository<Region, Integer> implements RegionRepository
 {
 
+    /**
+     * Creates a new {@link JpaRegionRepository}.
+     *
+     * @param entityManager The entity manager that operations are performed upon.
+     */
     public JpaRegionRepository(EntityManager entityManager)
     {
         super(entityManager, Region.class);

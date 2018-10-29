@@ -4,6 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * An interface defining common read operations on some {@code RepositoryEntity}.
+ *
+ * @param <E> The type of the entity managed by the repository.
+ * @param <K> The type of the key of the entities managed by the repository.
+ */
 public interface ReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>> extends Repository
 {
 

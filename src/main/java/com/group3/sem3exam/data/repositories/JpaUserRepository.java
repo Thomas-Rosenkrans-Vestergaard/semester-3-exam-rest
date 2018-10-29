@@ -10,6 +10,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.time.LocalDate;
 
+/**
+ * An implementation of the {@code UserRepository} interface, backed by a JPA data source.
+ */
 public class JpaUserRepository extends JpaCrudRepository<User, Integer> implements UserRepository
 {
 

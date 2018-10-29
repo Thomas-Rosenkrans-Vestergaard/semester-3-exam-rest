@@ -7,6 +7,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
+/**
+ * An implementation of the {@code CountryRepository} interface, backed by a JPA data source.
+ */
 public class JpaCountryRepository extends JpaReadCrudRepository<Country, Integer>
         implements CountryRepository
 {

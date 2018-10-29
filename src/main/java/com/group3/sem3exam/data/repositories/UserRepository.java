@@ -7,6 +7,9 @@ import com.group3.sem3exam.data.repositories.transactions.TransactionalRepositor
 
 import java.time.LocalDate;
 
+/**
+ * Represents a data source of users. Defines read and write operations on the data source.
+ */
 public interface UserRepository extends CrudRepository<User, Integer>, TransactionalRepository
 {
 

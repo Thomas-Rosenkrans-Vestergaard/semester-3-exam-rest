@@ -7,6 +7,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
+/**
+ * An abstract implementation of a repository backed by a JPA data source.
+ */
 public class AbstractJpaRepository implements TransactionalRepository
 {
 
