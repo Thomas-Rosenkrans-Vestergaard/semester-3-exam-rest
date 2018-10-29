@@ -9,9 +9,9 @@ public interface JwtSecret
     /**
      * Returns the secret string value.
      *
-     * @return The secret string value.
+     * @return The secret byte value.
      */
-    String getValue();
+    byte[] getValue();
 
     /**
      * Regenerates the Jwt secret.
@@ -20,5 +20,5 @@ public interface JwtSecret
      * @return The newly generated value.
      * @throws JwtSecretGenerationException When a secret cannot be generated.
      */
-    String regenerate(int bytes) throws JwtSecretGenerationException;
+    byte[] regenerate(int bytes) throws JwtSecretGenerationException;
 }

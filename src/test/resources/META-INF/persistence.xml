@@ -22,10 +22,10 @@
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/semester-3-exam-rest-test"/>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
             <property name="hibernate.hbm2ddl.import_files_sql_extractor"
                       value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor"/>
-            <property name="hibernate.hbm2ddl.import.files" value="testdata.sql"/>
+            <property name="hibernate.hbm2ddl.import_files" value="testdata.sql"/>
         </properties>
     </persistence-unit>
 </persistence>

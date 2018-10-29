@@ -1,7 +1,6 @@
 package com.group3.sem3exam.rest.authentication.jwt;
 
 import java.security.SecureRandom;
-import java.util.Base64;
 
 public class BasicJwtSecret implements JwtSecret
 {
@@ -9,7 +8,7 @@ public class BasicJwtSecret implements JwtSecret
     /**
      * The secret string value.
      */
-    private String value;
+    private byte[] secret;
 
     /**
      * The source of randomness the secret is generated from.
@@ -19,11 +18,11 @@ public class BasicJwtSecret implements JwtSecret
     /**
      * Creates a new {@link BasicJwtSecret}.
      *
-     * @param value The secret string value.
+     * @param secret The secret string value.
      */
-    public BasicJwtSecret(String value)
+    public BasicJwtSecret(byte[] secret)
     {
-        this.value = value;
+        this.secret = secret;
     }
 
     /**
@@ -37,14 +36,14 @@ public class BasicJwtSecret implements JwtSecret
     }
 
     /**
-     * Returns the secret string value.
+     * Returns the secret byte value.
      *
-     * @return The secret string value.
+     * @return The secret byte value.
      */
     @Override
-    public String getValue()
+    public byte[] getValue()
     {
-        return value;
+        return secret;
     }
 
     /**
@@ -54,10 +53,10 @@ public class BasicJwtSecret implements JwtSecret
      * @return The newly generated value.
      */
     @Override
-    public String regenerate(int bytes)
+    public byte[] regenerate(int bytes)
     {
         byte[] byteArray = new byte[bytes];
         random.nextBytes(byteArray);
-        return this.value = Base64.getEncoder().encodeToString(byteArray);
+        return this.secret = byteArray;
     }
 }

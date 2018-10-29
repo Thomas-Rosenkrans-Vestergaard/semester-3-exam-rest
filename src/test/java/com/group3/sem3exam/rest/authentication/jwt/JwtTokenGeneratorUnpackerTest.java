@@ -28,8 +28,8 @@ public class JwtTokenGeneratorUnpackerTest
     public void verifyFailureSecret() throws Exception
     {
         assertThrows(JWTVerificationException.class, () -> {
-            JwtSecret         secretA        = new BasicJwtSecret("secretA");
-            JwtSecret         secretB        = new BasicJwtSecret("secretB");
+            JwtSecret         secretA        = new BasicJwtSecret(new byte[]{1});
+            JwtSecret         secretB        = new BasicJwtSecret(new byte[]{2});
             JwtTokenGenerator tokenGenerator = new JwtTokenGenerator(secretA);
             JwtTokenUnpacker  tokenVerifier  = new JwtTokenUnpacker(secretB);
 
@@ -42,8 +42,8 @@ public class JwtTokenGeneratorUnpackerTest
     public void verifyFailureToken() throws Exception
     {
         assertThrows(JWTVerificationException.class, () -> {
-            JwtSecret         secretA        = new BasicJwtSecret("secretA");
-            JwtSecret         secretB        = new BasicJwtSecret("secretB");
+            JwtSecret         secretA        = new BasicJwtSecret(new byte[]{1});
+            JwtSecret         secretB        = new BasicJwtSecret(new byte[]{2});
             JwtTokenGenerator tokenGenerator = new JwtTokenGenerator(secretA);
             JwtTokenUnpacker  tokenVerifier  = new JwtTokenUnpacker(secretB);
 

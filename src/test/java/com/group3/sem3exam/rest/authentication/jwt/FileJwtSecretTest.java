@@ -1,15 +1,16 @@
 package com.group3.sem3exam.rest.authentication.jwt;
 
-import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
-import com.group3.sem3exam.rest.authentication.jwt.JwtSecret;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Scanner;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -31,19 +32,21 @@ public class FileJwtSecretTest
     public void constructorReadsEmpty() throws Exception
     {
         JwtSecret instance = new FileJwtSecret(saveFile);
-        assertEquals("", instance.getValue());
+        assertEquals(0, instance.getValue().length);
     }
 
     @Test
     public void constructorReadsNonEmpty() throws Exception
     {
+        byte[] randomBytes = randomByteArray(5);
+
         try (FileWriter fileWriter = new FileWriter(saveFile)) {
-            fileWriter.write("secret");
+            fileWriter.write(Base64.getEncoder().encodeToString(randomBytes));
             fileWriter.flush();
         }
 
         JwtSecret instance = new FileJwtSecret(saveFile);
-        assertEquals("secret", instance.getValue());
+        assertArrayEquals(randomBytes, instance.getValue());
     }
 
     @Test
@@ -53,19 +56,20 @@ public class FileJwtSecretTest
 
         JwtSecret instance = new FileJwtSecret(saveFile, 6);
         assertNotEquals(0, saveFile.length());
-        assertEquals(instance.getValue(), read());
+        assertEquals(Base64.getEncoder().encodeToString(instance.getValue()), read());
     }
 
     @Test
     public void constructorDoesNotGenerateAndWriteWhenNonEmpty() throws Exception
     {
+        byte[] randomBytes = randomByteArray(5);
         try (FileWriter fileWriter = new FileWriter(saveFile)) {
-            fileWriter.write("secret");
+            fileWriter.write(Base64.getEncoder().encodeToString(randomBytes));
             fileWriter.flush();
         }
 
         JwtSecret instance = new FileJwtSecret(saveFile, 6);
-        assertEquals("secret", instance.getValue());
+        assertArrayEquals(randomBytes, instance.getValue());
     }
 
     @Test
@@ -73,7 +77,7 @@ public class FileJwtSecretTest
     {
         assertEquals(0, saveFile.length());
         JwtSecret instance = new FileJwtSecret(saveFile);
-        assertEquals(instance.regenerate(6), read());
+        assertArrayEquals(instance.regenerate(6), Base64.getDecoder().decode(read()));
     }
 
     private String read() throws Exception
@@ -84,5 +88,13 @@ public class FileJwtSecretTest
         String contents = stream.nextLine();
         stream.close();
         return contents;
+    }
+
+    private byte[] randomByteArray(int size)
+    {
+        byte[]       array        = new byte[size];
+        SecureRandom secureRandom = new SecureRandom();
+        secureRandom.nextBytes(array);
+        return array;
     }
 }
