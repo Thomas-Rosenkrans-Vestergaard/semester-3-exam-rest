@@ -1,8 +1,8 @@
 package com.group3.sem3exam.rest.authentication;
 
-import com.group3.sem3exam.rest.exceptions.APIException;
+import com.group3.sem3exam.facades.FacadeException;
 
-public class AuthenticationException extends APIException
+public class AuthenticationException extends FacadeException
 {
 
     public AuthenticationException()

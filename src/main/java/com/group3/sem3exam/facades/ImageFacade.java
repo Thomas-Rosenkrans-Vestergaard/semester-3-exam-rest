@@ -1,45 +1,63 @@
 package com.group3.sem3exam.facades;
 
 import com.group3.sem3exam.data.entities.Image;
-import com.group3.sem3exam.data.repositories.JpaImageRepository;
-import com.group3.sem3exam.rest.exceptions.ImageNotFoundException;
+import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.ImageRepository;
 
-import javax.persistence.EntityManagerFactory;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ImageFacade
 {
 
-    private EntityManagerFactory emf;
+    /**
+     * The factory that produces instances the {@link ImageRepository} used by this facade.
+     */
+    private final Supplier<ImageRepository> imageRepositoryFactory;
 
-    public ImageFacade(EntityManagerFactory emf)
+    /**
+     * Creates a new {@link ImageFacade}.
+     *
+     * @param imageRepositoryFactory The factory that produces instances the {@link ImageRepository} used by this facade.
+     */
+    public ImageFacade(Supplier<ImageRepository> imageRepositoryFactory)
     {
-        this.emf = emf;
+        this.imageRepositoryFactory = imageRepositoryFactory;
     }
 
+    /**
+     * Returns the image with the provided id.
+     *
+     * @param id The id of the image to retrieve.
+     * @return The image with the provided id.
+     * @throws ResourceNotFoundException When an image with the provided id does not exist.
+     */
+    public Image get(Integer id) throws ResourceNotFoundException
+    {
 
-    public Image get(Integer id) throws ImageNotFoundException{
+        try (ImageRepository ir = imageRepositoryFactory.get()) {
+            Image image = ir.get(id);
+            if (image == null)
+                throw ResourceNotFoundException.with404(Image.class, id);
 
-        try(JpaImageRepository tir = new JpaImageRepository(emf)){
-            Image image = tir.get(id);
-            if(image == null){
-                throw new ImageNotFoundException(id);
-            }
             return image;
         }
     }
 
+    /**
+     * Returns the images by the user with the provided id.
+     *
+     * @param user The id of the user to return the image of.
+     * @return The images by the user with the provided id.
+     * @throws ResourceNotFoundException When a user with the provided id does not exist.
+     */
+    public List<Image> getByUser(Integer user) throws ResourceNotFoundException
+    {
+        try (ImageRepository ir = imageRepositoryFactory.get()) {
+            List<Image> images = ir.getByUser(user);
+            if (images == null)
+                throw ResourceNotFoundException.with404(User.class, user);
 
-
-
-
-    public List<Image> getByUser(Integer user) throws ImageNotFoundException{
-
-        try(JpaImageRepository tir = new JpaImageRepository(emf)) {
-            List<Image> images = tir.getByUser(user);
-            if (images == null) {
-                throw new ImageNotFoundException(user);
-            }
             return images;
         }
     }

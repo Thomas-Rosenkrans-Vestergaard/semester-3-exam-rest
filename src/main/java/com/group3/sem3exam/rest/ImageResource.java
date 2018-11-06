@@ -2,14 +2,15 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.facades.DataUriEncoder;
 import com.group3.sem3exam.facades.ImageFacade;
+import com.group3.sem3exam.facades.ResourceNotFoundException;
 import com.group3.sem3exam.rest.authentication.AuthenticationContext;
 import com.group3.sem3exam.rest.authentication.AuthenticationException;
 import com.group3.sem3exam.rest.authentication.TokenAuthenticator;
 import com.group3.sem3exam.rest.dto.ImageDTO;
-import com.group3.sem3exam.rest.exceptions.ImageNotFoundException;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -25,19 +26,20 @@ import static com.group3.sem3exam.rest.authentication.AuthenticationType.USER;
 public class ImageResource
 {
 
-    private static Gson               gson          = SpecializedGson.create();
-    private static ImageFacade        imageFacade   = new ImageFacade(JpaConnection.create());
-    private static DataUriEncoder     encoder       = new DataUriEncoder();
+    private static Gson           gson        = SpecializedGson.create();
+    private static ImageFacade    imageFacade = new ImageFacade(() -> new JpaImageRepository(JpaConnection.create()));
+    private static DataUriEncoder encoder     = new DataUriEncoder();
 
 
     @POST
     @Path("create")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response create(@HeaderParam("Authorization")String token, String content) throws IOException, AuthenticationException
+    public Response create(@HeaderParam("Authorization") String token, String content)
+    throws IOException, AuthenticationException
     {
-        TokenAuthenticator authenticator = new TokenAuthenticator(() -> new JpaUserRepository(JpaConnection.create()));
-        AuthenticationContext  authenticationContext = authenticator.authenticateBearerHeader(token);
-        if(authenticationContext.getType() == USER) {
+        TokenAuthenticator    authenticator         = new TokenAuthenticator(() -> new JpaUserRepository(JpaConnection.create()));
+        AuthenticationContext authenticationContext = authenticator.authenticateBearerHeader(token);
+        if (authenticationContext.getType() == USER) {
             ReceivedCreateImage image = gson.fromJson(content, ReceivedCreateImage.class);
             byte[]              data  = Base64.getDecoder().decode(image.data);
             String              URI   = encoder.bytesToDataURI(data);
@@ -48,11 +50,12 @@ public class ImageResource
 
     @GET
     @Path("get/{user: [0-9]+}")
-    public Response getByUser(@PathParam("user")int user, @HeaderParam("Authorization") String content) throws ImageNotFoundException
+    public Response getByUser(@PathParam("user") int user, @HeaderParam("Authorization") String content)
+    throws ResourceNotFoundException
     {
-    List<Image> images = imageFacade.getByUser(user);
-    String json = gson.toJson(images.stream().map(ImageDTO::basic).collect(Collectors.toList()));
-    return Response.ok(json).build();
+        List<Image> images = imageFacade.getByUser(user);
+        String      json   = gson.toJson(images.stream().map(ImageDTO::basic).collect(Collectors.toList()));
+        return Response.ok(json).build();
     }
 
     private class ReceivedCreateImage

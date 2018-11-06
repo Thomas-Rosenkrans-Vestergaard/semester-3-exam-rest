@@ -2,7 +2,6 @@ package com.group3.sem3exam.facades;
 
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.repositories.CityRepository;
-import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -30,14 +29,14 @@ public class CityFacade
      *
      * @param id The id of the city to return.
      * @return The city with the provided id.
-     * @throws CityNotFoundException When a city with the provided id does not exist.
+     * @throws ResourceNotFoundException When a city with the provided id does not exist.
      */
-    public City get(Integer id) throws CityNotFoundException
+    public City get(Integer id) throws ResourceNotFoundException
     {
         try (CityRepository cr = cityRepositoryFactory.get()) {
             City city = cr.get(id);
             if (city == null)
-                throw new CityNotFoundException(id);
+                throw ResourceNotFoundException.with404(City.class, id);
 
             return city;
         }

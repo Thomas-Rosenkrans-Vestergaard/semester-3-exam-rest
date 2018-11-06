@@ -1,9 +1,5 @@
 package com.group3.sem3exam.facades;
 
-import com.group3.sem3exam.rest.exceptions.ImageTypeException;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.URLConnection;
 import java.util.Base64;

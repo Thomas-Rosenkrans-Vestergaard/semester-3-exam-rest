@@ -5,8 +5,8 @@ import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.facades.CityFacade;
+import com.group3.sem3exam.facades.ResourceNotFoundException;
 import com.group3.sem3exam.rest.dto.CityDTO;
-import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -29,7 +29,7 @@ public class CityResource
     @GET
     @Path("{id: [0-9]+}")
     @Produces(APPLICATION_JSON)
-    public Response getCityById(@PathParam("id") int id) throws CityNotFoundException
+    public Response getCityById(@PathParam("id") int id) throws ResourceNotFoundException
     {
         City   city = cityFacade.get(id);
         String json = gson.toJson(CityDTO.basic(city));

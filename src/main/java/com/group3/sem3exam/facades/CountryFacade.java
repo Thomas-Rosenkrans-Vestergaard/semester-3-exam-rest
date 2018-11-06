@@ -2,7 +2,6 @@ package com.group3.sem3exam.facades;
 
 import com.group3.sem3exam.data.entities.Country;
 import com.group3.sem3exam.data.repositories.CountryRepository;
-import com.group3.sem3exam.rest.exceptions.CountryNotFoundException;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -30,14 +29,14 @@ public class CountryFacade
      *
      * @param id The id of the country to return.
      * @return The country with the provided id.
-     * @throws CountryNotFoundException When a country with the provided id does not exist.
+     * @throws ResourceNotFoundException When a country with the provided id does not exist.
      */
-    public Country get(Integer id) throws CountryNotFoundException
+    public Country get(Integer id) throws ResourceNotFoundException
     {
         try (CountryRepository cr = countryRepositoryFactory.get()) {
             Country country = cr.get(id);
             if (country == null)
-                throw new CountryNotFoundException(id);
+                throw ResourceNotFoundException.with400(Country.class, id);
 
             return country;
         }

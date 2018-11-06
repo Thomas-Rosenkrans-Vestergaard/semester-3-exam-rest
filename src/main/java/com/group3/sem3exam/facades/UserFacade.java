@@ -6,8 +6,6 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
-import com.group3.sem3exam.rest.exceptions.CityNotFoundException;
-import com.group3.sem3exam.rest.exceptions.UserNotFoundException;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDate;
@@ -54,14 +52,14 @@ public class UserFacade<T extends Transaction>
      *
      * @param id The id of the user to return.
      * @return The user with the provided id.
-     * @throws UserNotFoundException When a user with the provided id does not exist.
+     * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public User get(Integer id) throws UserNotFoundException
+    public User get(Integer id) throws ResourceNotFoundException
     {
         try (UserRepository ur = userRepositoryFactory.apply(transactionFactory.get())) {
             User user = ur.get(id);
             if (user == null)
-                throw new UserNotFoundException(id);
+                throw ResourceNotFoundException.with404(User.class, id);
 
             return user;
         }
@@ -77,10 +75,10 @@ public class UserFacade<T extends Transaction>
      * @param gender      The gender of the user to create.
      * @param dateOfBirth The date of birth of the user to create.
      * @return The newly created user entity.
-     * @throws CityNotFoundException When a city with the provided id does not exist.
+     * @throws ResourceNotFoundException When a city with the provided id does not exist.
      */
     public User createUser(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
-    throws CityNotFoundException
+    throws ResourceNotFoundException
     {
         try (T transaction = transactionFactory.get()) {
 
@@ -90,7 +88,7 @@ public class UserFacade<T extends Transaction>
 
             City retrievedCity = cr.get(city);
             if (retrievedCity == null)
-                throw new CityNotFoundException(city);
+                throw ResourceNotFoundException.with400(City.class, city);
 
             User user = ur.createUser(name, email, hash(password), retrievedCity, gender, dateOfBirth);
             transaction.commit();

@@ -2,7 +2,6 @@ package com.group3.sem3exam.facades;
 
 import com.group3.sem3exam.data.entities.Region;
 import com.group3.sem3exam.data.repositories.RegionRepository;
-import com.group3.sem3exam.rest.exceptions.RegionNotFoundException;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -42,14 +41,14 @@ public class RegionFacade
      *
      * @param id The id of the region to return.
      * @return The region with the provided id.
-     * @throws RegionNotFoundException When the region with the provided id does not exist.
+     * @throws ResourceNotFoundException When the region with the provided id does not exist.
      */
-    public Region get(Integer id) throws RegionNotFoundException
+    public Region get(Integer id) throws ResourceNotFoundException
     {
         try (RegionRepository rr = regionRepositoryFactory.get()) {
             Region region = rr.get(id);
             if (region == null)
-                throw new RegionNotFoundException(id);
+                throw ResourceNotFoundException.with404(Region.class, id);
 
             return region;
         }
