@@ -1,8 +1,8 @@
-package com.group3.sem3exam.rest.authentication.jwt;
+package com.group3.sem3exam.logic.authentication.jwt;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.rest.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

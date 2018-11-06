@@ -77,9 +77,9 @@ public class ResourceNotFoundException extends FacadeException
      * @param id       The id of the missing resource.
      * @return The created exception.
      */
-    public static ResourceNotFoundException with400(Class resource, Object id)
+    public static ResourceNotFoundException with422(Class resource, Object id)
     {
-        return new ResourceNotFoundException(resource, id, 400);
+        return new ResourceNotFoundException(resource, id, 422);
     }
 
     /**

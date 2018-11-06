@@ -1,11 +1,11 @@
 package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.repositories.UserRepository;
-import com.group3.sem3exam.rest.authentication.AuthenticationContext;
-import com.group3.sem3exam.rest.authentication.AuthenticationException;
-import com.group3.sem3exam.rest.authentication.UserAuthenticator;
-import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
-import com.group3.sem3exam.rest.authentication.jwt.JwtTokenGenerator;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.logic.authentication.UserAuthenticator;
+import com.group3.sem3exam.logic.authentication.jwt.FileJwtSecret;
+import com.group3.sem3exam.logic.authentication.jwt.JwtTokenGenerator;
 
 import java.io.File;
 import java.util.function.Supplier;

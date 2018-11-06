@@ -8,9 +8,9 @@ import com.group3.sem3exam.logic.ImageFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.images.DataUriEncoder;
 import com.group3.sem3exam.logic.images.UnsupportedImageTypeException;
-import com.group3.sem3exam.rest.authentication.AuthenticationContext;
-import com.group3.sem3exam.rest.authentication.AuthenticationException;
-import com.group3.sem3exam.rest.authentication.TokenAuthenticator;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.logic.authentication.TokenAuthenticator;
 import com.group3.sem3exam.rest.dto.ImageDTO;
 
 import javax.ws.rs.*;
@@ -19,7 +19,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.group3.sem3exam.rest.authentication.AuthenticationType.USER;
+import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
 
 @Path("images")
 public class ImageResource

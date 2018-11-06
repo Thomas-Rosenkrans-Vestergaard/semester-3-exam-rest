@@ -1,4 +1,4 @@
-package com.group3.sem3exam.rest.authentication;
+package com.group3.sem3exam.logic.authentication;
 
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
@@ -35,14 +35,13 @@ public class UserAuthenticator
     public AuthenticationContext authenticate(String email, String password) throws AuthenticationException
     {
         try (UserRepository repository = repositoryFactory.get()) {
-            User user = repository.getByEmail(email);
-            if (user == null)
-                throw new AuthenticationException(new IncorrectCredentialsException());
+            User    user      = repository.getByEmail(email);
+            boolean checkHash = checkHash(password, user == null ? "" : user.getPasswordHash());
 
-            if (!checkHash(password, user.getPasswordHash()))
-                throw new AuthenticationException(new IncorrectCredentialsException());
+            if (user != null && checkHash)
+                return AuthenticationContext.user(user);
 
-            return AuthenticationContext.user(user);
+            throw new AuthenticationException(new IncorrectCredentialsException());
         }
     }
 

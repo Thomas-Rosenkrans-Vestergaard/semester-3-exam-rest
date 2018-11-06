@@ -1,11 +1,11 @@
-package com.group3.sem3exam.rest.authentication;
+package com.group3.sem3exam.logic.authentication;
 
 import com.group3.sem3exam.data.entities.User;
 
 import java.util.Objects;
 
-import static com.group3.sem3exam.rest.authentication.AuthenticationType.THIRD_PARTY_REPRESENTING_USER;
-import static com.group3.sem3exam.rest.authentication.AuthenticationType.USER;
+import static com.group3.sem3exam.logic.authentication.AuthenticationType.THIRD_PARTY_REPRESENTING_USER;
+import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
 
 public class AuthenticationContext
 {

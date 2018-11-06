@@ -1,10 +1,10 @@
-package com.group3.sem3exam.rest.authentication;
+package com.group3.sem3exam.logic.authentication;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
-import com.group3.sem3exam.rest.authentication.jwt.FileJwtSecret;
-import com.group3.sem3exam.rest.authentication.jwt.JwtTokenUnpacker;
+import com.group3.sem3exam.logic.authentication.jwt.FileJwtSecret;
+import com.group3.sem3exam.logic.authentication.jwt.JwtTokenUnpacker;
 
 import java.io.File;
 import java.io.IOException;

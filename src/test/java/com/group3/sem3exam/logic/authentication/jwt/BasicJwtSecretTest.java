@@ -1,7 +1,5 @@
-package com.group3.sem3exam.rest.authentication.jwt;
+package com.group3.sem3exam.logic.authentication.jwt;
 
-import com.group3.sem3exam.rest.authentication.jwt.BasicJwtSecret;
-import com.group3.sem3exam.rest.authentication.jwt.JwtSecret;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

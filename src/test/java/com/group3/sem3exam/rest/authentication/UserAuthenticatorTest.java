@@ -2,6 +2,9 @@ package com.group3.sem3exam.rest.authentication;
 
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.logic.authentication.UserAuthenticator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;

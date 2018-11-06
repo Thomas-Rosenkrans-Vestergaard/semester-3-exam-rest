@@ -1,4 +1,4 @@
-package com.group3.sem3exam.rest.authentication.jwt;
+package com.group3.sem3exam.logic.authentication.jwt;
 
 /**
  * The secret used when generating and verifying JWT tokens.

@@ -1,11 +1,11 @@
-package com.group3.sem3exam.rest.authentication.jwt;
+package com.group3.sem3exam.logic.authentication.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.rest.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
 import java.util.Date;
 

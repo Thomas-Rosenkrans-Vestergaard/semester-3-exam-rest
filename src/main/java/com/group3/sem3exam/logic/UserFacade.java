@@ -88,7 +88,7 @@ public class UserFacade<T extends Transaction>
 
             City retrievedCity = cr.get(city);
             if (retrievedCity == null)
-                throw ResourceNotFoundException.with400(City.class, city);
+                throw ResourceNotFoundException.with422(City.class, city);
 
             User user = ur.createUser(name, email, hash(password), retrievedCity, gender, dateOfBirth);
             transaction.commit();
