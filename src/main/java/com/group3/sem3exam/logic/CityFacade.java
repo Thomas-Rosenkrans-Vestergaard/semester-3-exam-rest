@@ -1,4 +1,4 @@
-package com.group3.sem3exam.facades;
+package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.repositories.CityRepository;

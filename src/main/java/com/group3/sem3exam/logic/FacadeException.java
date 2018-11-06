@@ -1,4 +1,4 @@
-package com.group3.sem3exam.facades;
+package com.group3.sem3exam.logic;
 
 public class FacadeException extends Exception
 {

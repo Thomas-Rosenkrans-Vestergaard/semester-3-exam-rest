@@ -1,4 +1,4 @@
-package com.group3.sem3exam.facades;
+package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.rest.authentication.AuthenticationContext;

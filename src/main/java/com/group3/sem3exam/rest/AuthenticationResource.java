@@ -2,7 +2,7 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
-import com.group3.sem3exam.facades.AuthenticationFacade;
+import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.rest.authentication.AuthenticationContext;
 import com.group3.sem3exam.rest.dto.AuthenticationDTO;
 

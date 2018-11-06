@@ -3,8 +3,8 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Region;
 import com.group3.sem3exam.data.repositories.JpaRegionRepository;
-import com.group3.sem3exam.facades.RegionFacade;
-import com.group3.sem3exam.facades.ResourceNotFoundException;
+import com.group3.sem3exam.logic.RegionFacade;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.rest.dto.RegionDTO;
 
 import javax.ws.rs.GET;

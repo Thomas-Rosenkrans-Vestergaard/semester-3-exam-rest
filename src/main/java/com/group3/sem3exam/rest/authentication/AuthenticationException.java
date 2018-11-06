@@ -1,6 +1,6 @@
 package com.group3.sem3exam.rest.authentication;
 
-import com.group3.sem3exam.facades.FacadeException;
+import com.group3.sem3exam.logic.FacadeException;
 
 public class AuthenticationException extends FacadeException
 {

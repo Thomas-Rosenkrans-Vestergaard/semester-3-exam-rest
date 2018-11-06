@@ -6,8 +6,8 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.facades.ResourceNotFoundException;
-import com.group3.sem3exam.facades.UserFacade;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.UserFacade;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
 import javax.ws.rs.*;
