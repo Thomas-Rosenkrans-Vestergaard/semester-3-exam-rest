@@ -15,6 +15,11 @@ public class UserAuthenticator
     private final Supplier<UserRepository> repositoryFactory;
 
     /**
+     * A b-crypt hash that is check against to avoid information leaks through timing attacks.
+     */
+    private static final String timingHash = "$2a$10$TcspcbNbrPac2XnfEBdgVeUfhxkUDZ9hvls5jcRAqb6EODbkAKnUy";
+
+    /**
      * Creates a new {@link UserAuthenticator}.
      *
      * @param repositoryFactory The factory that produces user repositories used by this object.
@@ -36,7 +41,7 @@ public class UserAuthenticator
     {
         try (UserRepository repository = repositoryFactory.get()) {
             User    user      = repository.getByEmail(email);
-            boolean checkHash = checkHash(password, user == null ? "" : user.getPasswordHash());
+            boolean checkHash = checkHash(password, user == null ? timingHash : user.getPasswordHash());
 
             if (user != null && checkHash)
                 return AuthenticationContext.user(user);

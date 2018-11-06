@@ -1,5 +1,5 @@
 # Ignore persistence file
-persistence.xml
+src/main/**/persistence.xml
 
 # Ignore test and secret files
 *.test

@@ -20,7 +20,8 @@ public class Image implements RepositoryEntity<Integer>
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "MEDIUMTEXT", nullable = false)
+    @Lob
+    @Column(nullable = false)
     private String uri;
 
     @ManyToOne(fetch = EAGER, optional = false)

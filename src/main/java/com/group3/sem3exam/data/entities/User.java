@@ -17,7 +17,7 @@ import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user_")
 public class User implements RepositoryEntity<Integer>
 {
 
@@ -57,7 +57,7 @@ public class User implements RepositoryEntity<Integer>
     @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "user")
     private List<Image> images = new ArrayList<>();
 
-    @OneToOne(fetch = EAGER, cascade = ALL)
+    @OneToOne(fetch = EAGER)
     private Image profilePicture;
 
     public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
