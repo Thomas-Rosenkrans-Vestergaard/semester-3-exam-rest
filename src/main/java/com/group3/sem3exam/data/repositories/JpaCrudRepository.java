@@ -41,7 +41,7 @@ public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparab
     }
 
     /**
-     * Creates a new {@link JpaCityRepository}.
+     * Creates a new {@link JpaCrudRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
