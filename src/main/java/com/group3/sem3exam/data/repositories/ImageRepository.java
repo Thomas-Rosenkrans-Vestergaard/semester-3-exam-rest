@@ -21,7 +21,21 @@ public interface ImageRepository extends CrudRepository<Image, Integer>
      */
     Image create(String title, String uri, User user);
 
+    /**
+     * Returns all the images of the user with the provided id.
+     *
+     * @param user The id of the user to return the images of.
+     * @return The images of the user with the provided id.
+     */
     List<Image> getByUser(Integer user);
 
+    /**
+     * Returns a paginated view of the images of the user with the provided id.
+     *
+     * @param user       The user to return the images of.
+     * @param pageSize   The number of images in a single page in the paginated view.
+     * @param pageNumber The page number to retrieve. Starts at 1.
+     * @return The paginated view.
+     */
     List<Image> getByUserPaginated(Integer user, int pageSize, int pageNumber);
 }

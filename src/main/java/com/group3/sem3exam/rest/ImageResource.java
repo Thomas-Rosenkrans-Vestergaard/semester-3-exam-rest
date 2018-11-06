@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
-import com.group3.sem3exam.logic.DataUriEncoder;
 import com.group3.sem3exam.logic.ImageFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.images.DataUriEncoder;
+import com.group3.sem3exam.logic.images.UnsupportedImageTypeException;
 import com.group3.sem3exam.rest.authentication.AuthenticationContext;
 import com.group3.sem3exam.rest.authentication.AuthenticationException;
 import com.group3.sem3exam.rest.authentication.TokenAuthenticator;
@@ -15,8 +16,6 @@ import com.group3.sem3exam.rest.dto.ImageDTO;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,16 +34,19 @@ public class ImageResource
     @Path("create")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@HeaderParam("Authorization") String token, String content)
-    throws IOException, AuthenticationException
+    throws AuthenticationException, UnsupportedImageTypeException
     {
         TokenAuthenticator    authenticator         = new TokenAuthenticator(() -> new JpaUserRepository(JpaConnection.create()));
         AuthenticationContext authenticationContext = authenticator.authenticateBearerHeader(token);
         if (authenticationContext.getType() == USER) {
-            ReceivedCreateImage image = gson.fromJson(content, ReceivedCreateImage.class);
-            byte[]              data  = Base64.getDecoder().decode(image.data);
-            String              URI   = encoder.bytesToDataURI(data);
-            return Response.ok(URI).build();
+            ReceivedCreateImage receivedCreateImage = gson.fromJson(content, ReceivedCreateImage.class);
+            Image image = imageFacade.create(
+                    authenticationContext.getUser(),
+                    receivedCreateImage.title,
+                    receivedCreateImage.data);
+            return Response.ok(ImageDTO.basic(image)).build();
         }
+
         throw new AuthenticationException("Unsupported usertype");
     }
 
@@ -63,5 +65,4 @@ public class ImageResource
         public String title;
         public String data;
     }
-
 }
