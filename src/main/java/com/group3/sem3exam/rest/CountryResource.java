@@ -4,9 +4,9 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Country;
 import com.group3.sem3exam.data.repositories.JpaCountryRepository;
-import com.group3.sem3exam.facades.CountryFacade;
+import com.group3.sem3exam.logic.CountryFacade;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.rest.dto.CountryDTO;
-import com.group3.sem3exam.rest.exceptions.CountryNotFoundException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -37,7 +37,7 @@ public class CountryResource
     @GET
     @Produces(APPLICATION_JSON)
     @Path("{id: [0-9]+}")
-    public Response getCountryById(@PathParam("id") int id) throws CountryNotFoundException
+    public Response getCountryById(@PathParam("id") int id) throws ResourceNotFoundException
     {
         Country country = countryFacade.get(id);
         String  json    = gson.toJson(CountryDTO.withRegions(country));

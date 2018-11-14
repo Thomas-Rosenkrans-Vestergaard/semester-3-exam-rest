@@ -1,5 +1,5 @@
 # Ignore persistence file
-persistence.xml
+src/main/**/persistence.xml
 
 # Ignore test and secret files
 *.test
@@ -15,7 +15,6 @@ persistence.xml
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
-.idea/**/dictionaries
 .idea/**/shelf
 .idea/**/vcs.xml
 

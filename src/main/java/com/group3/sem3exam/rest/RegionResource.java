@@ -3,9 +3,9 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Region;
 import com.group3.sem3exam.data.repositories.JpaRegionRepository;
-import com.group3.sem3exam.facades.RegionFacade;
+import com.group3.sem3exam.logic.RegionFacade;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.rest.dto.RegionDTO;
-import com.group3.sem3exam.rest.exceptions.RegionNotFoundException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -28,7 +28,7 @@ public class RegionResource
     @GET
     @Path("{id: [0-9]+}")
     @Produces(APPLICATION_JSON)
-    public Response getRegionById(@PathParam("id") int id) throws RegionNotFoundException
+    public Response getRegionById(@PathParam("id") int id) throws ResourceNotFoundException
     {
         Region region = regionFacade.get(id);
         String json   = gson.toJson(RegionDTO.basic(region));

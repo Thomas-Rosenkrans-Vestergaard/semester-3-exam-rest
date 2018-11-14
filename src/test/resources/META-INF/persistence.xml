@@ -12,20 +12,19 @@
         <class>com.group3.sem3exam.data.entities.Country</class>
         <class>com.group3.sem3exam.data.entities.Image</class>
         <properties>
-            <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/semester-3-exam-rest-test"/>
-            <property name="javax.persistence.jdbc.user" value="thomas"/>
-            <property name="javax.persistence.jdbc.password" value=""/>
-            <!--<property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>-->
-
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL57Dialect"/>
-            <property name="hibernate.show_sql" value="true"/>
-            <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/semester-3-exam-rest-test"/>
-            <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
-            <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+            <property name="hibernate.connection.url" value="jdbc:derby:memory:unit-testing;create=true"/>
+            <property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyTenSevenDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="create"/>
+            <property name="hibernate.connection.username" value=""/>
+            <property name="hibernate.connection.password" value=""/>
             <property name="hibernate.hbm2ddl.import_files_sql_extractor"
                       value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor"/>
             <property name="hibernate.hbm2ddl.import_files" value="testdata.sql"/>
+
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.use_sql_comments" value="true"/>
         </properties>
     </persistence-unit>
 </persistence>
