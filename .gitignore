@@ -1,5 +1,5 @@
 # Ignore persistence file
-src/main/**/persistence.xml
+connection.cfg
 
 # Ignore test and secret files
 *.test
