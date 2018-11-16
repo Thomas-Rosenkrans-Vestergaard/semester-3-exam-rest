@@ -3,6 +3,7 @@ package com.group3.sem3exam.logic.authentication.jwt;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.EagerAuthenticationContext;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,7 +21,7 @@ public class JwtTokenGeneratorUnpackerTest
 
         User user = new User();
         user.setId(1);
-        String token = tokenGenerator.generate(AuthenticationContext.user(user));
+        String token = tokenGenerator.generate(EagerAuthenticationContext.user(user));
         assertEquals(1, (int) tokenVerifier.unpack(token).getClaim("user").asInt());
     }
 
@@ -34,7 +35,7 @@ public class JwtTokenGeneratorUnpackerTest
             JwtTokenUnpacker  tokenVerifier  = new JwtTokenUnpacker(secretB);
 
             User user = new User();
-            tokenVerifier.unpack(tokenGenerator.generate(AuthenticationContext.user(user)));
+            tokenVerifier.unpack(tokenGenerator.generate(EagerAuthenticationContext.user(user)));
         });
     }
 
@@ -48,7 +49,7 @@ public class JwtTokenGeneratorUnpackerTest
             JwtTokenUnpacker  tokenVerifier  = new JwtTokenUnpacker(secretB);
 
             User user = new User();
-            tokenVerifier.unpack("a" + tokenGenerator.generate(AuthenticationContext.user(user))); // Illegal header format
+            tokenVerifier.unpack("a" + tokenGenerator.generate(EagerAuthenticationContext.user(user))); // Illegal header format
         });
     }
 }

@@ -1,7 +1,6 @@
 package com.group3.sem3exam.logic.authentication;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.logic.authentication.jwt.FileJwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenUnpacker;
@@ -38,17 +37,18 @@ public class TokenAuthenticator
      */
     public AuthenticationContext authenticate(String token) throws AuthenticationException
     {
-        try (UserRepository userRepository = userRepositoryFactory.get()) {
+        try {
             JwtTokenUnpacker   unpacker = new JwtTokenUnpacker(new FileJwtSecret(new File("jwt.secret")));
             DecodedJWT         jwt      = unpacker.unpack(token);
             AuthenticationType type     = AuthenticationType.valueOf(jwt.getClaim("type").asString());
 
             if (type == AuthenticationType.USER) {
-                User user = userRepository.get(jwt.getClaim("user").asInt());
-                if (user == null)
-                    throw new AuthenticationException("Unknown user in authorization token.");
-
-                return AuthenticationContext.user(userRepository.get(jwt.getClaim("user").asInt()));
+                Integer userId = jwt.getClaim("user").asInt();
+                return LazyAuthenticationContext.user(userId, () -> {
+                    try (UserRepository userRepository = userRepositoryFactory.get()) {
+                        return userRepository.get(userId);
+                    }
+                });
             }
 
             throw new AuthenticationException("Unsupported authentication type.");
@@ -60,7 +60,6 @@ public class TokenAuthenticator
 
 
     /**
-     *
      * @param header
      * @return the given AuthenticationContext
      * @throws AuthenticationException
@@ -68,10 +67,10 @@ public class TokenAuthenticator
 
     public AuthenticationContext authenticateBearerHeader(String header) throws AuthenticationException
     {
-            header = header.trim();
-        if(header.startsWith("Bearer ")) {
-            header =header.substring(7);
-          return this.authenticate(header);
+        header = header.trim();
+        if (header.startsWith("Bearer ")) {
+            header = header.substring(7);
+            return this.authenticate(header);
 
         }
         throw new AuthenticationException("Unsupported HTTP Authorization type.");

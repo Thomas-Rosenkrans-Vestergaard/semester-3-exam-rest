@@ -44,7 +44,7 @@ public class UserAuthenticator
             boolean checkHash = checkHash(password, user == null ? timingHash : user.getPasswordHash());
 
             if (user != null && checkHash)
-                return AuthenticationContext.user(user);
+                return EagerAuthenticationContext.user(user);
 
             throw new AuthenticationException(new IncorrectCredentialsException());
         }
