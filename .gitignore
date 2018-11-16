@@ -1,4 +1,4 @@
-# Ignore persistence file
+# Ignore configuration files
 connection.cfg
 
 # Ignore test and secret files
