@@ -172,6 +172,8 @@ public class JpaReadCrudRepositoryTester<
         return Arrays.asList(
                 createQueryDescTest(),
                 createQueryAscTest(),
+                createQueryWhereEqTest(),
+                createQueryWhereNotTest(),
                 createQueryWhereGtTest(),
                 createQueryWhereLtTest(),
                 createQueryWhereGtoeTest(),
@@ -199,6 +201,32 @@ public class JpaReadCrudRepositoryTester<
     private K getRandomKey(List<E> keys)
     {
         return keys.get(random.nextInt(keys.size())).getId();
+    }
+
+    private DynamicTest createQueryWhereEqTest()
+    {
+        return DynamicTest.dynamicTest("query.eq", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+
+                assertTrue(instance.query().eq(instance.kAttribute, getRandomKey(data)).exists());
+                assertFalse(instance.query().eq(instance.kAttribute, unknownKey).exists());
+            }
+        });
+    }
+
+    private DynamicTest createQueryWhereNotTest()
+    {
+        return DynamicTest.dynamicTest("query.not", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                K       key  = getRandomKey(data);
+                assertTrue(instance.query().contains(key));
+                assertFalse(instance.query().not(instance.kAttribute, key).contains(key));
+            }
+        });
     }
 
     private DynamicTest createQueryWhereGtTest()
