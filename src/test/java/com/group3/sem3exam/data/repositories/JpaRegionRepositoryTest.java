@@ -22,7 +22,8 @@ class JpaRegionRepositoryTest
                 new JpaReadCrudRepositoryTester<>(
                         () -> new JpaRegionRepository(JpaTestConnection.create()),
                         (repository) -> createRegionMap(repository),
-                        -1
+                        -1,
+                        7
                 );
 
         return tester.getDynamicTests();

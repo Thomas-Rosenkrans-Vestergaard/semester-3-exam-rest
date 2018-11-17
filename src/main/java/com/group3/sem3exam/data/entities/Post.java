@@ -19,7 +19,8 @@ public class Post implements RepositoryEntity<Integer>
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(length = 65535, columnDefinition = "TEXT")
+    @Lob
+    @Column(nullable = false)
     private String contents;
 
     @ManyToOne

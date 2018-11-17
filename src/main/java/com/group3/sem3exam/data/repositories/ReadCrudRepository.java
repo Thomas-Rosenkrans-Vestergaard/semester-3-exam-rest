@@ -1,5 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.repositories.queries.RepositoryQuery;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,4 +63,11 @@ public interface ReadCrudRepository<E extends RepositoryEntity<K>, K extends Com
      * @return {@code true} when an entity with the provided id exists, {@code false} otherwise.
      */
     boolean exists(K id);
+
+    /**
+     * Creates and returns a new {@link RepositoryQuery}.
+     *
+     * @return The query.
+     */
+    RepositoryQuery<K, E> query();
 }

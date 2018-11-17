@@ -21,11 +21,13 @@ public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparab
      * Creates a new {@link JpaCrudRepository} using the provided entity manager.
      *
      * @param entityManager The entity manager to perform operations upon.
-     * @param c             The type of entity the operations are performed upon.
+     * @param kClass        The type of the key of the entity the operations are performed upon.
+     * @param kAttribute    The attribute of the key of the entity the operations are performed upon.
+     * @param eClass        The type of entity the operations are performed upon.
      */
-    public JpaCrudRepository(EntityManager entityManager, Class<E> c)
+    public JpaCrudRepository(EntityManager entityManager, Class<K> kClass, String kAttribute, Class<E> eClass)
     {
-        super(entityManager, c);
+        super(entityManager, kClass, kAttribute, eClass);
     }
 
     /**
@@ -33,11 +35,13 @@ public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparab
      *
      * @param entityManagerFactory The entity manager factory used to create the entity manager to perform operations
      *                             upon.
-     * @param c                    The type of entity the operations are performed upon.
+     * @param kClass               The type of the key of the entity the operations are performed upon.
+     * @param kAttribute           The attribute of the key of the entity the operations are performed upon.
+     * @param eClass               The type of entity the operations are performed upon.
      */
-    public JpaCrudRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
+    public JpaCrudRepository(EntityManagerFactory entityManagerFactory, Class<K> kClass, String kAttribute, Class<E> eClass)
     {
-        super(entityManagerFactory, c);
+        super(entityManagerFactory, kClass, kAttribute, eClass);
     }
 
     /**
@@ -45,11 +49,13 @@ public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparab
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
-     * @param c           The type of entity the operations are performed upon.
+     * @param kClass      The type of the key of the entity the operations are performed upon.
+     * @param kAttribute  The attribute of the key of the entity the operations are performed upon.
+     * @param eClass      The type of entity the operations are performed upon.
      */
-    public JpaCrudRepository(JpaTransaction transaction, Class<E> c)
+    public JpaCrudRepository(JpaTransaction transaction, Class<K> kClass, String kAttribute, Class<E> eClass)
     {
-        super(transaction, c);
+        super(transaction, kClass, kAttribute, eClass);
     }
 
     /**
@@ -75,7 +81,7 @@ public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparab
     public E delete(K id)
     {
         EntityManager entityManager = this.getEntityManager();
-        E             find          = entityManager.find(c, id);
+        E             find          = entityManager.find(eClass, id);
         if (find == null)
             return null;
 

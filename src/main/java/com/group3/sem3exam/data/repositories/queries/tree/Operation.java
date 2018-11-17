@@ -2,13 +2,13 @@ package com.group3.sem3exam.data.repositories.queries.tree;
 
 public class Operation
 {
-    public final String   column;
+    public final String   attribute;
     public final Type     type;
     public final Object[] arguments;
 
-    public Operation(String column, Type type, Object... arguments)
+    public Operation(String attribute, Type type, Object... arguments)
     {
-        this.column = column;
+        this.attribute = attribute;
         this.type = type;
         this.arguments = arguments;
     }

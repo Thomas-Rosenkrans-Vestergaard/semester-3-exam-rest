@@ -25,7 +25,8 @@ public class JpaUserRepositoryTest
                 new JpaCrudRepositoryTester<>(
                         () -> new JpaUserRepository(JpaTestConnection.create()),
                         (repository) -> createUserMap(repository),
-                        -1
+                        -1,
+                        0
                 );
 
         return tester.getDynamicTests();

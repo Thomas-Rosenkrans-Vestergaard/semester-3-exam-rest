@@ -1,5 +1,6 @@
 package com.group3.sem3exam.data.repositories.queries;
 
+import com.group3.sem3exam.data.repositories.RepositoryEntity;
 import com.group3.sem3exam.data.repositories.queries.tree.Direction;
 
 import java.util.List;
@@ -7,167 +8,183 @@ import java.util.List;
 /**
  * Represents a query on a repository.
  * <p>
- * Constraints are added to the query using the {where} prefixed methods.
- * The query is executed using the {get} prefixed methods.
- *
  * Any operation not supported by an implementation throws an {@link UnsupportedOperationException}.
  *
+ * @param <K> The key of the type of the entity handled by this query.
  * @param <E> The type of the entity handled by this query.
  */
-public interface RepositoryQuery<E>
+public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEntity<K>>
 {
 
     /**
-     * Adds an {@code equals} constraint to the query. The value of the provided {@code column} must be equal to the
+     * Adds an {@code equals} constraint to the query. The value of the provided {@code attribute} must be equal to the
      * provided {@code object}.
      *
-     * @param column The column value that must be equal to the object.
-     * @param object The object the column must equal.
+     * @param attribute The attribute value that must be equal to the object.
+     * @param object    The object the attribute must equal.
      * @return this
-     * @see RepositoryQuery#whereNot(String column, Object object) The inverse of this operation.
+     * @see RepositoryQuery#whereNot(String attribute, Object object) The inverse of this operation.
      */
-    RepositoryQuery whereEq(String column, Object object);
+    RepositoryQuery<K, E> whereEq(String attribute, Object object);
 
     /**
-     * Adds a {@code not equals} constraint to the query. The value of the provided {@code column} must not be equal to the
+     * Adds a {@code not equals} constraint to the query. The value of the provided {@code attribute} must not be equal to the
      * provided {@code object}.
      *
-     * @param column The column value that must not be equal to the object.
-     * @param object The object the column must not equal.
+     * @param attribute The attribute value that must not be equal to the object.
+     * @param object    The object the attribute must not equal.
      * @return this
      * @see RepositoryQuery#whereEq(String, Object) The inverse of this operation.
      */
-    RepositoryQuery whereNot(String column, Object object);
+    RepositoryQuery<K, E> whereNot(String attribute, Object object);
 
     /**
-     * Adds an {@code in} constraint to the query. The value of the provided {@code column} must be present in the
+     * Adds an {@code in} constraint to the query. The value of the provided {@code attribute} must be present in the
      * provided list of {@code objects}.
      *
-     * @param column  The column value that must be present in the provided {@code objects}.
-     * @param objects The objects that the value of the column must match.
+     * @param attribute The attribute value that must be present in the provided {@code objects}.
+     * @param objects   The objects that the value of the attribute must match.
      * @return this
      * @see RepositoryQuery#whereNotIn(String, Object...) The inverse of this operation.
      */
-    RepositoryQuery whereIn(String column, Object... objects);
+    RepositoryQuery<K, E> whereIn(String attribute, Object... objects);
 
     /**
-     * Adds an {@code in} constraint to the query. The value of the provided {@code column} must be present in the
+     * Adds an {@code in} constraint to the query. The value of the provided {@code attribute} must be present in the
      * provided list of {@code objects}.
      *
-     * @param column  The column value that must be present in the provided {@code objects}.
-     * @param objects The objects that the value of the column must match.
+     * @param attribute The attribute value that must be present in the provided {@code objects}.
+     * @param objects   The objects that the value of the attribute must match.
      * @return this
      * @see RepositoryQuery#whereNotIn(String, List) The inverse of this operation.
      */
-    RepositoryQuery whereIn(String column, List<Object> objects);
+    RepositoryQuery<K, E> whereIn(String attribute, List<Object> objects);
 
     /**
-     * Adds a {@code not in} constraint to the query. The value of the provided {@code column} must not be present in
+     * Adds a {@code not in} constraint to the query. The value of the provided {@code attribute} must not be present in
      * the provided list of {@code objects}.
      *
-     * @param column  The column value that must not be present in the provided {@code objects}.
-     * @param objects The objects that the value of the column must not match.
+     * @param attribute The attribute value that must not be present in the provided {@code objects}.
+     * @param objects   The objects that the value of the attribute must not match.
      * @return this
      * @see RepositoryQuery#whereIn(String, Object...) The inverse of this operation.
      */
-    RepositoryQuery whereNotIn(String column, Object... objects);
+    RepositoryQuery<K, E> whereNotIn(String attribute, Object... objects);
 
     /**
-     * Adds a {@code not in} constraint to the query. The value of the provided {@code column} must not be present in
+     * Adds a {@code not in} constraint to the query. The value of the provided {@code attribute} must not be present in
      * the provided list of {@code objects}.
      *
-     * @param column  The column value that must not be present in the provided {@code objects}.
-     * @param objects The objects that the value of the column must not match.
+     * @param attribute The attribute value that must not be present in the provided {@code objects}.
+     * @param objects   The objects that the value of the attribute must not match.
      * @return this
      * @see RepositoryQuery#whereIn(String, Object...) The inverse of this operation.
      */
-    RepositoryQuery whereNotIn(String column, List<Object> objects);
+    RepositoryQuery<K, E> whereNotIn(String attribute, List<Object> objects);
 
     /**
-     * Adds a {@code between} constraint to the query. The value of the provided {@code column} must be between
+     * Adds a {@code between} constraint to the query. The value of the provided {@code attribute} must be between
      * {@code start} and {@code end}. Whether or not the operation is inclusive is implementation specific.
      *
-     * @param column The value of the column that must be between the provided {@code start} and {@code end}.
-     * @param start  The start of the between constraint.
-     * @param end    The end of the between constraint.
+     * @param attribute The value of the attribute that must be between the provided {@code start} and {@code end}.
+     * @param start     The start of the between constraint.
+     * @param end       The end of the between constraint.
      * @return this
      * @see RepositoryQuery#whereOutside(String, Object, Object) The inverse operation.
      */
-    RepositoryQuery whereBetween(String column, Object start, Object end);
+    RepositoryQuery<K, E> whereBetween(String attribute, Object start, Object end);
 
     /**
-     * Adds a {@code not between} constraint to the query. The value of the provided {@code column} must not be between
+     * Adds a {@code not between} constraint to the query. The value of the provided {@code attribute} must not be between
      * {@code start} and {@code end}. Whether or not the operation is inclusive is implementation specific.
      *
-     * @param column The value of the column that must not be between the provided {@code start} and {@code end}.
-     * @param start  The start of the between constraint.
-     * @param end    The end of the between constraint.
+     * @param attribute The value of the attribute that must not be between the provided {@code start} and {@code end}.
+     * @param start     The start of the between constraint.
+     * @param end       The end of the between constraint.
      * @return this
      * @see RepositoryQuery#whereBetween(String, Object, Object) The inverse of this operation.
      */
-    RepositoryQuery whereOutside(String column, Object start, Object end);
+    RepositoryQuery<K, E> whereOutside(String attribute, Object start, Object end);
 
     /**
-     * Adds a {@code like} constraint to the query. The value of the provided {@code column} must be similar to the
+     * Adds a {@code like} constraint to the query. The value of the provided {@code attribute} must be similar to the
      * provided {@code object}. The behavior of this constraint is implementation specific.
      *
-     * @param column The value of the column that must be {@code like} the provided {@code object}.
-     * @param object The value that the column value must be {@code like}
+     * @param attribute The value of the attribute that must be {@code like} the provided {@code object}.
+     * @param object    The value that the attribute value must be {@code like}
      * @return this
      * @see RepositoryQuery#whereNotLike(String, Object) The inverse of this operation.
      */
-    RepositoryQuery whereLike(String column, Object object);
+    RepositoryQuery<K, E> whereLike(String attribute, Object object);
 
     /**
-     * Adds a {@code like} constraint to the query. The value of the provided {@code column} must not be similar to
+     * Adds a {@code like} constraint to the query. The value of the provided {@code attribute} must not be similar to
      * the provided {@code object}. The behavior of this constraint is implementation specific.
      *
-     * @param column The value of the column that must not be {@code like} the provided {@code object}.
-     * @param object The value that the column value not must be {@code like}.
+     * @param attribute The value of the attribute that must not be {@code like} the provided {@code object}.
+     * @param object    The value that the attribute value not must be {@code like}.
      * @return this
      * @see RepositoryQuery#whereLike(String, Object) The inverse of this operation.
      */
-    RepositoryQuery whereNotLike(String column, Object object);
+    RepositoryQuery<K, E> whereNotLike(String attribute, Object object);
 
     /**
-     * Orders the provided {@code column} in the provided {@code direction}.
+     * Orders the provided {@code attribute} in the provided {@code direction}.
      *
-     * @param column    The column to order by.
-     * @param direction The direction the column should be ordered in.
+     * @param attribute The attribute to order by.
+     * @param direction The direction the attribute should be ordered in.
      * @return this
      * @see RepositoryQuery#desc(String) A cleaner way to order by DESC.
      * @see RepositoryQuery#asc(String) A cleaner way to order by ASC.
      */
-    RepositoryQuery order(String column, Direction direction);
+    RepositoryQuery<K, E> order(String attribute, Direction direction);
 
     /**
-     * Orders the provided {@code column} to descending.
+     * Orders the provided {@code attribute} to descending.
      *
-     * @param column The column to order by.
+     * @param attribute The attribute to order by.
      * @return this
      */
-    default RepositoryQuery desc(String column)
+    default RepositoryQuery<K, E> desc(String attribute)
     {
-        return order(column, Direction.DESC);
+        return order(attribute, Direction.DESC);
     }
 
     /**
-     * Orders the provided {@code column} to ascending.
+     * Orders the provided {@code attribute} to ascending.
      *
-     * @param column The column to order by.
+     * @param attribute The attribute to order by.
      * @return this
      */
-    default RepositoryQuery asc(String column)
+    default RepositoryQuery<K, E> asc(String attribute)
     {
-        return order(column, Direction.ASC);
+        return order(attribute, Direction.ASC);
     }
+
+    /**
+     * Sets the number of results to skip. Replaces the previously declared value. The default number of results
+     * to skip is {@code 0}.
+     *
+     * @param n The number of queries to skip.
+     * @return this
+     */
+    RepositoryQuery<K, E> skip(int n);
+
+    /**
+     * Sets the max number of results to return. Replaces the previously declared value. The default number of results
+     * to skip is {@code Integer.MAX_VALUE}.
+     *
+     * @param n The maximum number of results to return.
+     * @return this
+     */
+    RepositoryQuery<K, E> limit(int n);
 
     /**
      * Executes the query, returning all results.
      *
      * @return All the results in the query.
      */
-    List<E> getAll();
+    List<E> get();
 
     /**
      * Executes the query returning the result of a single page. The operation does not throw an exception when the
@@ -195,7 +212,7 @@ public interface RepositoryQuery<E>
      * @param n The index of the element to return. {@code n} starts at 0.
      * @return The {@code n}th result of the query. {@code null} when the result is out of bounds.
      */
-    E get(int n);
+    E getAt(int n);
 
     /**
      * Returns the first result of the query.
@@ -204,6 +221,75 @@ public interface RepositoryQuery<E>
      */
     default E getFirst()
     {
-        return get(1);
+        return getAt(0);
     }
+
+    /**
+     * Counts the number of results using the provided constraints. The declared {@code limit} does not
+     * effect the result of this method.
+     *
+     * @return The number of results using the provided constraints.
+     */
+    long count();
+
+    /**
+     * sChecks that there exists a result when using the provided constraints. The declared {@code limit} does not
+     * effect the result of this method.
+     *
+     * @return {@code true} when there exists at least one result when using the provided constraints.
+     */
+    boolean exists();
+
+    /**
+     * Checks if the given key exists in the list of results.
+     *
+     * @param key The key to check for existence of.
+     * @return {@code true} when the given key exists in the list of results. {@code false} otherwise.
+     */
+    boolean contains(K key);
+
+    /**
+     * Returns the maximum value of the provided attribute.
+     *
+     * @param attribute The attribute to return the maximum value of.
+     * @param vClass    The class of the return type.
+     * @param <V>       The type of the return type.
+     * @return The maximum value of the provided attribute, {@code null} when no result exists.
+     */
+    <V> V max(String attribute, Class<V> vClass);
+
+    /**
+     * Returns the minimum value of the provided attribute.
+     *
+     * @param attribute The attribute to return the minimum value of.
+     * @param vClass    The class of the return type.
+     * @param <V>       The type of the return type.
+     * @return The minimum value of the provided attribute, {@code null} when no result exists.
+     */
+    <V> V min(String attribute, Class<V> vClass);
+
+    /**
+     * Returns the values of the provided attribute in the list of results.
+     *
+     * @param attribute The name of the attribute to return the values of.
+     * @param vClass    The class of the return type.
+     * @param <V>       The type of the return type.
+     * @return The values of the provided attribute in the list of results.
+     */
+    <V> List<V> getAttributes(String attribute, Class<V> vClass);
+
+    /**
+     * Returns the keys of the list of results.
+     *
+     * @return The keys of the list of results.
+     */
+    List<K> getKeys();
+
+    /**
+     * Creates and returns a new instance of this query. Both queries can be modifies without changing the
+     * other.
+     *
+     * @return The newly created copy.
+     */
+    RepositoryQuery<K, E> copy();
 }

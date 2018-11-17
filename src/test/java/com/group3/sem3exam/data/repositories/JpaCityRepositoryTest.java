@@ -22,7 +22,8 @@ class JpaCityRepositoryTest
                 new JpaReadCrudRepositoryTester<>(
                         () -> new JpaCityRepository(JpaTestConnection.create()),
                         (repository) -> createCityMap(repository),
-                        -1
+                        -1,
+                        7
                 );
 
         return tester.getDynamicTests();

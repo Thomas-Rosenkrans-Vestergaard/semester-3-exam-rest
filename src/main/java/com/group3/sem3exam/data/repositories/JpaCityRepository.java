@@ -20,7 +20,7 @@ public class JpaCityRepository extends JpaReadCrudRepository<City, Integer> impl
      */
     public JpaCityRepository(EntityManager entityManager)
     {
-        super(entityManager, City.class);
+        super(entityManager, Integer.class, "id", City.class);
     }
 
     /**
@@ -31,7 +31,7 @@ public class JpaCityRepository extends JpaReadCrudRepository<City, Integer> impl
      */
     public JpaCityRepository(EntityManagerFactory entityManagerFactory)
     {
-        super(entityManagerFactory, City.class);
+        super(entityManagerFactory, Integer.class, "id", City.class);
     }
 
     /**
@@ -42,7 +42,7 @@ public class JpaCityRepository extends JpaReadCrudRepository<City, Integer> impl
      */
     public JpaCityRepository(JpaTransaction transaction)
     {
-        super(transaction, City.class);
+        super(transaction, Integer.class, "id", City.class);
     }
 
     /**

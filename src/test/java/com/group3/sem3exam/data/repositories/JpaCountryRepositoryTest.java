@@ -22,7 +22,8 @@ class JpaCountryRepositoryTest
                 new JpaReadCrudRepositoryTester<>(
                         () -> new JpaCountryRepository(JpaTestConnection.create()),
                         (repository) -> createCountryMap(repository),
-                        -1
+                        -1,
+                        5
                 );
 
         return tester.getDynamicTests();

@@ -20,7 +20,7 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
      */
     public JpaImageRepository(EntityManager entityManager)
     {
-        super(entityManager, Image.class);
+        super(entityManager, Integer.class, "id", Image.class);
     }
 
     /**
@@ -31,7 +31,7 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
      */
     public JpaImageRepository(EntityManagerFactory entityManagerFactory)
     {
-        super(entityManagerFactory, Image.class);
+        super(entityManagerFactory, Integer.class, "id", Image.class);
     }
 
     /**
@@ -42,7 +42,7 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
      */
     public JpaImageRepository(JpaTransaction transaction)
     {
-        super(transaction, Image.class);
+        super(transaction, Integer.class, "id", Image.class);
     }
 
     @Override

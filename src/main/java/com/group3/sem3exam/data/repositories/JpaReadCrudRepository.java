@@ -1,5 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.repositories.queries.JpaRepositoryQuery;
+import com.group3.sem3exam.data.repositories.queries.RepositoryQuery;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -22,20 +24,34 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
 {
 
     /**
+     * The type of the key of the entity the operations are performed upon.
+     */
+    public final Class<K> kClass;
+
+    /**
+     * The attribute of the key of the entity the operations are performed upon.
+     */
+    public final String kAttribute;
+
+    /**
      * The type of entity the operations are performed upon.
      */
-    protected final Class<E> c;
+    public final Class<E> eClass;
 
     /**
      * Creates a new {@link JpaReadCrudRepository} using the provided entity manager.
      *
      * @param entityManager The entity manager to perform operations upon.
-     * @param c             The type of entity the operations are performed upon.
+     * @param kClass        The type of the key of the entity the operations are performed upon.
+     * @param kAttribute    The attribute of the key of the entity the operations are performed upon.
+     * @param eClass        The type of entity the operations are performed upon.
      */
-    public JpaReadCrudRepository(EntityManager entityManager, Class<E> c)
+    public JpaReadCrudRepository(EntityManager entityManager, Class<K> kClass, String kAttribute, Class<E> eClass)
     {
         super(entityManager);
-        this.c = c;
+        this.eClass = eClass;
+        this.kClass = kClass;
+        this.kAttribute = kAttribute;
     }
 
     /**
@@ -43,12 +59,16 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
      *
      * @param entityManagerFactory The entity manager factory used to create the entity manager to perform operations
      *                             upon.
-     * @param c                    The type of entity the operations are performed upon.
+     * @param kClass               The type of the key of the entity the operations are performed upon.
+     * @param kAttribute           The attribute of the key of the entity the operations are performed upon.
+     * @param eClass               The type of entity the operations are performed upon.
      */
-    public JpaReadCrudRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
+    public JpaReadCrudRepository(EntityManagerFactory entityManagerFactory, Class<K> kClass, String kAttribute, Class<E> eClass)
     {
         super(entityManagerFactory);
-        this.c = c;
+        this.eClass = eClass;
+        this.kClass = kClass;
+        this.kAttribute = kAttribute;
     }
 
     /**
@@ -56,12 +76,16 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
-     * @param c           The type of entity the operations are performed upon.
+     * @param kClass      The type of the key of the entity the operations are performed upon.
+     * @param kAttribute  The attribute of the key of the entity the operations are performed upon.
+     * @param eClass      The type of entity the operations are performed upon.
      */
-    public JpaReadCrudRepository(JpaTransaction transaction, Class<E> c)
+    public JpaReadCrudRepository(JpaTransaction transaction, Class<K> kClass, String kAttribute, Class<E> eClass)
     {
         super(transaction);
-        this.c = c;
+        this.eClass = eClass;
+        this.kClass = kClass;
+        this.kAttribute = kAttribute;
     }
 
     /**
@@ -73,7 +97,7 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
     public List<E> get()
     {
         return getEntityManager()
-                .createQuery("SELECT e FROM " + c.getSimpleName() + " e", c)
+                .createQuery("SELECT e FROM " + eClass.getSimpleName() + " e", eClass)
                 .getResultList();
     }
 
@@ -92,7 +116,7 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
         pageNumber = Math.max(pageNumber, 1);
 
         return getEntityManager()
-                .createQuery("SELECT e FROM " + c.getSimpleName() + " e", c)
+                .createQuery("SELECT e FROM " + eClass.getSimpleName() + " e", eClass)
                 .setFirstResult((pageNumber - 1) * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();
@@ -107,7 +131,7 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
     public long count()
     {
         return getEntityManager()
-                .createQuery("SELECT count(e) FROM " + c.getSimpleName() + " e", Long.class)
+                .createQuery("SELECT count(e) FROM " + eClass.getSimpleName() + " e", Long.class)
                 .getSingleResult();
     }
 
@@ -120,7 +144,7 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
     @Override
     public E get(K id)
     {
-        return getEntityManager().find(c, id);
+        return getEntityManager().find(eClass, id);
     }
 
     /**
@@ -135,7 +159,7 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
     public Map<K, E> get(Set<K> ids)
     {
         List<E> results = getEntityManager()
-                .createQuery("SELECT e FROM " + c.getSimpleName() + " e WHERE e.id IN :ids", c)
+                .createQuery("SELECT e FROM " + eClass.getSimpleName() + " e WHERE e.id IN :ids", eClass)
                 .setParameter("ids", ids)
                 .getResultList();
 
@@ -156,10 +180,22 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
     public boolean exists(K id)
     {
         Long count = getEntityManager()
-                .createQuery("SELECT count(e.id) FROM " + c.getSimpleName() + " e WHERE e.id = :id", Long.class)
+                .createQuery("SELECT count(e.id) FROM " + eClass.getSimpleName() + " e WHERE e.id = :id", Long.class)
                 .setParameter("id", id)
                 .getSingleResult();
 
         return count > 0;
+    }
+
+
+    /**
+     * Creates and returns a new {@link RepositoryQuery}.
+     *
+     * @return The query.
+     */
+    @Override
+    public RepositoryQuery<K, E> query()
+    {
+        return new JpaRepositoryQuery<>(getEntityManager(), kClass, kAttribute, eClass);
     }
 }

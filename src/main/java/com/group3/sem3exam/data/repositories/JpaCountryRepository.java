@@ -21,7 +21,7 @@ public class JpaCountryRepository extends JpaReadCrudRepository<Country, Integer
      */
     public JpaCountryRepository(EntityManager entityManager)
     {
-        super(entityManager, Country.class);
+        super(entityManager, Integer.class, "id", Country.class);
     }
 
     /**
@@ -32,7 +32,7 @@ public class JpaCountryRepository extends JpaReadCrudRepository<Country, Integer
      */
     public JpaCountryRepository(EntityManagerFactory entityManagerFactory)
     {
-        super(entityManagerFactory, Country.class);
+        super(entityManagerFactory, Integer.class, "id", Country.class);
     }
 
     /**
@@ -43,7 +43,7 @@ public class JpaCountryRepository extends JpaReadCrudRepository<Country, Integer
      */
     public JpaCountryRepository(JpaTransaction transaction)
     {
-        super(transaction, Country.class);
+        super(transaction, Integer.class, "id", Country.class);
     }
 
     /**

@@ -2,22 +2,22 @@ package com.group3.sem3exam.data.repositories.queries.tree;
 
 public class Order
 {
-    public final String    column;
+    public final String    attribute;
     public final Direction direction;
 
-    public Order(String column, Direction direction)
+    public Order(String attribute, Direction direction)
     {
-        this.column = column;
+        this.attribute = attribute;
         this.direction = direction;
     }
 
-    public static Order desc(String column)
+    public static Order desc(String attribute)
     {
-        return new Order(column, Direction.DESC);
+        return new Order(attribute, Direction.DESC);
     }
 
-    public static Order asc(String column)
+    public static Order asc(String attribute)
     {
-        return new Order(column, Direction.ASC);
+        return new Order(attribute, Direction.ASC);
     }
 }

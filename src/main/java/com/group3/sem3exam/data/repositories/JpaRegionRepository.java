@@ -20,7 +20,7 @@ public class JpaRegionRepository extends JpaReadCrudRepository<Region, Integer> 
      */
     public JpaRegionRepository(EntityManager entityManager)
     {
-        super(entityManager, Region.class);
+        super(entityManager, Integer.class, "id", Region.class);
     }
 
     /**
@@ -31,7 +31,7 @@ public class JpaRegionRepository extends JpaReadCrudRepository<Region, Integer> 
      */
     public JpaRegionRepository(EntityManagerFactory entityManagerFactory)
     {
-        super(entityManagerFactory, Region.class);
+        super(entityManagerFactory, Integer.class, "id", Region.class);
     }
 
     /**
@@ -42,7 +42,7 @@ public class JpaRegionRepository extends JpaReadCrudRepository<Region, Integer> 
      */
     public JpaRegionRepository(JpaTransaction transaction)
     {
-        super(transaction, Region.class);
+        super(transaction, Integer.class, "id", Region.class);
     }
 
     /**

@@ -19,9 +19,10 @@ public class JpaCrudRepositoryTester<
     public JpaCrudRepositoryTester(
             Supplier<I> constructor,
             Function<I, TreeMap<K, E>> dataProducer,
-            K unknownKey)
+            K unknownKey,
+            long initialDataSize)
     {
-        super(constructor, dataProducer, unknownKey);
+        super(constructor, dataProducer, unknownKey, initialDataSize);
     }
 
     Collection<DynamicTest> getDynamicTests()

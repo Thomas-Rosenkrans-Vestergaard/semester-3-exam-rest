@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DynamicTest;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,20 +18,23 @@ public class JpaReadCrudRepositoryTester<
     protected final Supplier<I>                constructor;
     protected final Function<I, TreeMap<K, E>> dataProducer;
     protected final K                          unknownKey;
+    protected final long                       initialDataSize;
 
     public JpaReadCrudRepositoryTester(
             Supplier<I> constructor,
             Function<I, TreeMap<K, E>> dataProducer,
-            K unknownKey)
+            K unknownKey,
+            long initialDataSize)
     {
         this.constructor = constructor;
         this.dataProducer = dataProducer;
         this.unknownKey = unknownKey;
+        this.initialDataSize = initialDataSize;
     }
 
     Collection<DynamicTest> getDynamicTests()
     {
-        return new ArrayList<>(Arrays.asList(
+        ArrayList<DynamicTest> tests = new ArrayList<>(Arrays.asList(
                 createGetTest(),
                 createGetPaginatedTest(),
                 createCountTest(),
@@ -38,6 +42,10 @@ public class JpaReadCrudRepositoryTester<
                 createGetByIdsTest(),
                 createExistsTest()
         ));
+
+        tests.addAll(createQueryTests());
+
+        return tests;
     }
 
     private DynamicTest createGetTest()
@@ -154,6 +162,261 @@ public class JpaReadCrudRepositoryTester<
                 }
 
                 assertFalse(instance.exists(unknownKey));
+            }
+        });
+    }
+
+    private List<DynamicTest> createQueryTests()
+    {
+        return Arrays.asList(
+                createQueryGetTest(),
+                createQueryGetPageTest(),
+                createQueryGetFirstNTest(),
+                createQueryGetAtTest(),
+                createQueryGetFirstTest(),
+                createQueryCountTest(),
+                createQueryExistsTest(),
+                createQueryContainsTest(),
+                createQuerySkipGetAtTest(),
+                createQueryLimitGetTest(),
+                createQueryMaxTest(),
+                createQueryMinTest(),
+                createQueryGetAttributesTest(),
+                createQueryGetKeysTest(),
+                createQueryDescTest(),
+                createQueryAscTest()
+        );
+    }
+
+    private DynamicTest createQueryGetTest()
+    {
+        return DynamicTest.dynamicTest("query.get", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                Collection<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(data, instance.query().get());
+            }
+        });
+    }
+
+    private DynamicTest createQueryGetPageTest()
+    {
+        return DynamicTest.dynamicTest("query.getPage", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+
+                if (data.size() < 3) {
+                    fail(String.format("Cannot test %s.query().getPage(), not enough test data.", instance.getClass().getName()));
+                    return;
+                }
+
+                {
+                    // Test page size
+                    List<E> result = instance.query().getPage(3, 0);
+                    assertEquals(3, result.size());
+                    assertEquals(data.get(0), result.get(0));
+                    assertEquals(data.get(2), result.get(2));
+                }
+
+                {
+                    // Test offset
+                    List<E> result = instance.query().getPage(2, 2);
+                    assertEquals(2, result.size());
+                    assertEquals(data.get(2), result.get(0));
+                    assertEquals(data.get(3), result.get(1));
+                }
+
+                assertEquals(data, instance.query().get());
+            }
+        });
+    }
+
+    private DynamicTest createQueryGetFirstNTest()
+    {
+        return DynamicTest.dynamicTest("query.getFirst(n)", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data   = new ArrayList<>(dataProducer.apply(instance).values());
+                List<E> result = instance.query().getFirst(data.size() - 1);
+                assertEquals(data.size() - 1, result.size());
+                assertEquals(data.get(0), result.get(0));
+                assertEquals(data.get(result.size() - 1), result.get(result.size() - 1));
+            }
+        });
+    }
+
+    private DynamicTest createQueryGetAtTest()
+    {
+        return DynamicTest.dynamicTest("query.getAt", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+
+                assertEquals(data.get(0), instance.query().getAt(0));
+                assertEquals(data.get(data.size() - 1), instance.query().getAt(data.size() - 1));
+            }
+        });
+    }
+
+    private DynamicTest createQueryGetFirstTest()
+    {
+        return DynamicTest.dynamicTest("query.getFirst", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data   = new ArrayList<>(dataProducer.apply(instance).values());
+                E       result = instance.query().desc("id").getFirst();
+                assertEquals(data.get(data.size() - 1), result);
+            }
+        });
+    }
+
+    private DynamicTest createQueryCountTest()
+    {
+        return DynamicTest.dynamicTest("query.count", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(data.size(), instance.query().count());
+            }
+
+            try (I instance = constructor.get()) {
+                instance.begin();
+                assertEquals(this.initialDataSize, instance.query().count());
+            }
+        });
+    }
+
+    private DynamicTest createQueryExistsTest()
+    {
+        return DynamicTest.dynamicTest("query.exists", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                if (data.size() > 0)
+                    assertTrue(instance.query().exists());
+                else
+                    assertFalse(instance.query().exists());
+            }
+
+            try (I instance = constructor.get()) {
+                instance.begin();
+                if (this.initialDataSize > 0)
+                    assertTrue(instance.query().exists());
+                else
+                    assertFalse(instance.query().exists());
+            }
+        });
+    }
+
+    private DynamicTest createQueryContainsTest()
+    {
+        return DynamicTest.dynamicTest("query.contains", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                K       key  = data.get(0).getId();
+                assertTrue(instance.query().contains(key));
+                assertFalse(instance.query().whereNot(instance.kAttribute, key).contains(key));
+
+                assertFalse(instance.exists(unknownKey));
+            }
+        });
+    }
+
+    private DynamicTest createQuerySkipGetAtTest()
+    {
+        return DynamicTest.dynamicTest("query.skip + query.getAt", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(data.get(1), instance.query().skip(1).getAt(0));
+            }
+        });
+    }
+
+    private DynamicTest createQueryLimitGetTest()
+    {
+        return DynamicTest.dynamicTest("query.limit + query.get", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data   = new ArrayList<>(dataProducer.apply(instance).values());
+                List<E> result = instance.query().limit(data.size() - 1).get();
+                assertEquals(data.size() - 1, result.size());
+            }
+        });
+    }
+
+    private DynamicTest createQueryMaxTest()
+    {
+        return DynamicTest.dynamicTest("query.max", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(data.get(data.size() - 1).getId(), instance.query().max(instance.kAttribute, instance.kClass));
+            }
+        });
+    }
+
+    private DynamicTest createQueryMinTest()
+    {
+        return DynamicTest.dynamicTest("query.min", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(data.get(0).getId(), instance.query().min(instance.kAttribute, instance.kClass));
+            }
+        });
+    }
+
+    private DynamicTest createQueryGetAttributesTest()
+    {
+        return DynamicTest.dynamicTest("query.getAttributes", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(data.stream().map(E::getId).collect(Collectors.toList()),
+                             instance.query().getAttributes(instance.kAttribute, instance.kClass));
+            }
+        });
+    }
+
+    private DynamicTest createQueryGetKeysTest()
+    {
+        return DynamicTest.dynamicTest("query.getKeys", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(data.stream().map(E::getId).collect(Collectors.toList()),
+                             instance.query().getKeys());
+            }
+        });
+    }
+
+    private DynamicTest createQueryDescTest()
+    {
+        return DynamicTest.dynamicTest("query.desc + query.getKeys", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(
+                        data.stream().map(E::getId).sorted(Comparator.reverseOrder()).collect(Collectors.toList()),
+                        instance.query().desc(instance.kAttribute).getKeys()
+                );
+            }
+        });
+    }
+
+    private DynamicTest createQueryAscTest()
+    {
+        return DynamicTest.dynamicTest("query.asc + query.getKeys", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(
+                        data.stream().map(E::getId).sorted(Comparator.naturalOrder()).collect(Collectors.toList()),
+                        instance.query().asc(instance.kAttribute).getKeys()
+                );
             }
         });
     }

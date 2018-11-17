@@ -23,7 +23,7 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
      */
     public JpaUserRepository(EntityManager entityManager)
     {
-        super(entityManager, User.class);
+        super(entityManager, Integer.class, "id", User.class);
     }
 
     /**
@@ -34,7 +34,7 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
      */
     public JpaUserRepository(EntityManagerFactory entityManagerFactory)
     {
-        super(entityManagerFactory, User.class);
+        super(entityManagerFactory, Integer.class, "id", User.class);
     }
 
     /**
@@ -45,7 +45,7 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
      */
     public JpaUserRepository(JpaTransaction transaction)
     {
-        super(transaction, User.class);
+        super(transaction, Integer.class, "id", User.class);
     }
 
     /**

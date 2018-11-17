@@ -1,121 +1,153 @@
 package com.group3.sem3exam.data.repositories.queries;
 
+import com.group3.sem3exam.data.repositories.RepositoryEntity;
 import com.group3.sem3exam.data.repositories.queries.tree.Conditional;
 import com.group3.sem3exam.data.repositories.queries.tree.Direction;
 import com.group3.sem3exam.data.repositories.queries.tree.Operation;
 import com.group3.sem3exam.data.repositories.queries.tree.Order;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-public abstract class AbstractRepositoryQuery<E> implements RepositoryQuery<E>
+public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends RepositoryEntity<K>>
+        implements RepositoryQuery<K, E>
 {
 
-    protected Set<String>       allowedColumns;
-    protected List<Conditional> wheres = new ArrayList<>();
-    protected List<Order>       orders = new ArrayList<>();
+    /**
+     * The where conditionals registered with the query.
+     */
+    protected final List<Conditional> wheres;
 
-    public AbstractRepositoryQuery(Set<String> allowedColumns)
+    /**
+     * The order clauses registered with the query.
+     */
+    protected final List<Order> orders;
+
+    /**
+     * The number of results to skip.
+     */
+    protected int skip;
+
+    /**
+     * The maximum number of results to return.
+     */
+    protected int limit;
+
+    /**
+     * Creates a new {@link AbstractRepositoryQuery} with predefined where and order clauses.
+     *
+     * @param wheres The where conditionals registered with the query.
+     * @param orders The order clauses registered with the query.
+     * @param skip   The number of results the query should skip.
+     * @param limit  The maximum number of results to return.
+     */
+    public AbstractRepositoryQuery(List<Conditional> wheres, List<Order> orders, int skip, int limit)
     {
-        this.allowedColumns = allowedColumns;
+        this.wheres = wheres;
+        this.orders = orders;
+        this.skip = skip;
+        this.limit = limit;
     }
 
     @Override
-    public RepositoryQuery whereEq(String column, Object object)
+    public RepositoryQuery<K, E> whereEq(String attribute, Object object)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.EQ, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.EQ, object)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereNot(String column, Object object)
+    public RepositoryQuery<K, E> whereNot(String attribute, Object object)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.NOT, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT, object)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereIn(String column, Object... objects)
+    public RepositoryQuery<K, E> whereIn(String attribute, Object... objects)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.IN, objects)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.IN, objects)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereIn(String column, List objects)
+    public RepositoryQuery<K, E> whereIn(String attribute, List objects)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.IN, objects)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.IN, objects)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereNotIn(String column, Object... objects)
+    public RepositoryQuery<K, E> whereNotIn(String attribute, Object... objects)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.NOT_IN, objects)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_IN, objects)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereNotIn(String column, List objects)
+    public RepositoryQuery<K, E> whereNotIn(String attribute, List objects)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.NOT_IN, objects)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_IN, objects)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereBetween(String column, Object start, Object end)
+    public RepositoryQuery<K, E> whereBetween(String attribute, Object start, Object end)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.BETWEEN, start, end)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.BETWEEN, start, end)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereOutside(String column, Object start, Object end)
+    public RepositoryQuery<K, E> whereOutside(String attribute, Object start, Object end)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.OUTSIDE, start, end)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.OUTSIDE, start, end)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereLike(String column, Object object)
+    public RepositoryQuery<K, E> whereLike(String attribute, Object object)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.LIKE, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LIKE, object)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery whereNotLike(String column, Object object)
+    public RepositoryQuery<K, E> whereNotLike(String attribute, Object object)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            wheres.add(Conditional.op(new Operation(column, Operation.Type.NOT_LIKE, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_LIKE, object)));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery order(String column, Direction direction)
+    public RepositoryQuery<K, E> order(String attribute, Direction direction)
     {
-        if (allowedColumns == null || allowedColumns.contains(column))
-            orders.add(new Order(column, direction));
+        orders.add(new Order(attribute, direction));
+
+        return this;
+    }
+
+    @Override
+    public RepositoryQuery<K, E> skip(int n)
+    {
+        this.skip = Math.max(n, 0);
+
+        return this;
+    }
+
+    @Override
+    public RepositoryQuery<K, E> limit(int n)
+    {
+        this.limit = Math.max(n, 0);
 
         return this;
     }
