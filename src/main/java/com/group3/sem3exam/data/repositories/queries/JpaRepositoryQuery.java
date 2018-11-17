@@ -257,11 +257,63 @@ public class JpaRepositoryQuery<K extends Comparable<K>, E extends RepositoryEnt
         }
     }
 
-    /**
-     * Creates and returns a new instance of this query.
-     *
-     * @return The newly created copy.
-     */
+    @Override
+    public boolean chunk(int chunkSize, Chunker<E> chunker)
+    {
+        MutableChunk<E> chunk   = new MutableChunk<>();
+        Stopper         stopper = new Stopper();
+
+        for (int chunkNumber = 1; !stopper.stopped; chunkNumber++) {
+            chunk.index = chunkNumber - 1;
+            chunk.position = chunkNumber;
+            chunk.results = getPage(chunkSize, chunkNumber);
+            if (chunk.results.isEmpty())
+                return true;
+
+            chunker.handle(chunk, stopper);
+            entityManager.flush();
+            entityManager.clear();
+        }
+
+        return false;
+    }
+
+    public class Stopper implements Runnable
+    {
+
+        public boolean stopped = false;
+
+        @Override
+        public void run()
+        {
+            this.stopped = true;
+        }
+    }
+
+    private class MutableChunk<E> implements Chunk<E>
+    {
+
+        public int     index;
+        public int     position;
+        public List<E> results;
+
+        public int index()
+        {
+            return index;
+        }
+
+        public int position()
+        {
+            return position;
+        }
+
+        @Override
+        public List<E> getResults()
+        {
+            return results;
+        }
+    }
+
     @Override
     public RepositoryQuery<K, E> copy()
     {

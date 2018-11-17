@@ -286,6 +286,59 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
     List<K> getKeys();
 
     /**
+     * Chunks the results in the query, providing each chunk to the provided callback.
+     *
+     * @param chunkSize The number of results in each chunk.
+     * @param chunker   The The handler that the chunks are provided to.
+     * @return {@code true} when the chunker was not stopped prematurely, and therefor ran through all the results
+     * of the query, {@code false} otherwise.
+     */
+    boolean chunk(int chunkSize, Chunker<E> chunker);
+
+    @FunctionalInterface
+    interface Chunker<E>
+    {
+
+        /**
+         * Handles a single chunk.
+         *
+         * @param chunk   The chunk provided to the handler.
+         * @param stopper A runnable instance that can be called to stop the chunking of the results.
+         */
+        void handle(Chunk<E> chunk, Runnable stopper);
+    }
+
+    /**
+     * Represents a chunk of results provided to the {@link Chunker} interface.
+     *
+     * @param <E> The type of the entity in the {@link Chunk}.
+     */
+    interface Chunk<E>
+    {
+
+        /**
+         * Returns the index of the current chunk, starts at {@code 0}.
+         *
+         * @return The index of the current chunk, starts at {@code 0}.
+         */
+        int index();
+
+        /**
+         * Returns the position of the current chunk, starts at {@code 1}.
+         *
+         * @return The position of the current chunk, starts at {@code 1}.
+         */
+        int position();
+
+        /**
+         * Returns the results in the chunk.
+         *
+         * @return The results in the chunk.
+         */
+        List<E> getResults();
+    }
+
+    /**
      * Creates and returns a new instance of this query. Both queries can be modifies without changing the
      * other.
      *

@@ -1,5 +1,6 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.repositories.queries.RepositoryQuery;
 import org.junit.jupiter.api.DynamicTest;
 
 import java.util.*;
@@ -183,6 +184,7 @@ public class JpaReadCrudRepositoryTester<
                 createQueryMinTest(),
                 createQueryGetAttributesTest(),
                 createQueryGetKeysTest(),
+                createQueryChunkTest(),
                 createQueryDescTest(),
                 createQueryAscTest()
         );
@@ -391,6 +393,46 @@ public class JpaReadCrudRepositoryTester<
                              instance.query().getKeys());
             }
         });
+    }
+
+    private DynamicTest createQueryChunkTest()
+    {
+        return DynamicTest.dynamicTest("query.chunk", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                if (data.size() < 3) {
+                    fail("Cannot test query.chunk, not enough data.");
+                    return;
+                }
+
+                CountingChunker<E> countingChunker = new CountingChunker<>(data.size());
+                assertTrue(instance.query().chunk(2, countingChunker));
+                assertEquals(0, countingChunker.missing);
+                assertEquals(Math.ceil((float) data.size() / 2), countingChunker.counter);
+
+                // Test that chunk() returns false when the chunk was stopped.
+                assertFalse(instance.query().chunk(2, ((chunk, stopper) -> stopper.run())));
+            }
+        });
+    }
+
+    private class CountingChunker<E> implements RepositoryQuery.Chunker<E>
+    {
+        public int missing;
+        public int counter = 0;
+
+        public CountingChunker(int missing)
+        {
+            this.missing = missing;
+        }
+
+        @Override
+        public void handle(RepositoryQuery.Chunk<E> chunk, Runnable stopper)
+        {
+            counter++;
+            missing -= chunk.getResults().size();
+        }
     }
 
     private DynamicTest createQueryDescTest()
