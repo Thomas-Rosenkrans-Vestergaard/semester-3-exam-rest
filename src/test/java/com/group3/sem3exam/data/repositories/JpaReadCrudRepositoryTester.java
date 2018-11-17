@@ -170,6 +170,12 @@ public class JpaReadCrudRepositoryTester<
     private List<DynamicTest> createQueryTests()
     {
         return Arrays.asList(
+                createQueryDescTest(),
+                createQueryAscTest(),
+                createQueryWhereGtTest(),
+                createQueryWhereLtTest(),
+                createQueryWhereGtoeTest(),
+                createQueryWhereLtoeTest(),
                 createQueryGetTest(),
                 createQueryGetPageTest(),
                 createQueryGetFirstNTest(),
@@ -184,10 +190,79 @@ public class JpaReadCrudRepositoryTester<
                 createQueryMinTest(),
                 createQueryGetAttributesTest(),
                 createQueryGetKeysTest(),
-                createQueryChunkTest(),
-                createQueryDescTest(),
-                createQueryAscTest()
+                createQueryChunkTest()
         );
+    }
+
+    private static Random random = new Random();
+
+    private K getRandomKey(List<E> keys)
+    {
+        return keys.get(random.nextInt(keys.size())).getId();
+    }
+
+    private DynamicTest createQueryWhereGtTest()
+    {
+        return DynamicTest.dynamicTest("query.gt", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data   = new ArrayList<>(dataProducer.apply(instance).values());
+                K       cutoff = getRandomKey(data);
+
+                assertEquals(
+                        data.stream().filter(e -> e.getId().compareTo(cutoff) > 0).collect(Collectors.toList()),
+                        instance.query().gt(instance.kAttribute, cutoff).get()
+                );
+            }
+        });
+    }
+
+    private DynamicTest createQueryWhereLtTest()
+    {
+        return DynamicTest.dynamicTest("query.lt", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data   = new ArrayList<>(dataProducer.apply(instance).values());
+                K       cutoff = getRandomKey(data);
+
+                assertEquals(
+                        data.stream().filter(e -> e.getId().compareTo(cutoff) < 0).collect(Collectors.toList()),
+                        instance.query().lt(instance.kAttribute, cutoff).get()
+                );
+            }
+        });
+    }
+
+    private DynamicTest createQueryWhereGtoeTest()
+    {
+        return DynamicTest.dynamicTest("query.gtoe", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data   = new ArrayList<>(dataProducer.apply(instance).values());
+                K       cutoff = getRandomKey(data);
+
+                assertEquals(
+                        data.stream().filter(e -> e.getId().compareTo(cutoff) > -1).collect(Collectors.toList()),
+                        instance.query().gtoe(instance.kAttribute, cutoff).get()
+                );
+            }
+        });
+    }
+
+    private DynamicTest createQueryWhereLtoeTest()
+    {
+        return DynamicTest.dynamicTest("query.ltoe", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data   = new ArrayList<>(dataProducer.apply(instance).values());
+                K       cutoff = getRandomKey(data);
+
+                assertEquals(
+                        data.stream().filter(e -> e.getId().compareTo(cutoff) < 1).collect(Collectors.toList()),
+                        instance.query().ltoe(instance.kAttribute, cutoff).get()
+                );
+            }
+        });
     }
 
     private DynamicTest createQueryGetTest()
@@ -319,7 +394,7 @@ public class JpaReadCrudRepositoryTester<
                 List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
                 K       key  = data.get(0).getId();
                 assertTrue(instance.query().contains(key));
-                assertFalse(instance.query().whereNot(instance.kAttribute, key).contains(key));
+                assertFalse(instance.query().not(instance.kAttribute, key).contains(key));
 
                 assertFalse(instance.exists(unknownKey));
             }

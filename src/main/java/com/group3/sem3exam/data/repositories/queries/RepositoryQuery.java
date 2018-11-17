@@ -23,20 +23,68 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param attribute The attribute value that must be equal to the object.
      * @param object    The object the attribute must equal.
      * @return this
-     * @see RepositoryQuery#whereNot(String attribute, Object object) The inverse of this operation.
+     * @see RepositoryQuery#not(String attribute, Object object) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereEq(String attribute, Object object);
+    RepositoryQuery<K, E> eq(String attribute, Object object);
 
     /**
-     * Adds a {@code not equals} constraint to the query. The value of the provided {@code attribute} must not be equal to the
-     * provided {@code object}.
+     * Adds a {@code not equals} constraint to the query. The value of the provided {@code attribute} must not be equal
+     * to the provided {@code object}.
      *
      * @param attribute The attribute value that must not be equal to the object.
      * @param object    The object the attribute must not equal.
      * @return this
-     * @see RepositoryQuery#whereEq(String, Object) The inverse of this operation.
+     * @see RepositoryQuery#eq(String, Object) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereNot(String attribute, Object object);
+    RepositoryQuery<K, E> not(String attribute, Object object);
+
+    /**
+     * Adds a {@code greater than} constraint to the query. The value of the provided {@code attribute} must be
+     * greater than the provided {@code object}.
+     *
+     * @param attribute The attribute value that must be greater than the provided object.
+     * @param object    The object the attribute be greater than.
+     * @return this
+     * @see RepositoryQuery#gtoe(String, Object) For placing a similar constraint that is inclusive of the object.
+     * @see RepositoryQuery#ltoe(String, Object) The insverse of this operation.
+     */
+    RepositoryQuery<K, E> gt(String attribute, Object object);
+
+    /**
+     * Adds a {@code less than} constraint to the query. The value of the provided {@code attribute} must be
+     * less than the provided {@code object}.
+     *
+     * @param attribute The attribute value that must be less than the provided object.
+     * @param object    The object the attribute be less than.
+     * @return this
+     * @see RepositoryQuery#ltoe(String, Object) For placing a similar constraint that is inclusive of the object.
+     * @see RepositoryQuery#gtoe(String, Object) The insverse of this operation.
+     */
+    RepositoryQuery<K, E> lt(String attribute, Object object);
+
+    /**
+     * Adds a {@code greater than or equal} constraint to the query. The value of the provided {@code attribute} must be
+     * greater than, or equal to, the provided {@code object}.
+     *
+     * @param attribute The attribute value that must be greater than, or equal to, the provided object.
+     * @param object    The object the attribute be greater than, or equal to.
+     * @return this
+     * @see RepositoryQuery#gt(String, Object) For placing a similar constraint that is not inclusive of the object.
+     * @see RepositoryQuery#lt(String, Object) The inverse of this operation.
+     */
+    RepositoryQuery<K, E> gtoe(String attribute, Object object);
+
+    /**
+     * Adds a {@code less than or equal} constraint to the query. The value of the provided {@code attribute} must be
+     * less than, or equal to, the provided {@code object}.
+     *
+     * @param attribute The attribute value that must be less than, or equal to, the provided object.
+     * @param object    The object the attribute be less than, or equal to.
+     * @return this
+     * @see RepositoryQuery#lt(String, Object) For placing a similar constraint that is not inclusive of the object.
+     * @see RepositoryQuery#gt(String, Object) The inverse of this operation.
+     */
+    RepositoryQuery<K, E> ltoe(String attribute, Object object);
 
     /**
      * Adds an {@code in} constraint to the query. The value of the provided {@code attribute} must be present in the
@@ -45,9 +93,9 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param attribute The attribute value that must be present in the provided {@code objects}.
      * @param objects   The objects that the value of the attribute must match.
      * @return this
-     * @see RepositoryQuery#whereNotIn(String, Object...) The inverse of this operation.
+     * @see RepositoryQuery#notIn(String, Object...) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereIn(String attribute, Object... objects);
+    RepositoryQuery<K, E> in(String attribute, Object... objects);
 
     /**
      * Adds an {@code in} constraint to the query. The value of the provided {@code attribute} must be present in the
@@ -56,9 +104,9 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param attribute The attribute value that must be present in the provided {@code objects}.
      * @param objects   The objects that the value of the attribute must match.
      * @return this
-     * @see RepositoryQuery#whereNotIn(String, List) The inverse of this operation.
+     * @see RepositoryQuery#notIn(String, List) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereIn(String attribute, List<Object> objects);
+    RepositoryQuery<K, E> in(String attribute, List<Object> objects);
 
     /**
      * Adds a {@code not in} constraint to the query. The value of the provided {@code attribute} must not be present in
@@ -67,9 +115,9 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param attribute The attribute value that must not be present in the provided {@code objects}.
      * @param objects   The objects that the value of the attribute must not match.
      * @return this
-     * @see RepositoryQuery#whereIn(String, Object...) The inverse of this operation.
+     * @see RepositoryQuery#in(String, Object...) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereNotIn(String attribute, Object... objects);
+    RepositoryQuery<K, E> notIn(String attribute, Object... objects);
 
     /**
      * Adds a {@code not in} constraint to the query. The value of the provided {@code attribute} must not be present in
@@ -78,9 +126,9 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param attribute The attribute value that must not be present in the provided {@code objects}.
      * @param objects   The objects that the value of the attribute must not match.
      * @return this
-     * @see RepositoryQuery#whereIn(String, Object...) The inverse of this operation.
+     * @see RepositoryQuery#in(String, Object...) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereNotIn(String attribute, List<Object> objects);
+    RepositoryQuery<K, E> notIn(String attribute, List<Object> objects);
 
     /**
      * Adds a {@code between} constraint to the query. The value of the provided {@code attribute} must be between
@@ -90,9 +138,9 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param start     The start of the between constraint.
      * @param end       The end of the between constraint.
      * @return this
-     * @see RepositoryQuery#whereOutside(String, Object, Object) The inverse operation.
+     * @see RepositoryQuery#outside(String, Object, Object) The inverse operation.
      */
-    RepositoryQuery<K, E> whereBetween(String attribute, Object start, Object end);
+    RepositoryQuery<K, E> between(String attribute, Object start, Object end);
 
     /**
      * Adds a {@code not between} constraint to the query. The value of the provided {@code attribute} must not be between
@@ -102,9 +150,9 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param start     The start of the between constraint.
      * @param end       The end of the between constraint.
      * @return this
-     * @see RepositoryQuery#whereBetween(String, Object, Object) The inverse of this operation.
+     * @see RepositoryQuery#between(String, Object, Object) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereOutside(String attribute, Object start, Object end);
+    RepositoryQuery<K, E> outside(String attribute, Object start, Object end);
 
     /**
      * Adds a {@code like} constraint to the query. The value of the provided {@code attribute} must be similar to the
@@ -113,9 +161,9 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param attribute The value of the attribute that must be {@code like} the provided {@code object}.
      * @param object    The value that the attribute value must be {@code like}
      * @return this
-     * @see RepositoryQuery#whereNotLike(String, Object) The inverse of this operation.
+     * @see RepositoryQuery#notLike(String, Object) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereLike(String attribute, Object object);
+    RepositoryQuery<K, E> like(String attribute, Object object);
 
     /**
      * Adds a {@code like} constraint to the query. The value of the provided {@code attribute} must not be similar to
@@ -124,9 +172,9 @@ public interface RepositoryQuery<K extends Comparable<K>, E extends RepositoryEn
      * @param attribute The value of the attribute that must not be {@code like} the provided {@code object}.
      * @param object    The value that the attribute value not must be {@code like}.
      * @return this
-     * @see RepositoryQuery#whereLike(String, Object) The inverse of this operation.
+     * @see RepositoryQuery#like(String, Object) The inverse of this operation.
      */
-    RepositoryQuery<K, E> whereNotLike(String attribute, Object object);
+    RepositoryQuery<K, E> notLike(String attribute, Object object);
 
     /**
      * Orders the provided {@code attribute} in the provided {@code direction}.

@@ -49,7 +49,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereEq(String attribute, Object object)
+    public RepositoryQuery<K, E> eq(String attribute, Object object)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.EQ, object)));
 
@@ -57,7 +57,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereNot(String attribute, Object object)
+    public RepositoryQuery<K, E> not(String attribute, Object object)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT, object)));
 
@@ -65,7 +65,39 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereIn(String attribute, Object... objects)
+    public RepositoryQuery<K, E> gt(String attribute, Object object)
+    {
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.GT, object)));
+
+        return this;
+    }
+
+    @Override
+    public RepositoryQuery<K, E> lt(String attribute, Object object)
+    {
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LT, object)));
+
+        return this;
+    }
+
+    @Override
+    public RepositoryQuery<K, E> gtoe(String attribute, Object object)
+    {
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.GTOE, object)));
+
+        return this;
+    }
+
+    @Override
+    public RepositoryQuery<K, E> ltoe(String attribute, Object object)
+    {
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LTOE, object)));
+
+        return this;
+    }
+
+    @Override
+    public RepositoryQuery<K, E> in(String attribute, Object... objects)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.IN, objects)));
 
@@ -73,7 +105,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereIn(String attribute, List objects)
+    public RepositoryQuery<K, E> in(String attribute, List objects)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.IN, objects)));
 
@@ -81,7 +113,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereNotIn(String attribute, Object... objects)
+    public RepositoryQuery<K, E> notIn(String attribute, Object... objects)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_IN, objects)));
 
@@ -89,7 +121,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereNotIn(String attribute, List objects)
+    public RepositoryQuery<K, E> notIn(String attribute, List objects)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_IN, objects)));
 
@@ -97,7 +129,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereBetween(String attribute, Object start, Object end)
+    public RepositoryQuery<K, E> between(String attribute, Object start, Object end)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.BETWEEN, start, end)));
 
@@ -105,7 +137,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereOutside(String attribute, Object start, Object end)
+    public RepositoryQuery<K, E> outside(String attribute, Object start, Object end)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.OUTSIDE, start, end)));
 
@@ -113,7 +145,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereLike(String attribute, Object object)
+    public RepositoryQuery<K, E> like(String attribute, Object object)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LIKE, object)));
 
@@ -121,7 +153,7 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> whereNotLike(String attribute, Object object)
+    public RepositoryQuery<K, E> notLike(String attribute, Object object)
     {
         wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_LIKE, object)));
 

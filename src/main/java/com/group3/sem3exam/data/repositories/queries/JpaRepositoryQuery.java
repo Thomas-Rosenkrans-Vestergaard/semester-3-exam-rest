@@ -182,7 +182,7 @@ public class JpaRepositoryQuery<K extends Comparable<K>, E extends RepositoryEnt
     @Override
     public boolean contains(K key)
     {
-        return whereEq(kAttribute, key).exists();
+        return eq(kAttribute, key).exists();
     }
 
     @Override
@@ -426,6 +426,26 @@ public class JpaRepositoryQuery<K extends Comparable<K>, E extends RepositoryEnt
                 builder.append(" != ");
                 builder.append(parameter(counter));
                 return;
+            case GT:
+                builder.append(prefix(operation.attribute));
+                builder.append(" > ");
+                builder.append(parameter(counter));
+                return;
+            case LT:
+                builder.append(prefix(operation.attribute));
+                builder.append(" < ");
+                builder.append(parameter(counter));
+                return;
+            case GTOE:
+                builder.append(prefix(operation.attribute));
+                builder.append(" >= ");
+                builder.append(parameter(counter));
+                return;
+            case LTOE:
+                builder.append(prefix(operation.attribute));
+                builder.append(" <= ");
+                builder.append(parameter(counter));
+                return;
             case IN:
                 builder.append(prefix(operation.attribute));
                 builder.append(" IN ");
@@ -536,6 +556,18 @@ public class JpaRepositoryQuery<K extends Comparable<K>, E extends RepositoryEnt
                 bind(query, counter, operation.attribute, argument(operation, 0));
                 return;
             case NOT:
+                bind(query, counter, operation.attribute, argument(operation, 0));
+                return;
+            case GT:
+                bind(query, counter, operation.attribute, argument(operation, 0));
+                return;
+            case LT:
+                bind(query, counter, operation.attribute, argument(operation, 0));
+                return;
+            case GTOE:
+                bind(query, counter, operation.attribute, argument(operation, 0));
+                return;
+            case LTOE:
                 bind(query, counter, operation.attribute, argument(operation, 0));
                 return;
             case IN:

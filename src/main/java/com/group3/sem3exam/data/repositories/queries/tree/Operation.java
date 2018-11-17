@@ -23,5 +23,9 @@ public class Operation
         OUTSIDE,
         LIKE,
         NOT_LIKE,
+        GT,
+        LT,
+        GTOE,
+        LTOE
     }
 }
