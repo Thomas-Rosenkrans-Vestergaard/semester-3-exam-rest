@@ -6,7 +6,7 @@ public class Operation
     public final Type     type;
     public final Object[] arguments;
 
-    public Operation(String attribute, Type type, Object... arguments)
+    public Operation(String attribute, Type type, Object[] arguments)
     {
         this.attribute = attribute;
         this.type = type;

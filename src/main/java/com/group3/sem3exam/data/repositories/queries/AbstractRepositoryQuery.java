@@ -6,6 +6,8 @@ import com.group3.sem3exam.data.repositories.queries.tree.Direction;
 import com.group3.sem3exam.data.repositories.queries.tree.Operation;
 import com.group3.sem3exam.data.repositories.queries.tree.Order;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends RepositoryEntity<K>>
@@ -49,89 +51,91 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     }
 
     @Override
-    public RepositoryQuery<K, E> eq(String attribute, Object object)
+    public RepositoryQuery<K, E> eq(String attribute, Object value)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.EQ, object)));
+
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.EQ, arguments(value))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> not(String attribute, Object object)
+    public RepositoryQuery<K, E> not(String attribute, Object value)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT, arguments(value))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> gt(String attribute, Object object)
+    public RepositoryQuery<K, E> gt(String attribute, Object value)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.GT, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.GT, arguments(value))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> lt(String attribute, Object object)
+    public RepositoryQuery<K, E> lt(String attribute, Object value)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LT, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LT, arguments(value))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> gtoe(String attribute, Object object)
+    public RepositoryQuery<K, E> gtoe(String attribute, Object value)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.GTOE, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.GTOE, arguments(value))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> ltoe(String attribute, Object object)
+    public RepositoryQuery<K, E> ltoe(String attribute, Object value)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LTOE, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LTOE, arguments(value))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> in(String attribute, Object... objects)
+    public RepositoryQuery<K, E> in(String attribute, Object... values)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.IN, objects)));
+        Object argument = null;
+        if (values.length > 0 && values[0] instanceof Collection)
+            argument = values[0];
+        else
+            argument = Arrays.asList(values);
+
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.IN, arguments(argument))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> in(String attribute, List objects)
+    public RepositoryQuery<K, E> notIn(String attribute, Object... values)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.IN, objects)));
+        Object argument = null;
+        if (values.length > 0 && values[0] instanceof Collection)
+            argument = values[0];
+        else
+            argument = Arrays.asList(values);
+
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_IN, arguments(argument))));
 
         return this;
     }
 
-    @Override
-    public RepositoryQuery<K, E> notIn(String attribute, Object... objects)
+    public Object[] arguments(Object... objects)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_IN, objects)));
-
-        return this;
-    }
-
-    @Override
-    public RepositoryQuery<K, E> notIn(String attribute, List objects)
-    {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_IN, objects)));
-
-        return this;
+        return objects;
     }
 
     @Override
     public RepositoryQuery<K, E> between(String attribute, Object start, Object end)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.BETWEEN, start, end)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.BETWEEN, arguments(start, end))));
 
         return this;
     }
@@ -139,23 +143,23 @@ public abstract class AbstractRepositoryQuery<K extends Comparable<K>, E extends
     @Override
     public RepositoryQuery<K, E> outside(String attribute, Object start, Object end)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.OUTSIDE, start, end)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.OUTSIDE, arguments(start, end))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> like(String attribute, Object object)
+    public RepositoryQuery<K, E> like(String attribute, Object value)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LIKE, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.LIKE, arguments(value))));
 
         return this;
     }
 
     @Override
-    public RepositoryQuery<K, E> notLike(String attribute, Object object)
+    public RepositoryQuery<K, E> notLike(String attribute, Object value)
     {
-        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_LIKE, object)));
+        wheres.add(Conditional.op(new Operation(attribute, Operation.Type.NOT_LIKE, arguments(value))));
 
         return this;
     }

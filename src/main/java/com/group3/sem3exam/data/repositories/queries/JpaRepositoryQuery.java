@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class JpaRepositoryQuery<K extends Comparable<K>, E extends RepositoryEntity<K>> extends AbstractRepositoryQuery<K, E>
@@ -446,15 +447,26 @@ public class JpaRepositoryQuery<K extends Comparable<K>, E extends RepositoryEnt
                 builder.append(" <= ");
                 builder.append(parameter(counter));
                 return;
-            case IN:
-                builder.append(prefix(operation.attribute));
-                builder.append(" IN ");
-                builder.append(parameter(counter));
+            case IN: {
+                Collection a = (Collection) operation.arguments[0];
+                if (a.size() > 0) {
+                    builder.append(prefix(operation.attribute));
+                    builder.append(" IN ");
+                    builder.append(parameter(counter));
+                } else {
+                    builder.append(" true = false ");
+                }
                 return;
+            }
             case NOT_IN:
-                builder.append(prefix(operation.attribute));
-                builder.append(" NOT IN ");
-                builder.append(parameter(counter));
+                Collection a = (Collection) operation.arguments[0];
+                if (a.size() > 0) {
+                    builder.append(prefix(operation.attribute));
+                    builder.append(" NOT IN ");
+                    builder.append(parameter(counter));
+                } else {
+                    builder.append(" true = true ");
+                }
                 return;
             case BETWEEN:
                 builder.append(prefix(operation.attribute));
@@ -570,12 +582,18 @@ public class JpaRepositoryQuery<K extends Comparable<K>, E extends RepositoryEnt
             case LTOE:
                 bind(query, counter, operation.attribute, argument(operation, 0));
                 return;
-            case IN:
-                bind(query, counter, operation.attribute, argument(operation, 0));
+            case IN: {
+                Collection a = (Collection) operation.arguments[0];
+                if (a.size() > 0)
+                    bind(query, counter, operation.attribute, argument(operation, 0));
                 return;
-            case NOT_IN:
-                bind(query, counter, operation.attribute, argument(operation, 0));
+            }
+            case NOT_IN: {
+                Collection a = (Collection) operation.arguments[0];
+                if (a.size() > 0)
+                    bind(query, counter, operation.attribute, argument(operation, 0));
                 return;
+            }
             case BETWEEN:
                 bind(query, counter, operation.attribute, argument(operation, 0));
                 bind(query, counter, operation.attribute, argument(operation, 1));

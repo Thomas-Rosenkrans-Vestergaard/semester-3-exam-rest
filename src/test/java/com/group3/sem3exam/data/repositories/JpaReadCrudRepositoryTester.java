@@ -174,6 +174,8 @@ public class JpaReadCrudRepositoryTester<
                 createQueryAscTest(),
                 createQueryWhereEqTest(),
                 createQueryWhereNotTest(),
+                createQueryWhereInTest(),
+                createQueryWhereNotInTest(),
                 createQueryWhereGtTest(),
                 createQueryWhereLtTest(),
                 createQueryWhereGtoeTest(),
@@ -225,6 +227,38 @@ public class JpaReadCrudRepositoryTester<
                 K       key  = getRandomKey(data);
                 assertTrue(instance.query().contains(key));
                 assertFalse(instance.query().not(instance.kAttribute, key).contains(key));
+            }
+        });
+    }
+
+    private DynamicTest createQueryWhereInTest()
+    {
+        return DynamicTest.dynamicTest("query.in", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                assertEquals(0, instance.query().in(instance.kAttribute).count());
+                assertEquals(data.size(), instance.query().in(instance.kAttribute, keys(data)).count());
+                assertEquals(0, instance.query().in(instance.kAttribute).count());
+            }
+        });
+    }
+
+    private List<K> keys(List<E> elements)
+    {
+        return elements.stream().map(E::getId).collect(Collectors.toList());
+    }
+
+    private DynamicTest createQueryWhereNotInTest()
+    {
+        return DynamicTest.dynamicTest("query.notIn", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+
+                assertEquals(data.size(), instance.query().notIn(instance.kAttribute).count());
+                assertEquals(0, instance.query().notIn(instance.kAttribute, keys(data)).count());
+                assertEquals(data.size(), instance.query().notIn(instance.kAttribute).count());
             }
         });
     }
