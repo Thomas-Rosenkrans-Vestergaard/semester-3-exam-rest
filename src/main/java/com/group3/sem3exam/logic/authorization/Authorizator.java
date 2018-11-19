@@ -40,7 +40,7 @@ public class Authorizator
      *
      * @param check     The check that must check for the operation to be performed.
      * @param operation The operation to perform when the provided {@code check} passes.
-     * @throws Exception Any exception thrown from the operation or the provided {@code check}.
+     * @throws Exception Any error thrown from the operation or the provided {@code check}.
      * @see Authorizator#attempt(AuthorizationCheck, Callable)
      */
     public void attempt(AuthorizationCheck check, ExceptionRunnable operation) throws Exception
@@ -58,7 +58,7 @@ public class Authorizator
      * @param check     The check that must check for the operation to be performed.
      * @param operation The operation to perform when the provided {@code check} passes.
      * @return The value returned by the {@code operation}.
-     * @throws Exception Any exception thrown from the operation or the provided {@code check}.
+     * @throws Exception Any error thrown from the operation or the provided {@code check}.
      * @see Authorizator#attempt(AuthorizationCheck, ExceptionRunnable)
      */
     public <T> T attempt(AuthorizationCheck check, Supplier<T> operation) throws Exception

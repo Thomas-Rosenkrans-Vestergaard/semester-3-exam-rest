@@ -36,7 +36,7 @@ public class CityFacade
         try (CityRepository cr = cityRepositoryFactory.get()) {
             City city = cr.get(id);
             if (city == null)
-                throw ResourceNotFoundException.with404(City.class, id);
+                throw new ResourceNotFoundException(City.class, id);
 
             return city;
         }

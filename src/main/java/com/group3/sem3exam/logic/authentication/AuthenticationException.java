@@ -12,16 +12,16 @@ public class AuthenticationException extends FacadeException
 
     public AuthenticationException(String errorMessage)
     {
-        this("AuthenticationError", errorMessage, 401, null);
+        this("AuthenticationError", errorMessage, null);
     }
 
     public AuthenticationException(Throwable cause)
     {
-        this("AuthenticationError", "Could not perform authentication.", 401, cause);
+        this("AuthenticationError", "Could not perform authentication.", cause);
     }
 
-    public AuthenticationException(String errorName, String errorMessage, int responseCode, Throwable cause)
+    public AuthenticationException(String errorName, String errorMessage, Throwable cause)
     {
-        super(errorName, errorMessage, responseCode, cause);
+        super(errorName, errorMessage, cause);
     }
 }

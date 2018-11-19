@@ -59,7 +59,7 @@ public class UserFacade<T extends Transaction>
         try (UserRepository ur = userRepositoryFactory.apply(transactionFactory.get())) {
             User user = ur.get(id);
             if (user == null)
-                throw ResourceNotFoundException.with404(User.class, id);
+                throw new ResourceNotFoundException(User.class, id);
 
             return user;
         }
@@ -88,7 +88,7 @@ public class UserFacade<T extends Transaction>
 
             City retrievedCity = cr.get(city);
             if (retrievedCity == null)
-                throw ResourceNotFoundException.with422(City.class, city);
+                throw new ResourceNotFoundException(City.class, city);
 
             User user = ur.createUser(name, email, hash(password), retrievedCity, gender, dateOfBirth);
             transaction.commit();

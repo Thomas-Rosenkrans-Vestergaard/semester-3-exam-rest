@@ -48,7 +48,7 @@ public class RegionFacade
         try (RegionRepository rr = regionRepositoryFactory.get()) {
             Region region = rr.get(id);
             if (region == null)
-                throw ResourceNotFoundException.with404(Region.class, id);
+                throw new ResourceNotFoundException(Region.class, id);
 
             return region;
         }

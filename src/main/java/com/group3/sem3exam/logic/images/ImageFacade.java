@@ -40,7 +40,7 @@ public class ImageFacade
         try (ImageRepository ir = imageRepositoryFactory.get()) {
             Image image = ir.get(id);
             if (image == null)
-                throw ResourceNotFoundException.with404(Image.class, id);
+                throw new ResourceNotFoundException(Image.class, id);
 
             return image;
         }
@@ -58,7 +58,7 @@ public class ImageFacade
         try (ImageRepository ir = imageRepositoryFactory.get()) {
             List<Image> images = ir.getByUser(user);
             if (images == null)
-                throw ResourceNotFoundException.with404(User.class, user);
+                throw new ResourceNotFoundException(User.class, user);
 
             return images;
         }

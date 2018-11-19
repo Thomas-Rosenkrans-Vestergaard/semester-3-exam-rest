@@ -24,7 +24,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception>
 
         ExceptionResponse exceptionResponse = new ExceptionResponse();
         exceptionResponse.exception = exception.getClass().getSimpleName();
-        exceptionResponse.message = "An unexpected exception occurred.";
+        exceptionResponse.message = "An unexpected error occurred.";
         exceptionResponse.debug = isDebug;
         exceptionResponse.responseCode = 500;
         if (isDebug) {

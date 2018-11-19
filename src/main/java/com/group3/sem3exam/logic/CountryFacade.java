@@ -36,7 +36,7 @@ public class CountryFacade
         try (CountryRepository cr = countryRepositoryFactory.get()) {
             Country country = cr.get(id);
             if (country == null)
-                throw ResourceNotFoundException.with422(Country.class, id);
+                throw new ResourceNotFoundException(Country.class, id);
 
             return country;
         }

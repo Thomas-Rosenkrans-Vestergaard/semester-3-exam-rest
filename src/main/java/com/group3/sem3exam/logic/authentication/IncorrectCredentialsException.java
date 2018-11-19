@@ -14,10 +14,10 @@ public class IncorrectCredentialsException extends AuthenticationException
     /**
      * Creates a new {@link IncorrectCredentialsException} with a cause.
      *
-     * @param cause The cause of the exception.
+     * @param cause The cause of the error.
      */
     public IncorrectCredentialsException(Throwable cause)
     {
-        super("IncorrectCredentialsError", "The provided credentials are incorrect.", 401, cause);
+        super("IncorrectCredentialsError", "The provided credentials are incorrect.", cause);
     }
 }
