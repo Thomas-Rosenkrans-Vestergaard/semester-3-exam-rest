@@ -8,11 +8,23 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Thrown when a provided resource could not be validated.
+ */
 public class ResourceValidationException extends FacadeException
 {
 
+    /**
+     * The complete list of violations, that caused the resource to not be valid.
+     */
     private final List<ValidationViolation> validationViolations;
 
+    /**
+     * Creates a new {@link ResourceValidationException}.
+     *
+     * @param resourceClass The type of the resource that could not be validated.
+     * @param violations    The complete list of violations, that caused the resource to not be valid.
+     */
     public ResourceValidationException(Class resourceClass, List<ValidationViolation> violations)
     {
         super(
@@ -23,11 +35,23 @@ public class ResourceValidationException extends FacadeException
         this.validationViolations = violations;
     }
 
+    /**
+     * Returns the complete list of violations, that caused the resource to not be valid.
+     *
+     * @return The complete list of violations, that caused the resource to not be valid.
+     */
     public List<ValidationViolation> getValidationViolations()
     {
         return this.validationViolations;
     }
 
+    /**
+     * Creates a new {@link ResourceValidationException} from a provided list of Oval constraint violations.
+     *
+     * @param resourceClass        The type of the resource that could not be validated.
+     * @param constraintViolations The Oval constraint violations.
+     * @return The newly created {@link ResourceValidationException} instance.
+     */
     public static ResourceValidationException oval(Class resourceClass, List<ConstraintViolation> constraintViolations)
     {
         List<ValidationViolation> validationViolations = new ArrayList<>();
