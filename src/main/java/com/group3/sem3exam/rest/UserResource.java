@@ -38,7 +38,7 @@ public class UserResource
                                                  receivedUser.city,
                                                  receivedUser.gender,
                                                  receivedUser.dateOfBirth);
-        
+
         return Response.ok(gson.toJson(UserDTO.basic(createdUser))).build();
     }
 
