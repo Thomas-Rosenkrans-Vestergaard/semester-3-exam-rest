@@ -3,17 +3,18 @@ package com.group3.sem3exam.logic.authorization;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 /**
  * Performs checks on an {@link AuthenticationContext} before performing some operation.
  * <p>
  * An example of the usage:
  * <code>
- *  int userToRetrieve = 5;
- *  return new Authorizator(authenticationContext).attempt(new SensitiveDataCheck(userToRetrieve), () -> {
- *      UserFacade userFacade = new UserFacade();
- *      return userFacade.getSensitiveData(userToRetrieve);
- *  });
+ * int userToRetrieve = 5;
+ * return new Authorizator(authenticationContext).attempt(new SensitiveDataCheck(userToRetrieve), () -> {
+ * UserFacade userFacade = new UserFacade();
+ * return userFacade.getSensitiveData(userToRetrieve);
+ * });
  * </code>
  */
 public class Authorizator
@@ -46,6 +47,7 @@ public class Authorizator
     {
         check.check(this.authenticationContext);
 
+
         operation.run();
     }
 
@@ -59,17 +61,17 @@ public class Authorizator
      * @throws Exception Any exception thrown from the operation or the provided {@code check}.
      * @see Authorizator#attempt(AuthorizationCheck, ExceptionRunnable)
      */
-    public <T> T attempt(AuthorizationCheck check, Callable<T> operation) throws Exception
+    public <T> T attempt(AuthorizationCheck check, Supplier<T> operation) throws Exception
     {
         check.check(authenticationContext);
 
-        return operation.call();
+        return operation.get();
     }
+
 
     @FunctionalInterface
     public interface ExceptionRunnable
     {
-
         public void run() throws Exception;
     }
 }

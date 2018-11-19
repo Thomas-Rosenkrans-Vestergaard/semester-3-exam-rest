@@ -38,10 +38,7 @@ public class UserResource
                                                  receivedUser.city,
                                                  receivedUser.gender,
                                                  receivedUser.dateOfBirth);
-        if (createdUser == null) {
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        }
-
+        
         return Response.ok(gson.toJson(UserDTO.basic(createdUser))).build();
     }
 
