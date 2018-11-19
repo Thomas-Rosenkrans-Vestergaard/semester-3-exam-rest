@@ -64,6 +64,7 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
     {
         User user = new User(name, email, passwordHash, city, gender, dateOfBirth);
         getEntityManager().persist(user);
+        close();
         return user;
     }
 

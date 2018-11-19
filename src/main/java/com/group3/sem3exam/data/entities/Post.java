@@ -22,6 +22,9 @@ public class Post implements RepositoryEntity<Integer>
     @Column(length = 65535, columnDefinition = "TEXT")
     private String contents;
 
+    @Column
+    private String title;
+
     @ManyToOne
     private User author;
 
@@ -37,10 +40,22 @@ public class Post implements RepositoryEntity<Integer>
 
     }
 
-    public Post(String contents, User author)
+    public Post(String title, String contents, User author, LocalDateTime createdAt)
     {
+        this.title = title;
         this.contents = contents;
         this.author = author;
+        this.createdAt = createdAt;
+    }
+
+    public String getTitle()
+    {
+        return title;
+    }
+
+    public void setTitle(String title)
+    {
+        this.title = title;
     }
 
     public Integer getId()

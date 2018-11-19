@@ -73,7 +73,7 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
     public List<E> get()
     {
         return getEntityManager()
-                .createQuery("SELECT e FROM " + c.getSimpleName() + " e", c)
+                .createQuery("SELECT e FROM " +  c.getSimpleName() + " e", c)
                 .getResultList();
     }
 

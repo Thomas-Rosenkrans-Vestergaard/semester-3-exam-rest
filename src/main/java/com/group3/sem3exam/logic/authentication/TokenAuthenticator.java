@@ -27,6 +27,8 @@ public class TokenAuthenticator
         this.userRepositoryFactory = userRepositoryFactory;
     }
 
+
+
     /**
      * Authenticated the incoming token, returning an authentication context with information about the authenticated
      * user.
