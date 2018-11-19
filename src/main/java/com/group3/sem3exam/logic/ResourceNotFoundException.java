@@ -48,7 +48,9 @@ public class ResourceNotFoundException extends FacadeException
     {
         super(
                 String.format("%sNotFoundError", resource.getSimpleName()),
-                String.format("The %s resource with the provided key %s could not be found.", id.toString()),
+                String.format("The %s resource with the provided key %s could not be found.",
+                              resource.getSimpleName(),
+                              id.toString()),
                 code,
                 cause);
 
