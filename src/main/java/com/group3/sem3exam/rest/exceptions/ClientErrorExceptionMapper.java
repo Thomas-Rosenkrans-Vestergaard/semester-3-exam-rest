@@ -24,7 +24,7 @@ public class ClientErrorExceptionMapper implements ExceptionMapper<ClientErrorEx
         boolean isDebug = "true".equals(context.getInitParameter("debug"));
 
         ExceptionResponse exceptionResponse = new ExceptionResponse();
-        exceptionResponse.exception = exception.getClass().getSimpleName();
+        exceptionResponse.errorName = exception.getClass().getSimpleName();
         exceptionResponse.message = exception.getMessage();
         exceptionResponse.debug = isDebug;
         exceptionResponse.responseCode = exception.getResponse().getStatus();

@@ -23,7 +23,7 @@ public class GeneralExceptionMapper implements ExceptionMapper<Exception>
         boolean isDebug = "true".equals(context.getInitParameter("debug"));
 
         ExceptionResponse exceptionResponse = new ExceptionResponse();
-        exceptionResponse.exception = exception.getClass().getSimpleName();
+        exceptionResponse.errorName = exception.getClass().getSimpleName();
         exceptionResponse.message = "An unexpected error occurred.";
         exceptionResponse.debug = isDebug;
         exceptionResponse.responseCode = 500;

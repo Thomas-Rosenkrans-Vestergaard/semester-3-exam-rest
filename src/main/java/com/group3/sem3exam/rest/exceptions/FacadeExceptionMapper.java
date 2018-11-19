@@ -37,8 +37,8 @@ public class FacadeExceptionMapper implements ExceptionMapper<FacadeException>
         boolean isDebug = "true".equals(context.getInitParameter("debug"));
 
         ExceptionResponse exceptionResponse = new ExceptionResponse();
-        exceptionResponse.exception = exception.getClass().getSimpleName();
-        exceptionResponse.message = exception.getMessage();
+        exceptionResponse.errorName = exception.getErrorName();
+        exceptionResponse.message = exception.getErrorMessage();
         exceptionResponse.responseCode = codes.getOrDefault(exception.getClass(), 500);
         exceptionResponse.debug = isDebug;
 

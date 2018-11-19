@@ -33,7 +33,7 @@ public class ResourceValidationExceptionMapper implements ExceptionMapper<Resour
         boolean isDebug = "true".equals(context.getInitParameter("debug"));
 
         ExceptionResponse exceptionResponse = new ExceptionResponse();
-        exceptionResponse.error = exception.getErrorName();
+        exceptionResponse.errorName = exception.getErrorName();
         exceptionResponse.message = exception.getErrorMessage();
         exceptionResponse.responseCode = 422;
         exceptionResponse.debug = isDebug;
@@ -47,9 +47,8 @@ public class ResourceValidationExceptionMapper implements ExceptionMapper<Resour
 
     private class ExceptionResponse
     {
-        public String error;
-        public String message;
-
+        public String                       errorName;
+        public String                       message;
         public Integer                      responseCode;
         public Boolean                      debug;
         public List<ValidationViolationDTO> violations = new ArrayList<>();
