@@ -1,4 +1,4 @@
-package com.group3.sem3exam.rest.exceptions;
+package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.logic.FacadeException;
 import net.sf.oval.ConstraintViolation;

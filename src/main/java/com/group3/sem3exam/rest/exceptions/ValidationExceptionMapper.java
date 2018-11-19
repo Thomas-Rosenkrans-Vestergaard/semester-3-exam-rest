@@ -4,6 +4,7 @@ package com.group3.sem3exam.rest.exceptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.group3.sem3exam.logic.ValidationException;
 import net.sf.oval.ConstraintViolation;
 import net.sf.oval.context.FieldContext;
 

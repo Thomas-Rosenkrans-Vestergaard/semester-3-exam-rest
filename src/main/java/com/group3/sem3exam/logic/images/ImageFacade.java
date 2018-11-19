@@ -1,10 +1,9 @@
-package com.group3.sem3exam.logic;
+package com.group3.sem3exam.logic.images;
 
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.ImageRepository;
-import com.group3.sem3exam.logic.images.DataUriEncoder;
-import com.group3.sem3exam.logic.images.UnsupportedImageTypeException;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
 
 import java.util.Base64;
 import java.util.List;

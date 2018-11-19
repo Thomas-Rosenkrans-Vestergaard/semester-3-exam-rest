@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
-import com.group3.sem3exam.logic.ImageFacade;
+import com.group3.sem3exam.logic.images.ImageFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.images.DataUriEncoder;
 import com.group3.sem3exam.logic.images.UnsupportedImageTypeException;
