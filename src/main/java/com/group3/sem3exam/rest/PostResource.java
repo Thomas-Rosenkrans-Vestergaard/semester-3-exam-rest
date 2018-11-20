@@ -16,14 +16,7 @@ import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.util.List;
 
-<<<<<<< HEAD
 @Path("posts")
-=======
-import static com.group3.sem3exam.rest.dto.PostDTO.basic;
-import java.util.ArrayList;
-
-@Path("Posts")
->>>>>>> 3415b8bbee101e0b665ef27c99ed18ed82e712e1
 public class PostResource
 {
 
@@ -51,12 +44,10 @@ public class PostResource
     @Path("user/{userId: [0-9]+}")
     public Response getPostByUser(@PathParam("userId") Integer id) throws ResourceNotFoundException
     {
-     List<Post> posts = postFacade.getPostByUser(id);
-     List<PostDTO> postDTOS = new ArrayList<>();
-     for(Post post: posts){
-         postDTOS.add(new PostDTO(post));
-     }
-     return Response.ok(postDTOS).build();
+        List<Post>    posts    = postFacade.getPostByUser(id);
+        List<PostDTO> postDTOS = PostDTO.basic(posts);
+
+        return Response.ok(postDTOS).build();
     }
 
     @POST
@@ -69,7 +60,6 @@ public class PostResource
                                                  post.contents,
                                                  post.user,
                                                  post.timeCreated);
-
 
 
         return Response.ok(gson.toJson(PostDTO.basic(createdPost))).build();
