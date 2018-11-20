@@ -9,6 +9,7 @@ import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -105,5 +106,15 @@ public class UserFacade<T extends Transaction>
     private String hash(String password)
     {
         return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+
+    public List<User> getUserFriends(Integer userId)
+    {
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            UserRepository ur = userRepositoryFactory.apply(transaction);
+            return ur.getUserFriends(userId);
+        }
     }
 }

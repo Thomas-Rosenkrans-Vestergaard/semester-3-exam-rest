@@ -19,7 +19,6 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     }
 
 
-
     public JpaPostRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, Post.class);
@@ -53,5 +52,17 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     public List<Post> getPostsByUser(User user)
     {
         return null;
+    }
+
+    @Override
+    public List<Post> getTimeline(Integer userId)
+    {
+        return getEntityManager()
+                .createQuery("SELECT p FROM Post p WHERE p.author IN " +
+                             "(SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner = :id) " +
+                             "ORDER BY p.createdAt DESC", Post.class)
+                .setParameter("id", userId)
+                .getResultList()
+                ;
     }
 }

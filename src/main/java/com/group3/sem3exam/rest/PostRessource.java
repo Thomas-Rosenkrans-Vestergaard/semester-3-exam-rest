@@ -9,13 +9,13 @@ import com.group3.sem3exam.logic.PostFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.rest.dto.PostDTO;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static com.group3.sem3exam.rest.dto.PostDTO.basic;
 
 @Path("Posts")
 public class PostRessource
@@ -45,14 +45,13 @@ public class PostRessource
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createPost(String content) throws ResourceNotFoundException
     {
-        ReceivedCreatePost post        = gson.fromJson(content, ReceivedCreatePost.class);
-        Post               createdPost = postFacade.createPost(post.title,
-                                                               post.contents,
-                                                               post.user,
-                                                               post.timeCreated);
-        return Response.ok(gson.toJson(PostDTO.basic(createdPost))).build();
+        ReceivedCreatePost post = gson.fromJson(content, ReceivedCreatePost.class);
+        Post createdPost = postFacade.createPost(post.title,
+                                                 post.contents,
+                                                 post.user,
+                                                 post.timeCreated);
+        return Response.ok(gson.toJson(basic(createdPost))).build();
     }
-
 
     @Path("{id: 0-9+}")
     public Response getPostById(@PathParam("id") Integer id) throws ResourceNotFoundException
@@ -60,6 +59,17 @@ public class PostRessource
         Post    post    = postFacade.get(id);
         PostDTO postDTO = new PostDTO(post);
         return Response.ok(postDTO).build();
+    }
+
+    @Path("{id: 0-9+}/friends")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFriendsPostsByOwnerId(@PathParam("id") Integer id) throws ResourceNotFoundException
+    {
+        List<Post>    posts    = postFacade.getTimeline(id);
+        List<PostDTO> postDTOs = PostDTO.basic(posts);
+        return Response.ok(postDTOs).build();
+
     }
 
 

@@ -60,7 +60,6 @@ public class TokenAuthenticator
         }
     }
 
-
     /**
      * @param header
      * @return the given AuthenticationContext

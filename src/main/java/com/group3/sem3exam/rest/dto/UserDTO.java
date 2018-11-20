@@ -46,4 +46,12 @@ public class UserDTO
     {
         return new UserDTO(user, false, false);
     }
+
+    public static List<UserDTO> basic(List<User> users){
+        List<UserDTO> userDTOlist = new ArrayList<>(users.size());
+        for(User user : users){
+            userDTOlist.add(new UserDTO(user, false, true));
+        }
+        return userDTOlist;
+    }
 }

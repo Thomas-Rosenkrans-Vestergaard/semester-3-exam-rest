@@ -15,4 +15,6 @@ public interface PostRepository
     Post getPost(Integer post);
 
     List<Post> getPostsByUser(User user);
+
+    List<Post> getTimeline(Integer user);
 }
