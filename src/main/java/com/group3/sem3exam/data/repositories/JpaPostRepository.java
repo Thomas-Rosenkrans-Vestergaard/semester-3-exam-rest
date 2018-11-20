@@ -35,23 +35,17 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     {
         Post post = new Post(body, title, user, createdAt);
         getEntityManager().persist(post);
-        close();
         return post;
     }
 
     @Override
-    public Post getPost(Integer post)
+    public List<Post> getByUserId(User author)
     {
-        return getEntityManager()
-                .createQuery("SELECT p from Post p WHERE p.id = :id", Post.class)
-                .setParameter("id", post)
-                .getSingleResult()
-                ;
+      return getEntityManager().createQuery("SELECT Post FROM Post p where p.author = :author", Post.class)
+                          .setParameter("author", author)
+                          .getResultList();
+
     }
 
-    @Override
-    public List<Post> getPostsByUser(User user)
-    {
-        return null;
-    }
+
 }
