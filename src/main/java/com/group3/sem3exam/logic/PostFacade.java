@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public class PostFacade<T extends Transaction>
 {
 
-    private final Supplier <T> transactionFactory;
+    private final Supplier<T>                 transactionFactory;
     private final Function<T, PostRepository> postRepositoryFactory;
 
     public PostFacade(Supplier<T> transactionFactory, Function<T, PostRepository> postRepositoryFactory)
@@ -23,7 +23,7 @@ public class PostFacade<T extends Transaction>
     }
 
 
-    public Post createPost(String title, String body, User author, LocalDateTime time) throws ResourceNotFoundException
+    public Post createPost(String title, String body, User author, LocalDateTime time)
     {
 
         try (T transaction = transactionFactory.get()) {
@@ -31,9 +31,6 @@ public class PostFacade<T extends Transaction>
             PostRepository pr   = postRepositoryFactory.apply(transaction);
             Post           post = pr.createPost(author, title, body, time);
 
-            if (post == null) {
-                throw new ResourceNotFoundException(Post.class, post.getId(), 422);
-            }
             transaction.commit();
             return post;
 
@@ -43,12 +40,12 @@ public class PostFacade<T extends Transaction>
 
     public Post get(Integer id) throws ResourceNotFoundException
     {
-            PostRepository pr = postRepositoryFactory.apply(transactionFactory.get());
-            Post post = pr.getPost(id);
-            if(post == null){
-                throw new ResourceNotFoundException(Post.class, id, 404);
-            }
-            return post;
+        PostRepository pr   = postRepositoryFactory.apply(transactionFactory.get());
+        Post           post = pr.getPost(id);
+        if (post == null) {
+            throw new ResourceNotFoundException(Post.class, id, 404);
+        }
+        return post;
     }
-    }
+}
 
