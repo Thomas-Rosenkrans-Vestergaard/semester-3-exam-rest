@@ -5,7 +5,6 @@ import com.group3.sem3exam.data.entities.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,8 +18,8 @@ public class UserDTO
     private Gender              gender;
     private LocalDate           dateOfBirth;
     private LocalDateTime       createdAt;
-    private List<PostDTO>       posts       = new ArrayList<>();
-    private List<FriendshipDTO> friendships = new ArrayList<>();
+    private List<PostDTO>       posts;
+    private List<FriendshipDTO> friendships;
 
     public UserDTO(User user, boolean showFriendships, boolean showPosts)
     {

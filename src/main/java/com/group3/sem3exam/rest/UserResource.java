@@ -9,6 +9,7 @@ import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.UserFacade;
+import com.group3.sem3exam.logic.validation.ResourceValidationException;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
 import javax.ws.rs.*;
@@ -30,9 +31,10 @@ public class UserResource
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createUser(String content) throws ResourceNotFoundException
+    public Response createUser(String content) throws ResourceNotFoundException, ResourceValidationException
     {
         ReceivedCreateUser receivedUser = gson.fromJson(content, ReceivedCreateUser.class);
+
         User createdUser = userFacade.createUser(receivedUser.name,
                                                  receivedUser.email,
                                                  receivedUser.password,
