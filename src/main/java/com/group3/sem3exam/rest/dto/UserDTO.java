@@ -19,8 +19,8 @@ public class UserDTO
     private Gender              gender;
     private LocalDate           dateOfBirth;
     private LocalDateTime       createdAt;
-    private List<PostDTO>       posts       = new ArrayList<>();
-    private List<FriendshipDTO> friendships = new ArrayList<>();
+    private List<PostDTO>       posts;
+    private List<FriendshipDTO> friendships;
 
     public UserDTO(User user, boolean showFriendships, boolean showPosts)
     {
@@ -45,5 +45,13 @@ public class UserDTO
     public static UserDTO basic(User user)
     {
         return new UserDTO(user, false, false);
+    }
+
+    public static List<UserDTO> basic(List<User> users){
+        List<UserDTO> userDTOlist = new ArrayList<>(users.size());
+        for(User user : users){
+            userDTOlist.add(new UserDTO(user, false, true));
+        }
+        return userDTOlist;
     }
 }

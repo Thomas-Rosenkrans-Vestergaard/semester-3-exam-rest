@@ -23,7 +23,7 @@ public class FacadeExceptionMapper implements ExceptionMapper<FacadeException>
     private static Map<Class, Integer> codes = new HashMap<>();
 
     static {
-        codes.put(ResourceValidationException.class, 42);
+        codes.put(ResourceValidationException.class, 422);
         codes.put(ResourceNotFoundException.class, 404);
         codes.put(AuthenticationException.class, 401);
     }
@@ -41,6 +41,8 @@ public class FacadeExceptionMapper implements ExceptionMapper<FacadeException>
         exceptionResponse.message = exception.getErrorMessage();
         exceptionResponse.responseCode = codes.getOrDefault(exception.getClass(), 500);
         exceptionResponse.debug = isDebug;
+        if (isDebug)
+            exceptionResponse.cause = exception.getCause();
 
         return Response.status(exceptionResponse.responseCode).entity(gson.toJson(exceptionResponse)).build();
     }

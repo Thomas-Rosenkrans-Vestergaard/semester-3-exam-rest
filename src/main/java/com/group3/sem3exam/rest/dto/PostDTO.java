@@ -6,6 +6,8 @@ import com.group3.sem3exam.data.entities.User;
 import javax.ejb.Stateless;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Stateless
 public class PostDTO
@@ -56,5 +58,13 @@ public class PostDTO
 
     public static PostDTO basic(Post post){
         return new PostDTO(post, false);
+    }
+
+    public static List<PostDTO>basic(List<Post> posts){
+        List<PostDTO> postDTOlist = new ArrayList<>(posts.size());
+        for(Post post : posts){
+            postDTOlist.add(new PostDTO(post));
+        }
+        return postDTOlist;
     }
 }

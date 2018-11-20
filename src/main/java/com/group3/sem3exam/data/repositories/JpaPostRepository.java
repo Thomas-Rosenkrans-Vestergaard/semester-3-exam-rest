@@ -7,7 +7,6 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implements PostRepository
@@ -17,7 +16,6 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     {
         super(entityManager, Post.class);
     }
-
 
 
     public JpaPostRepository(EntityManagerFactory entityManagerFactory)
@@ -47,5 +45,16 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
 
     }
 
+    @Override
+    public List<Post> getTimeline(Integer userId)
+    {
+        return getEntityManager()
+                .createQuery("SELECT p FROM Post p WHERE p.author IN " +
+                             "(SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner = :id) " +
+                             "ORDER BY p.createdAt DESC", Post.class)
+                .setParameter("id", userId)
+                .getResultList()
+                ;
+    }
 
 }

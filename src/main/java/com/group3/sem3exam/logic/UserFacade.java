@@ -6,9 +6,16 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.logic.validation.ResourceValidationException;
+import net.sf.oval.ConstraintViolation;
+import net.sf.oval.Validator;
+import net.sf.oval.constraint.Email;
+import net.sf.oval.constraint.Length;
+import net.sf.oval.constraint.NotNull;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -78,8 +85,11 @@ public class UserFacade<T extends Transaction>
      * @throws ResourceNotFoundException When a city with the provided id does not exist.
      */
     public User createUser(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
-    throws ResourceNotFoundException
+    throws ResourceNotFoundException,
+           ResourceValidationException
     {
+        validate(name, email, password, city, gender, dateOfBirth);
+
         try (T transaction = transactionFactory.get()) {
 
             transaction.begin();
@@ -97,6 +107,59 @@ public class UserFacade<T extends Transaction>
     }
 
     /**
+     * Validates that the provided information is valid as a user.
+     *
+     * @param name        The name of the user.
+     * @param email       The email of the user.
+     * @param password    The password of the user.
+     * @param city        The city of the user.
+     * @param gender      The gender of the user.
+     * @param dateOfBirth The date of birth of the user.
+     * @throws ResourceValidationException When the user could not be validated.
+     */
+    private void validate(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
+    throws ResourceValidationException
+    {
+        UserValidator userValidator = new UserValidator();
+        userValidator.name = name;
+        userValidator.email = email;
+        userValidator.password = password;
+        userValidator.city = city;
+        userValidator.gender = gender;
+        userValidator.dateOfBirth = dateOfBirth;
+
+        Validator                 validator               = new Validator();
+        List<ConstraintViolation> constraintViolationList = validator.validate(userValidator);
+        if (!constraintViolationList.isEmpty())
+            throw ResourceValidationException.oval(User.class, constraintViolationList);
+    }
+
+    private static class UserValidator
+    {
+        @NotNull
+        @Length(min = 1, max = 255)
+        public String name;
+
+        @NotNull
+        @Email
+        @Length(min = 1, max = 255)
+        public String email;
+
+        @NotNull
+        @Length(min = 4)
+        public String password;
+
+        @NotNull
+        public Integer city;
+
+        @NotNull
+        public Gender gender;
+
+        @NotNull
+        public LocalDate dateOfBirth;
+    }
+
+    /**
      * Hashes the provided password using the bcrypt algorithm.
      *
      * @param password The password to hash.
@@ -105,5 +168,15 @@ public class UserFacade<T extends Transaction>
     private String hash(String password)
     {
         return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+
+    public List<User> getUserFriends(Integer userId)
+    {
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            UserRepository ur = userRepositoryFactory.apply(transaction);
+            return ur.getUserFriends(userId);
+        }
     }
 }

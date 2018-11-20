@@ -6,6 +6,7 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.TransactionalRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Represents a data source of users. Defines read and write operations on the data source.
@@ -33,4 +34,13 @@ public interface UserRepository extends CrudRepository<User, Integer>, Transacti
      * @return The user with the provided email, {@code null} when no such user exists.
      */
     User getByEmail(String email);
+
+
+    /**
+     * Returns the friends of the provided users ID
+     *
+     * @param userID ID of the person that needs friends returned
+     * @return A List of the users friends
+     */
+    List<User> getUserFriends(Integer userId);
 }
