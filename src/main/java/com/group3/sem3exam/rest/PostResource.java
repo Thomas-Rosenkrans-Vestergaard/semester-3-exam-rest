@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaPostRepository;
+import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.PostFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
@@ -13,15 +14,19 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Path("Posts")
-public class PostRessource
+public class PostResource
 {
 
     private static Gson                       gson       = SpecializedGson.create();
     private static PostFacade<JpaTransaction> postFacade = new PostFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaPostRepository(transaction)
+            transaction -> new JpaPostRepository(transaction),
+            transaction -> new JpaUserRepository(transaction)
     );
 
     /*
@@ -37,6 +42,18 @@ public class PostRessource
     */
 
 
+    @GET
+    @Path("user/{userId: [0-9]+}")
+    public Response getPostByUser(@PathParam("userId") Integer id) throws ResourceNotFoundException
+    {
+     List<Post> posts = postFacade.getPostByUser(id);
+     List<PostDTO> postDTOS = new ArrayList<>();
+     for(Post post: posts){
+         postDTOS.add(new PostDTO(post));
+     }
+     return Response.ok(postDTOS).build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -51,7 +68,7 @@ public class PostRessource
         return Response.ok(gson.toJson(PostDTO.basic(createdPost))).build();
     }
 
-
+    @GET
     @Path("{id: [0-9]+}")
     public Response getPostById(@PathParam("id") Integer id) throws ResourceNotFoundException
     {
