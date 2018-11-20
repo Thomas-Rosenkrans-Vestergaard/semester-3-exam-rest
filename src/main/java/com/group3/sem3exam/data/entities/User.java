@@ -57,7 +57,7 @@ public class User implements RepositoryEntity<Integer>
     @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "user")
     private List<Image> images = new ArrayList<>();
 
-    @OneToOne(fetch = EAGER)
+    @OneToOne(fetch = EAGER, optional = true)
     private Image profilePicture;
 
     public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
