@@ -19,8 +19,8 @@ public class UserDTO
     private Gender              gender;
     private LocalDate           dateOfBirth;
     private LocalDateTime       createdAt;
-    private List<PostDTO>       posts       = new ArrayList<>();
-    private List<FriendshipDTO> friendships = new ArrayList<>();
+    private List<PostDTO>       posts;
+    private List<FriendshipDTO> friendships;
 
     public UserDTO(User user, boolean showFriendships, boolean showPosts)
     {

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaPostRepository;
+import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.PostFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
@@ -16,15 +17,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.group3.sem3exam.rest.dto.PostDTO.basic;
+import java.util.ArrayList;
 
 @Path("Posts")
-public class PostRessource
+public class PostResource
 {
 
     private static Gson                       gson       = SpecializedGson.create();
     private static PostFacade<JpaTransaction> postFacade = new PostFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaPostRepository(transaction)
+            transaction -> new JpaPostRepository(transaction),
+            transaction -> new JpaUserRepository(transaction)
     );
 
     /*
@@ -40,20 +43,36 @@ public class PostRessource
     */
 
 
-    @Path("create")
+    @GET
+    @Path("user/{userId: [0-9]+}")
+    public Response getPostByUser(@PathParam("userId") Integer id) throws ResourceNotFoundException
+    {
+     List<Post> posts = postFacade.getPostByUser(id);
+     List<PostDTO> postDTOS = new ArrayList<>();
+     for(Post post: posts){
+         postDTOS.add(new PostDTO(post));
+     }
+     return Response.ok(postDTOS).build();
+    }
+
+    @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createPost(String content) throws ResourceNotFoundException
+    public Response createPost(String content)
     {
         ReceivedCreatePost post = gson.fromJson(content, ReceivedCreatePost.class);
         Post createdPost = postFacade.createPost(post.title,
                                                  post.contents,
                                                  post.user,
                                                  post.timeCreated);
-        return Response.ok(gson.toJson(basic(createdPost))).build();
+
+
+
+        return Response.ok(gson.toJson(PostDTO.basic(createdPost))).build();
     }
 
-    @Path("{id: 0-9+}")
+    @GET
+    @Path("{id: [0-9]+}")
     public Response getPostById(@PathParam("id") Integer id) throws ResourceNotFoundException
     {
         Post    post    = postFacade.get(id);

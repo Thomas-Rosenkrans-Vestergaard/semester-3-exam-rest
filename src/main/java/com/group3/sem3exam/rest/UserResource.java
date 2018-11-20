@@ -1,6 +1,7 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
@@ -8,6 +9,7 @@ import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.UserFacade;
+import com.group3.sem3exam.logic.validation.ResourceValidationException;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
 import javax.ws.rs.*;
@@ -30,9 +32,10 @@ public class UserResource
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createUser(String content) throws ResourceNotFoundException
+    public Response createUser(String content) throws ResourceNotFoundException, ResourceValidationException
     {
         ReceivedCreateUser receivedUser = gson.fromJson(content, ReceivedCreateUser.class);
+
         User createdUser = userFacade.createUser(receivedUser.name,
                                                  receivedUser.email,
                                                  receivedUser.password,
@@ -63,6 +66,7 @@ public class UserResource
         return Response.ok(jsonDTO).build();
     }
 
+
     @Path("{id: 0-9+}/friends")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -73,4 +77,15 @@ public class UserResource
        throw new UnsupportedOperationException("Not supported yet");
     }
 
+    @GET
+    @Path("genders")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getGenders()
+    {
+        JsonArray array = new JsonArray();
+        for (Gender gender : Gender.values())
+            array.add(gender.name());
+
+        return Response.ok(gson.toJson(array)).build();
+    }
 }

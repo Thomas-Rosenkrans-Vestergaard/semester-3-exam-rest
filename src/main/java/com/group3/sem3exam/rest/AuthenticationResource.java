@@ -29,7 +29,7 @@ public class AuthenticationResource
         ReceivedAuthenticateUser receivedUser          = gson.fromJson(content, ReceivedAuthenticateUser.class);
         AuthenticationContext    authenticationContext = authenticationFacade.authenticate(receivedUser.email, receivedUser.password);
         String                   token                 = authenticationFacade.generateAuthenticationToken(authenticationContext);
-        return Response.ok(gson.toJson(AuthenticationDTO.basic(token))).build();
+        return Response.ok(gson.toJson(AuthenticationDTO.basic(token, authenticationContext.getUser()))).build();
     }
 
     private class ReceivedAuthenticateUser
