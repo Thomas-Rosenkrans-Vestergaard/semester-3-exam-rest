@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@Path("Posts")
+@Path("posts")
 public class PostResource
 {
 
