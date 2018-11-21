@@ -14,16 +14,11 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
-<<<<<<< HEAD
 @Path("posts")
-=======
-import static com.group3.sem3exam.rest.dto.PostDTO.basic;
-import java.util.ArrayList;
 
-@Path("Posts")
->>>>>>> 3415b8bbee101e0b665ef27c99ed18ed82e712e1
 public class PostResource
 {
 
