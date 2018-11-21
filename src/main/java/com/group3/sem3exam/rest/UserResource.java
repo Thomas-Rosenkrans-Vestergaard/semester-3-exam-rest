@@ -92,14 +92,16 @@ public class UserResource
     }
 
 
+    //create new friendshipResource
+    //create auth for friendship
+    //request/target --> answer/request
     @POST
     @Path("{userId}/{friendId}")
     @Produces(APPLICATION_JSON)
     public Response createFriendship(@PathParam("userId") int uId, @PathParam("friendId") int fId) throws ResourceNotFoundException
     {
-        User       u  = userFacade.get(uId);
-        User       f  = userFacade.get(fId);
-        Friendship fs = userFacade.createFriendship(u, f);
-        return Response.ok(gson.toJson(fs)).build();
+
+        Friendship fs = userFacade.createFriendship(uId,fId);
+        return Response.ok(gson.toJson( fs )).build();
     }
 }

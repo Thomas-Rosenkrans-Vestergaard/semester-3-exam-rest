@@ -1,6 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.TransactionalRepository;
@@ -43,4 +44,6 @@ public interface UserRepository extends CrudRepository<User, Integer>, Transacti
      * @return A List of the users friends
      */
     List<User> getUserFriends(Integer userId);
+
+    Friendship createFriendship( User owner, User friend );
 }
