@@ -9,6 +9,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * An implementation of the {@code UserRepository} interface, backed by a JPA data source.
@@ -84,5 +85,14 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Override
+    public List<User> getUserFriends(Integer userId)
+    {
+        return getEntityManager()
+                .createQuery("SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner = :id", User.class)
+                .setParameter("id", userId)
+                .getResultList();
     }
 }

@@ -16,6 +16,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;
+import java.util.List;
 
 @Path("users")
 public class UserResource
@@ -63,6 +64,17 @@ public class UserResource
         User   user    = userFacade.get(id);
         String jsonDTO = gson.toJson(UserDTO.basic(user));
         return Response.ok(jsonDTO).build();
+    }
+
+
+    @Path("{id: 0-9+}/friends")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFriendsByOwnerId(@PathParam("id") Integer id)
+    {
+       List<User> friends = userFacade.getUserFriends(id);
+       String jsonDTO = gson.toJson(UserDTO.basic(friends));
+       throw new UnsupportedOperationException("Not supported yet");
     }
 
     @GET

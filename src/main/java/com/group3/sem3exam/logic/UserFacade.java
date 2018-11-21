@@ -7,8 +7,7 @@ import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
-import net.sf.oval.ConstraintViolation;
-import net.sf.oval.Validator;
+import com.group3.sem3exam.logic.validation.ResourceValidator;
 import net.sf.oval.constraint.Email;
 import net.sf.oval.constraint.Length;
 import net.sf.oval.constraint.NotNull;
@@ -120,6 +119,7 @@ public class UserFacade<T extends Transaction>
     private void validate(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
     throws ResourceValidationException
     {
+
         UserValidator userValidator = new UserValidator();
         userValidator.name = name;
         userValidator.email = email;
@@ -128,10 +128,10 @@ public class UserFacade<T extends Transaction>
         userValidator.gender = gender;
         userValidator.dateOfBirth = dateOfBirth;
 
-        Validator                 validator               = new Validator();
-        List<ConstraintViolation> constraintViolationList = validator.validate(userValidator);
-        if (!constraintViolationList.isEmpty())
-            throw ResourceValidationException.oval(User.class, constraintViolationList);
+        ResourceValidator<UserValidator> resourceValidator = new ResourceValidator<>(userValidator);
+        resourceValidator.oval();
+        if (resourceValidator.hasErrors())
+            resourceValidator.throwResourceValidationException();
     }
 
     private static class UserValidator
@@ -168,5 +168,15 @@ public class UserFacade<T extends Transaction>
     private String hash(String password)
     {
         return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+
+    public List<User> getUserFriends(Integer userId)
+    {
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            UserRepository ur = userRepositoryFactory.apply(transaction);
+            return ur.getUserFriends(userId);
+        }
     }
 }

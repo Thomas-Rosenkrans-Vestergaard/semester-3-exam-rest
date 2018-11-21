@@ -12,5 +12,7 @@ public interface PostRepository extends CrudRepository<Post, Integer>
 
     Post createPost(User user, String title, String body, LocalDateTime time);
 
+    List<Post> getTimeline(Integer user);
+
     List<Post> getByUserId(User user);
 }

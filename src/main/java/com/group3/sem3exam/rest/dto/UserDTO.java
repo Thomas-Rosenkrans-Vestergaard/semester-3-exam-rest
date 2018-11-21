@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.entities.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,5 +45,13 @@ public class UserDTO
     public static UserDTO basic(User user)
     {
         return new UserDTO(user, false, false);
+    }
+
+    public static List<UserDTO> basic(List<User> users){
+        List<UserDTO> userDTOlist = new ArrayList<>(users.size());
+        for(User user : users){
+            userDTOlist.add(new UserDTO(user, false, true));
+        }
+        return userDTOlist;
     }
 }

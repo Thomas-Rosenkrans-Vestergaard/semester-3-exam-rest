@@ -14,11 +14,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-@Path("Posts")
+@Path("posts")
 public class PostResource
 {
 
@@ -46,12 +44,10 @@ public class PostResource
     @Path("user/{userId: [0-9]+}")
     public Response getPostByUser(@PathParam("userId") Integer id) throws ResourceNotFoundException
     {
-     List<Post> posts = postFacade.getPostByUser(id);
-     List<PostDTO> postDTOS = new ArrayList<>();
-     for(Post post: posts){
-         postDTOS.add(new PostDTO(post));
-     }
-     return Response.ok(postDTOS).build();
+        List<Post>    posts    = postFacade.getPostByUser(id);
+        List<PostDTO> postDTOS = PostDTO.basic(posts);
+
+        return Response.ok(postDTOS).build();
     }
 
     @POST
@@ -65,6 +61,7 @@ public class PostResource
                                                  post.user,
                                                  post.timeCreated);
 
+
         return Response.ok(gson.toJson(PostDTO.basic(createdPost))).build();
     }
 
@@ -75,6 +72,17 @@ public class PostResource
         Post    post    = postFacade.get(id);
         PostDTO postDTO = new PostDTO(post);
         return Response.ok(postDTO).build();
+    }
+
+    @Path("{id: 0-9+}/friends")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getFriendsPostsByOwnerId(@PathParam("id") Integer id) throws ResourceNotFoundException
+    {
+        List<Post>    posts    = postFacade.getTimeline(id);
+        List<PostDTO> postDTOs = PostDTO.basic(posts);
+        return Response.ok(postDTOs).build();
+
     }
 
 
