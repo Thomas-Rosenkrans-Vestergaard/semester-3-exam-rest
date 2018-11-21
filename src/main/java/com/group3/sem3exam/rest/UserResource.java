@@ -2,6 +2,7 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
@@ -72,9 +73,9 @@ public class UserResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response getFriendsByOwnerId(@PathParam("id") Integer id)
     {
-       List<User> friends = userFacade.getUserFriends(id);
-       String jsonDTO = gson.toJson(UserDTO.basic(friends));
-       throw new UnsupportedOperationException("Not supported yet");
+        List<User> friends = userFacade.getUserFriends(id);
+        String     jsonDTO = gson.toJson(UserDTO.basic(friends));
+        throw new UnsupportedOperationException("Not supported yet");
     }
 
     @GET
@@ -87,5 +88,17 @@ public class UserResource
             array.add(gender.name());
 
         return Response.ok(gson.toJson(array)).build();
+    }
+
+
+    @POST
+    @Path("{userId}/{friendId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createFriendship(@PathParam("userId") int uId, @PathParam("friendId") int fId) throws ResourceNotFoundException
+    {
+        User u = userFacade.get(uId);
+        User f = userFacade.get(fId);
+        Friendship fs = userFacade.createFriendship(u,f);
+        return Response.ok(gson.toJson( fs )).build();
     }
 }

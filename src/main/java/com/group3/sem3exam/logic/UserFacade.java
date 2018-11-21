@@ -1,6 +1,7 @@
 package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
@@ -178,5 +179,11 @@ public class UserFacade<T extends Transaction>
             UserRepository ur = userRepositoryFactory.apply(transaction);
             return ur.getUserFriends(userId);
         }
+    }
+
+    public Friendship createFriendship(User owner, User friend)
+    {
+        Friendship friendship = new Friendship(owner, friend);
+        return friendship;
     }
 }
