@@ -17,11 +17,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.ArrayList;
 
-
 @Path("posts")
 public class PostResource
 {
-
     private static Gson                       gson       = SpecializedGson.create();
     private static PostFacade<JpaTransaction> postFacade = new PostFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
@@ -41,7 +39,6 @@ public class PostResource
     }
     */
 
-
     @GET
     @Path("user/{userId: [0-9]+}")
     public Response getPostByUser(@PathParam("userId") Integer id) throws ResourceNotFoundException
@@ -51,7 +48,7 @@ public class PostResource
         for (Post post : posts) {
             postDTOS.add(new PostDTO(post));
         }
-        postDTOS = PostDTO.basic(posts);
+        postDTOS = PostDTO.list(posts, PostDTO::withAuthor);
 
         return Response.ok(postDTOS).build();
     }
@@ -80,16 +77,15 @@ public class PostResource
         return Response.ok(postDTO).build();
     }
 
-    @Path("timeline/{id}")
+    @Path("timeline/{userId}/{pageSize}/{last}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getFriendsPostsByOwnerId(@PathParam("id") Integer id) throws ResourceNotFoundException
+    public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @PathParam("last") Integer last) throws ResourceNotFoundException
     {
-        List<Post>    posts    = postFacade.getTimeline(id);
-        List<PostDTO> postDTOs = PostDTO.basic(posts);
+        List<Post>    posts    = postFacade.getTimelinePosts(userId, pageSize, last);
+        List<PostDTO> postDTOs = PostDTO.list(posts, PostDTO::withAuthor);
         return Response.ok(gson.toJson(postDTOs)).build();
     }
-
 
     private class ReceivedCreatePost
     {
@@ -98,5 +94,4 @@ public class PostResource
         private LocalDateTime timeCreated;
         private User          user;
     }
-
 }
