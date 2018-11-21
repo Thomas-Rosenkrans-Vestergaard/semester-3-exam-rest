@@ -39,7 +39,7 @@ public interface UserRepository extends CrudRepository<User, Integer>, Transacti
     /**
      * Returns the friends of the provided users ID
      *
-     * @param userID ID of the person that needs friends returned
+     * @param userId ID of the person that needs friends returned
      * @return A List of the users friends
      */
     List<User> getUserFriends(Integer userId);
