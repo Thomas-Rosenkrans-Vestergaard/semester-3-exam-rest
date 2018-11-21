@@ -9,12 +9,15 @@ import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
 import com.group3.sem3exam.logic.validation.ResourceValidator;
+import com.group3.sem3exam.logic.validation.IsAfterCheck;
+import com.group3.sem3exam.logic.validation.IsBeforeCheck;
 import net.sf.oval.constraint.Email;
 import net.sf.oval.constraint.Length;
 import net.sf.oval.constraint.NotNull;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDate;
+import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -131,6 +134,9 @@ public class UserFacade<T extends Transaction>
 
         ResourceValidator<UserValidator> resourceValidator = new ResourceValidator<>(userValidator);
         resourceValidator.oval();
+        resourceValidator.on("dateOfBirth", Temporal.class)
+                         .check(IsAfterCheck.constructor(LocalDate.now().minusYears(120)))
+                         .check(IsBeforeCheck.constructor(LocalDate.now()));
         if (resourceValidator.hasErrors())
             resourceValidator.throwResourceValidationException();
     }
