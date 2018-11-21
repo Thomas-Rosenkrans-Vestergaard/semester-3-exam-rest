@@ -98,10 +98,10 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
     }
 
     @Override
-    public Friendship createFriendship( User owner, User friend )
+    public Friendship createFriendship(User owner, User friend)
     {
-        Friendship fr = new Friendship( owner, friend );
-        getEntityManager().persist( fr );
+        Friendship fr = new Friendship(owner, friend);
+        getEntityManager().persist(fr);
         return fr;
     }
 }

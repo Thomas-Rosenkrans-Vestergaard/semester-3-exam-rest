@@ -200,6 +200,7 @@ public class UserFacade<T extends Transaction>
             transaction.begin();
             UserRepository ur = userRepositoryFactory.apply(transaction);
             Friendship     fr = ur.createFriendship(u, f);
+            transaction.commit();
             return fr;
         }
     }
