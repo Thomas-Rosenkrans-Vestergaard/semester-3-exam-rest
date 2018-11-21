@@ -6,6 +6,7 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,22 +40,23 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     @Override
     public List<Post> getByUserId(User author)
     {
-      return getEntityManager().createQuery("SELECT Post FROM Post p where p.author = :author", Post.class)
-                          .setParameter("author", author)
-                          .getResultList();
+        return getEntityManager().createQuery("SELECT Post FROM Post p where p.author = :author", Post.class)
+                                 .setParameter("author", author)
+                                 .getResultList();
 
     }
 
     @Override
     public List<Post> getTimeline(Integer userId)
     {
-        return getEntityManager()
-                .createQuery("SELECT p FROM Post p WHERE p.author IN " +
-                             "(SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner = :id) " +
-                             "ORDER BY p.createdAt DESC", Post.class)
-                .setParameter("id", userId)
-                .getResultList()
-                ;
+        EntityManager em = getEntityManager();
+        Query query = em.createQuery("SELECT p FROM Post p WHERE p.author IN " +
+                                     "(SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner.id = :id) " +
+                                     "ORDER BY p.createdAt DESC", Post.class);
+        query.setParameter("id", userId);
+        List<Post> posts = query.getResultList();
+        return posts;
+
     }
 
 }

@@ -64,9 +64,7 @@ public class ResourceValidationExceptionMapper implements ExceptionMapper<Resour
 
         public ValidationViolationDTO(ValidationViolation violation)
         {
-
-            String message = violation.getMessage();
-            this.message = violation.getAttribute() + message.substring(message.indexOf(" "));
+            this.message = violation.getMessage();
             this.checkName = violation.getCheckName();
             this.variables = getVariables(violation.getVariables());
             this.attribute = violation.getAttribute();

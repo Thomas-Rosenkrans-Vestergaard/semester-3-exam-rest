@@ -7,14 +7,16 @@ import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
-import net.sf.oval.ConstraintViolation;
-import net.sf.oval.Validator;
+import com.group3.sem3exam.logic.validation.ResourceValidator;
+import com.group3.sem3exam.logic.validation.IsAfterCheck;
+import com.group3.sem3exam.logic.validation.IsBeforeCheck;
 import net.sf.oval.constraint.Email;
 import net.sf.oval.constraint.Length;
 import net.sf.oval.constraint.NotNull;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDate;
+import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -120,6 +122,7 @@ public class UserFacade<T extends Transaction>
     private void validate(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
     throws ResourceValidationException
     {
+
         UserValidator userValidator = new UserValidator();
         userValidator.name = name;
         userValidator.email = email;
@@ -128,10 +131,13 @@ public class UserFacade<T extends Transaction>
         userValidator.gender = gender;
         userValidator.dateOfBirth = dateOfBirth;
 
-        Validator                 validator               = new Validator();
-        List<ConstraintViolation> constraintViolationList = validator.validate(userValidator);
-        if (!constraintViolationList.isEmpty())
-            throw ResourceValidationException.oval(User.class, constraintViolationList);
+        ResourceValidator<UserValidator> resourceValidator = new ResourceValidator<>(userValidator);
+        resourceValidator.oval();
+        resourceValidator.on("dateOfBirth", Temporal.class)
+                         .check(IsAfterCheck.constructor(LocalDate.now().minusYears(120)))
+                         .check(IsBeforeCheck.constructor(LocalDate.now()));
+        if (resourceValidator.hasErrors())
+            resourceValidator.throwResourceValidationException();
     }
 
     private static class UserValidator
