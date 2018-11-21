@@ -14,6 +14,7 @@ import java.util.function.Function;
 public class PostDTO
 {
 
+    public final Integer id;
     public final String        contents;
     public final String        title;
     public final LocalDateTime timeCreated;
@@ -26,6 +27,7 @@ public class PostDTO
 
     public PostDTO(Post post, boolean showAuthor)
     {
+        this.id = post.getId();
         this.contents = post.getContents();
         this.timeCreated = post.getCreatedAt();
         this.title = post.getTitle();

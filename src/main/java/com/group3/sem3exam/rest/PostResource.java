@@ -9,7 +9,6 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.PostFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.rest.dto.PostDTO;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -77,12 +76,12 @@ public class PostResource
         return Response.ok(postDTO).build();
     }
 
-    @Path("timeline/{userId}/{pageSize}/{last}")
+    @Path("timeline/{userId}/{pageSize}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @PathParam("last") Integer last) throws ResourceNotFoundException
+    public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff) throws ResourceNotFoundException
     {
-        List<Post>    posts    = postFacade.getTimelinePosts(userId, pageSize, last);
+        List<Post>    posts    = postFacade.getTimelinePosts(userId, pageSize, cutoff);
         List<PostDTO> postDTOs = PostDTO.list(posts, PostDTO::withAuthor);
         return Response.ok(gson.toJson(postDTOs)).build();
     }

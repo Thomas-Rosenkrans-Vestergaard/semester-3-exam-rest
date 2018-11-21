@@ -44,36 +44,34 @@ public class PostFacade<T extends Transaction>
 
     public Post get(Integer id) throws ResourceNotFoundException
     {
-        PostRepository pr = postRepositoryFactory.apply(transactionFactory.get());
+        try (PostRepository pr = postRepositoryFactory.apply(transactionFactory.get())) {
+            Post post = pr.get(id);
+            if (post == null) {
+                throw new ResourceNotFoundException(Post.class, id, 404);
+            }
 
-        Post post = pr.get(id);
-
-        if (post == null) {
-            throw new ResourceNotFoundException(Post.class, id, 404);
+            return post;
         }
-        return post;
     }
 
     public List<Post> getTimelinePosts(Integer userId, Integer pageSize, Integer last) throws ResourceNotFoundException
     {
-        PostRepository pr   = postRepositoryFactory.apply(transactionFactory.get());
-        List<Post>     post = pr.getTimelinePosts(userId, pageSize, last);
-        if (post == null) {
-            throw new ResourceNotFoundException(Post.class, userId, 404);
+        try (PostRepository pr = postRepositoryFactory.apply(transactionFactory.get())) {
+            return pr.getTimelinePosts(userId, pageSize, last);
         }
-        return post;
     }
 
     public List<Post> getPostByUser(Integer id) throws ResourceNotFoundException
     {
-        UserRepository ur    = userRepositoryFactory.apply(transactionFactory.get());
-        User           user  = ur.get(id);
-        PostRepository pr    = postRepositoryFactory.apply(transactionFactory.get());
-        List<Post>     posts = pr.getByUserId(user);
-        if (user == null) {
-            throw new ResourceNotFoundException(Post.class, user.getId(), 422);
+        try (T transaction = transactionFactory.get()) {
+            UserRepository ur   = userRepositoryFactory.apply(transaction);
+            PostRepository pr   = postRepositoryFactory.apply(transaction);
+            User           user = ur.get(id);
+            if (user == null)
+                throw new ResourceNotFoundException(Post.class, user.getId(), 422);
+
+            return pr.getByUserId(user);
         }
-        return posts;
     }
 }
 
