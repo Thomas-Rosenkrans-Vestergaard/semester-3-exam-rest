@@ -1,6 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
@@ -94,5 +95,13 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
                 .createQuery("SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner = :id", User.class)
                 .setParameter("id", userId)
                 .getResultList();
+    }
+
+    @Override
+    public Friendship createFriendship( User owner, User friend )
+    {
+        Friendship fr = new Friendship( owner, friend );
+        getEntityManager().persist( fr );
+        return fr;
     }
 }

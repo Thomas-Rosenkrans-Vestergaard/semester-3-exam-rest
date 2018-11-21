@@ -11,6 +11,7 @@ import com.group3.sem3exam.logic.validation.ResourceValidationException;
 import com.group3.sem3exam.logic.validation.ResourceValidator;
 import com.group3.sem3exam.logic.validation.IsAfterCheck;
 import com.group3.sem3exam.logic.validation.IsBeforeCheck;
+import com.group3.sem3exam.rest.UserResource;
 import net.sf.oval.constraint.Email;
 import net.sf.oval.constraint.Length;
 import net.sf.oval.constraint.NotNull;
@@ -187,9 +188,15 @@ public class UserFacade<T extends Transaction>
         }
     }
 
-    public Friendship createFriendship(User owner, User friend)
+    public Friendship createFriendship(int ownerId, int friendId) throws ResourceNotFoundException
     {
-        Friendship friendship = new Friendship(owner, friend);
-        return friendship;
+        User u = get(ownerId);
+        User f = get(friendId);
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            UserRepository ur = userRepositoryFactory.apply(transaction);
+            Friendship     fr = ur.createFriendship(u, f);
+            return fr;
+        }
     }
 }

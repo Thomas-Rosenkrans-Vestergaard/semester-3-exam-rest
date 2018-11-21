@@ -96,9 +96,7 @@ public class UserResource
     @Produces(MediaType.APPLICATION_JSON)
     public Response createFriendship(@PathParam("userId") int uId, @PathParam("friendId") int fId) throws ResourceNotFoundException
     {
-        User u = userFacade.get(uId);
-        User f = userFacade.get(fId);
-        Friendship fs = userFacade.createFriendship(u,f);
+        Friendship fs = userFacade.createFriendship(uId,fId);
         return Response.ok(gson.toJson( fs )).build();
     }
 }
