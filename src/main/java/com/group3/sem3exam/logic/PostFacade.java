@@ -54,12 +54,12 @@ public class PostFacade<T extends Transaction>
         return post;
     }
 
-    public List<Post> getTimeline(Integer id) throws ResourceNotFoundException
+    public List<Post> getTimelinePosts(Integer userId, Integer pageSize, Integer last) throws ResourceNotFoundException
     {
         PostRepository pr   = postRepositoryFactory.apply(transactionFactory.get());
-        List<Post>     post = pr.getTimeline(id);
+        List<Post>     post = pr.getTimelinePosts(userId, pageSize, last);
         if (post == null) {
-            throw new ResourceNotFoundException(Post.class, id, 404);
+            throw new ResourceNotFoundException(Post.class, userId, 404);
         }
         return post;
     }

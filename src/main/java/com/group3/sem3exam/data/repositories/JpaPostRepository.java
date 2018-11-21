@@ -47,16 +47,16 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     }
 
     @Override
-    public List<Post> getTimeline(Integer userId)
+    public List<Post> getTimelinePosts(Integer userId, Integer pageSize, Integer last)
     {
         EntityManager em = getEntityManager();
         Query query = em.createQuery("SELECT p FROM Post p WHERE p.author IN " +
                                      "(SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner.id = :id) " +
                                      "ORDER BY p.createdAt DESC", Post.class);
+        query.setFirstResult(last); //offset
+        query.setMaxResults(pageSize+last);// limit
         query.setParameter("id", userId);
         List<Post> posts = query.getResultList();
         return posts;
-
     }
-
 }

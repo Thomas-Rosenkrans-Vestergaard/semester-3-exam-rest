@@ -22,18 +22,21 @@ public interface PostRepository extends CrudRepository<Post, Integer>
     Post createPost(User user, String title, String body, LocalDateTime time);
 
     /**
-     * Returns the timeline for the provided user.
-     *
-     * @param user The id of the user to return the timeline of.
-     * @return The posts on the timeline for the provided user.
-     */
-    List<Post> getTimeline(Integer user);
-
-    /**
      * Returns the posts made by the user with the provided id.
      *
      * @param user The id of the user to return the posts of.
      * @return The posts made by the user with the provided id.
      */
     List<Post> getByUserId(User user);
+
+
+    /**
+     * Returns a specific set of posts from a users friends.
+     *
+     * @param userId The id of the user to return the posts of.
+     * @param pageSize the amount of new posts to fetch
+     * @param last the offset from where to start to fetch posts
+     * @return The posts made by the user with the provided id.
+     */
+    List<Post> getTimelinePosts(Integer userId, Integer pageSize, Integer last);
 }

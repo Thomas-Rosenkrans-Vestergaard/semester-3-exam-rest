@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class UserDTO
@@ -24,6 +25,7 @@ public class UserDTO
 
     public UserDTO(User user, boolean showFriendships, boolean showPosts)
     {
+        this.id = user.getId();
         this.name = user.getName();
         this.email = user.getEmail();
         this.createdAt = user.getCreatedAt();
@@ -47,11 +49,13 @@ public class UserDTO
         return new UserDTO(user, false, false);
     }
 
-    public static List<UserDTO> basic(List<User> users){
-        List<UserDTO> userDTOlist = new ArrayList<>(users.size());
-        for(User user : users){
-            userDTOlist.add(new UserDTO(user, false, true));
+    public static List<UserDTO> list(List<User> users, Function<User, UserDTO> f)
+    {
+        List<UserDTO> userDTOs = new ArrayList<>(users.size());
+        for (User user : users) {
+            userDTOs.add(f.apply(user));
         }
-        return userDTOlist;
+
+        return userDTOs;
     }
 }
