@@ -91,6 +91,9 @@ public class UserResource
     }
 
 
+    //create new friendshipResource
+    //create auth for friendship
+    //request/target --> answer/request
     @POST
     @Path("{userId}/{friendId}")
     @Produces(MediaType.APPLICATION_JSON)
