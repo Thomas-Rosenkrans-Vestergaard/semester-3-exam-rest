@@ -89,7 +89,7 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
     }
 
     @Override
-    public List<User> getUserFriends(Integer userId)
+    public List<User> getFriends(Integer userId)
     {
         return getEntityManager()
                 .createQuery("SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner = :id", User.class)

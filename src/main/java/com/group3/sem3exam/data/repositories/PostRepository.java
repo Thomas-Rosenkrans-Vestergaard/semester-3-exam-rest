@@ -27,7 +27,7 @@ public interface PostRepository extends CrudRepository<Post, Integer>
      * @param user The id of the user to return the posts of.
      * @return The posts made by the user with the provided id.
      */
-    List<Post> getByUserId(User user);
+    List<Post> getByUser(User user);
 
 
     /**

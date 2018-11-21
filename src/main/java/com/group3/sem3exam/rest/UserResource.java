@@ -74,7 +74,7 @@ public class UserResource
     @Produces(APPLICATION_JSON)
     public Response getFriendsByOwnerId(@PathParam("id") Integer id)
     {
-        List<User> friends = userFacade.getUserFriends(id);
+        List<User> friends = userFacade.getFriends(id);
         String     jsonDTO = gson.toJson(UserDTO.list(friends, UserDTO::basic));
         throw new UnsupportedOperationException("Not supported yet");
     }

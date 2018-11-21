@@ -9,10 +9,10 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.PostFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.rest.dto.PostDTO;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,8 +60,7 @@ public class PostResource
         ReceivedCreatePost post = gson.fromJson(content, ReceivedCreatePost.class);
         Post createdPost = postFacade.createPost(post.title,
                                                  post.contents,
-                                                 post.user,
-                                                 post.timeCreated);
+                                                 post.user);
 
 
         return Response.ok(gson.toJson(PostDTO.basic(createdPost))).build();
@@ -88,9 +87,8 @@ public class PostResource
 
     private class ReceivedCreatePost
     {
-        private String        contents;
-        private String        title;
-        private LocalDateTime timeCreated;
-        private User          user;
+        private String contents;
+        private String title;
+        private User   user;
     }
 }

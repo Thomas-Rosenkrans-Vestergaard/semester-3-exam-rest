@@ -38,7 +38,7 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     }
 
     @Override
-    public List<Post> getByUserId(User author)
+    public List<Post> getByUser(User author)
     {
         return getEntityManager().createQuery("SELECT Post FROM Post p where p.author = :author", Post.class)
                                  .setParameter("author", author)

@@ -7,11 +7,10 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
-import com.group3.sem3exam.logic.validation.ResourceValidationException;
-import com.group3.sem3exam.logic.validation.ResourceValidator;
 import com.group3.sem3exam.logic.validation.IsAfterCheck;
 import com.group3.sem3exam.logic.validation.IsBeforeCheck;
-import com.group3.sem3exam.rest.UserResource;
+import com.group3.sem3exam.logic.validation.ResourceValidationException;
+import com.group3.sem3exam.logic.validation.ResourceValidator;
 import net.sf.oval.constraint.Email;
 import net.sf.oval.constraint.Length;
 import net.sf.oval.constraint.NotNull;
@@ -178,13 +177,18 @@ public class UserFacade<T extends Transaction>
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
-
-    public List<User> getUserFriends(Integer userId)
+    /**
+     * Returns the friends of the user with the provided id.
+     *
+     * @param user The id of the user to return the friends of.
+     * @return The friends of the user with the provided id.
+     */
+    public List<User> getFriends(Integer user)
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
             UserRepository ur = userRepositoryFactory.apply(transaction);
-            return ur.getUserFriends(userId);
+            return ur.getFriends(user);
         }
     }
 

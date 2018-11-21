@@ -21,19 +21,7 @@ public class ResourceNotFoundException extends FacadeException
      */
     public ResourceNotFoundException(Class resource, Object id)
     {
-        this(resource, id, 404);
-    }
-
-    /**
-     * Creates a new {@link ResourceNotFoundException} with a http status code.
-     *
-     * @param resource The class representing the resource that could not be found.
-     * @param id       The id of the missing resource.
-     * @param code     The status code to signal to the end user.
-     */
-    public ResourceNotFoundException(Class resource, Object id, int code)
-    {
-        this(resource, id, code, null);
+        this(resource, id, null);
     }
 
     /**
@@ -41,10 +29,9 @@ public class ResourceNotFoundException extends FacadeException
      *
      * @param resource The class representing the resource that could not be found.
      * @param id       The id of the missing resource.
-     * @param code     The status code to signal to the end user.
      * @param cause    The cause of this error.
      */
-    public ResourceNotFoundException(Class resource, Object id, int code, Throwable cause)
+    public ResourceNotFoundException(Class resource, Object id, Throwable cause)
     {
         super(
                 String.format("%sNotFoundError", resource.getSimpleName()),
