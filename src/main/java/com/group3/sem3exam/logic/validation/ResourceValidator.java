@@ -4,6 +4,7 @@ import net.sf.oval.ConstraintViolation;
 import net.sf.oval.Validator;
 import net.sf.oval.context.FieldContext;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -12,9 +13,9 @@ public class ResourceValidator<R>
 {
 
     /**
-     * The object to perform validation upon.
+     * The subject to perform validation upon.
      */
-    private final R object;
+    private final R subject;
 
     /**
      * The validation violation collected during validations.
@@ -24,34 +25,15 @@ public class ResourceValidator<R>
     /**
      * Creates a new {@link ResourceValidator}.
      *
-     * @param object The object to perform validation upon.
+     * @param subject The subject to perform validation upon.
      */
-    public ResourceValidator(R object)
+    public ResourceValidator(R subject)
     {
-        if (object == null)
-            throw new IllegalArgumentException("The object provided to ResourceValidator must not be null.");
-
-        this.object = object;
+        this.subject = subject;
     }
 
     /**
-     * Performs the provided check on the object being validated.
-     *
-     * @param condition The condition that must be true.
-     * @return The result of the condition check.
-     */
-    public <V> boolean check(ResourceValidatorCondition<R, V> condition)
-    {
-        V       subject = condition.getFactory().apply(this.object);
-        boolean result  = condition.isTrue(subject);
-        if (!result)
-            violations.add(condition.createViolation(subject));
-
-        return result;
-    }
-
-    /**
-     * Performs Oval validation on the object. Any constraint violations are converted to validation violations,
+     * Performs Oval validation on the subject. Any constraint violations are converted to validation violations,
      * and are added to the list of violations in this instance.
      *
      * @return {@code true} when there were no Oval constraint violations, {@code false} when there were Oval constraint
@@ -60,7 +42,7 @@ public class ResourceValidator<R>
     public boolean oval()
     {
         Validator                 validator            = new Validator();
-        List<ConstraintViolation> constraintViolations = validator.validate(object);
+        List<ConstraintViolation> constraintViolations = validator.validate(subject);
         for (ConstraintViolation constraintViolation : constraintViolations) {
             violations.addAll(toValidationViolations(constraintViolation));
         }
@@ -79,7 +61,7 @@ public class ResourceValidator<R>
     }
 
     /**
-     * Throws a new {@link ResourceValidationException} of the type of the encapsulated object, with the violation
+     * Throws a new {@link ResourceValidationException} of the type of the encapsulated subject, with the violation
      * violations.
      *
      * @throws ResourceValidationException The new exception.
@@ -87,7 +69,77 @@ public class ResourceValidator<R>
     public void throwResourceValidationException() throws ResourceValidationException
     {
         if (hasErrors())
-            throw new ResourceValidationException(object.getClass(), violations);
+            throw new ResourceValidationException(subject.getClass(), violations);
+    }
+
+    /**
+     * Returns an {@link ResourceValidatorAttribute} for the attribute with provided attribute name.
+     *
+     * @param attribute The name of the attribute to perform checks on.
+     * @param type      The class of the value on the attribute to perform checks on.
+     * @param <T>       The type of the value on the attribute to perform checks on.
+     * @return The {@link ResourceValidatorAttribute}.
+     */
+    public <T> ResourceValidatorAttribute<R, T> on(String attribute, Class<T> type)
+    {
+        try {
+
+            Field field = subject.getClass().getField(attribute);
+            field.setAccessible(true);
+            T casted = type.cast(field.get(subject));
+
+            return new Attribute<>(subject, casted, attribute);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * The internal implementation of {@link ResourceValidatorAttribute}.
+     *
+     * @param <V> The value in the attribute.
+     */
+    private class Attribute<V> implements ResourceValidatorAttribute<R, V>
+    {
+
+        /**
+         * The parent value.
+         */
+        private final R r;
+
+        /**
+         * The attribute value.
+         */
+        private final V v;
+
+        /**
+         * The name of the attribute.
+         */
+        private final String attributeName;
+
+        /**
+         * Creates a new {@link Attribute}.
+         *
+         * @param r             The parent value.
+         * @param v             The attribute value.
+         * @param attributeName The attribute name.
+         */
+        public Attribute(R r, V v, String attributeName)
+        {
+            this.r = r;
+            this.v = v;
+            this.attributeName = attributeName;
+        }
+
+        @Override
+        public ResourceValidatorAttribute<R, V> check(ResourceValidatorAttributeCheckConstructor<R, V> constructor)
+        {
+            ResourceValidatorAttributeCheck<R, V> check = constructor.construct(r, v, attributeName);
+            if (!check.passes())
+                ResourceValidator.this.violations.add(check.createViolation());
+
+            return this;
+        }
     }
 
     /**
@@ -152,7 +204,7 @@ public class ResourceValidator<R>
 
     /**
      * Returns the check name of a provided {@link ConstraintViolation}. The check name is the name of the
-     * annotation check that failed on the object.
+     * annotation check that failed on the subject.
      *
      * @param constraintViolation The {@link ConstraintViolation} from which to extract the check name.
      * @return The extracted check name.
