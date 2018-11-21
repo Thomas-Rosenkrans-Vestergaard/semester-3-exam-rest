@@ -42,8 +42,8 @@ public class ResourceValidator<R>
      */
     public <V> boolean check(ResourceValidatorCondition<R, V> condition)
     {
-        V subject = condition.getFactory().apply(this.object);
-        boolean result = condition.isTrue(subject);
+        V       subject = condition.getFactory().apply(this.object);
+        boolean result  = condition.isTrue(subject);
         if (!result)
             violations.add(condition.createViolation(subject));
 
@@ -117,10 +117,13 @@ public class ResourceValidator<R>
      */
     private ValidationViolation toValidationViolation(ConstraintViolation constraintViolation)
     {
+        String attributeName = getAttributeName(constraintViolation);
+        String message       = constraintViolation.getMessage();
+
         return new ValidationViolation(
-                "Provided " + constraintViolation.getMessage(),
+                "Provided " + attributeName + message.substring(message.indexOf(" ")),
                 getCheckName(constraintViolation),
-                getAttributeName(constraintViolation),
+                attributeName,
                 constraintViolation.getInvalidValue(),
                 constraintViolation.getMessageVariables()
         );
@@ -135,10 +138,13 @@ public class ResourceValidator<R>
      */
     private ValidationViolation toValidationViolation(ConstraintViolation parent, ConstraintViolation child)
     {
+        String attributeName = getAttributeName(parent) + '.' + getAttributeName(child);
+        String message       = child.getMessage();
+
         return new ValidationViolation(
-                "Provided " + child.getMessage(),
+                "Provided " + attributeName + message.substring(message.indexOf(" ")),
                 getCheckName(child),
-                getAttributeName(parent) + '.' + getAttributeName(child),
+                attributeName,
                 child.getInvalidValue(),
                 child.getMessageVariables()
         );
