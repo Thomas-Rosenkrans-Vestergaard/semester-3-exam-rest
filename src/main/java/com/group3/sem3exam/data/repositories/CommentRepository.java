@@ -10,10 +10,8 @@ public interface CommentRepository extends ReadCrudRepository<Comment, Integer>
     /**
      * Returns a complete list of comments for a given post
      *
-     * @param PostId Id of the post which to return comments from
-     * @return The complete list of the comments from the post
+     * @param postId Id of the post which to return comments from
+     * @return The complete list of the comments from the post.
      */
-
-    List<Comment> getCommentsByPost(Integer postId);
-
+    List<Comment> getByPost(Integer postId);
 }

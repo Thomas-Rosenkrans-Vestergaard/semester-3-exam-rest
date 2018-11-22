@@ -1,39 +1,23 @@
 package com.group3.sem3exam.logic;
 
-import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.repositories.CommentRepository;
 import com.group3.sem3exam.data.repositories.PostRepository;
+import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
-import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class CommentFacade
+public class CommentFacade<T extends Transaction>
 {
 
-    private final Supplier<CommentRepository> commentRepositoryFactory;
+    private final Supplier<Transaction>          transactionFactory;
+    private final Function<T, CommentRepository> commentRepositoryFactory;
+    private final Function<T, PostRepository>    postRepositoryFactory;
 
-    /**
-     * Creates a new {@link CommentFacade}.
-     *
-     * @param commentRepositoryFactory The factory that produces country repositories used by this facade.
-     */
-
-    public CommentFacade(Supplier<CommentRepository> commentRepositoryFactory)
+    public CommentFacade(Supplier<Transaction> transactionFactory, Function<T, CommentRepository> commentRepositoryFactory, Function<T, PostRepository> postRepositoryFactory)
     {
+        this.transactionFactory = transactionFactory;
         this.commentRepositoryFactory = commentRepositoryFactory;
-    }
-
-    /**
-     * Returns the country with the provided id.
-     *
-     * @param id The id of the country to return.
-     * @return The country with the provided id.
-     * @throws ResourceNotFoundException When a country with the provided id does not exist.
-     */
-    public List<Comment> get(Integer id) throws ResourceNotFoundException
-    {
-        try (PostRepository pr = commentRepositoryFactory.apply(transactionFactory.get())) {
-            return pr.getTimelinePosts(user, pageSize, cutoff);
-        }
+        this.postRepositoryFactory = postRepositoryFactory;
     }
 }
