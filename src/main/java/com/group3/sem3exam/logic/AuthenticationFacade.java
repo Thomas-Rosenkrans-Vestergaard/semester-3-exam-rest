@@ -4,14 +4,18 @@ import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authentication.UserAuthenticator;
-import com.group3.sem3exam.logic.authentication.jwt.FileJwtSecret;
+import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenGenerator;
 
-import java.io.File;
 import java.util.function.Supplier;
 
 public class AuthenticationFacade
 {
+
+    /**
+     * The jwt secret used to generate jwt tokens.
+     */
+    private final JwtSecret jwtSecret;
 
     /**
      * The factory that produces user repositories used by this facade.
@@ -21,10 +25,12 @@ public class AuthenticationFacade
     /**
      * Creates a new {@link AuthenticationFacade}.
      *
+     * @param jwtSecret             The jwt secret used to generate jwt tokens.
      * @param userRepositoryFactory The factory that produces user repositories used by this facade.
      */
-    public AuthenticationFacade(Supplier<UserRepository> userRepositoryFactory)
+    public AuthenticationFacade(JwtSecret jwtSecret, Supplier<UserRepository> userRepositoryFactory)
     {
+        this.jwtSecret = jwtSecret;
         this.userRepositoryFactory = userRepositoryFactory;
     }
 
@@ -37,8 +43,6 @@ public class AuthenticationFacade
      */
     public String generateAuthenticationToken(AuthenticationContext authenticationContext) throws Exception
     {
-        File              file      = new File("../temp/jwt.secret");
-        FileJwtSecret     jwtSecret = new FileJwtSecret(file, 256 / 8);
         JwtTokenGenerator generator = new JwtTokenGenerator(jwtSecret);
         return generator.generate(authenticationContext);
     }
