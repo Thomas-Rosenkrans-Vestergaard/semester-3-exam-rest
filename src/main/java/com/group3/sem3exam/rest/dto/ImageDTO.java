@@ -28,7 +28,7 @@ public class ImageDTO
 
     public static ImageDTO basic(Image image)
     {
-        return new ImageDTO(image, true);
+        return new ImageDTO(image, false);
     }
 
     public static List<ImageDTO> list(List<Image> images, Function<Image, ImageDTO> f)

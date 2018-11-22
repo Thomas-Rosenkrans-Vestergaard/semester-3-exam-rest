@@ -3,6 +3,7 @@ package com.group3.sem3exam.data.repositories;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -13,6 +14,7 @@ import java.util.List;
  */
 public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implements ImageRepository
 {
+
     /**
      * Creates a new {@link JpaImageRepository}.
      *
@@ -74,5 +76,11 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
                 .setMaxResults(pageSize)
                 .setParameter("user", user)
                 .getResultList();
+    }
+
+    @Override
+    public int countByUser(User user)
+    {
+        return user.getImages().size();
     }
 }

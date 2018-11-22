@@ -1,6 +1,7 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaJwtSecret;
@@ -45,7 +46,6 @@ public class ImageResource
     }
 
     @POST
-    @Path("create")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@HeaderParam("Authorization") String token, String content)
     throws AuthenticationException, UnsupportedImageTypeException
@@ -57,7 +57,7 @@ public class ImageResource
                     authenticationContext.getUser(),
                     receivedCreateImage.title,
                     receivedCreateImage.data);
-            return Response.ok(ImageDTO.basic(image)).build();
+            return Response.ok(gson.toJson(ImageDTO.basic(image))).build();
         }
 
         throw new AuthenticationException("Unsupported user type");
@@ -73,14 +73,36 @@ public class ImageResource
         return Response.ok(json).build();
     }
 
+    private class PaginatedView
+    {
+        public int            count;
+        public List<ImageDTO> results;
+    }
+
+    @GET
+    @Path("user/{user: [0-9]+}/count")
+    public Response countByUser(@PathParam("user") int user) throws ResourceNotFoundException
+    {
+        int        count  = imageFacade.countByUser(user);
+        JsonObject result = new JsonObject();
+        result.addProperty("count", count);
+        return Response.ok(gson.toJson(result)).build();
+    }
+
     @GET
     @Path("user/{user: [0-9]+}/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
-    public Response getByUserPaginated(@PathParam("user") int user, @PathParam("pageSize") int pageSize, @PathParam("pageNumber") int pageNumber)
+    public Response getByUserPaginated(
+            @PathParam("user") int user,
+            @PathParam("pageSize") int pageSize,
+            @PathParam("pageNumber") int pageNumber)
     throws ResourceNotFoundException
     {
-        List<Image> images = imageFacade.getByUserPaginated(user, pageSize, pageNumber);
-        String      json   = gson.toJson(ImageDTO.list(images, ImageDTO::basic));
-        return Response.ok(json).build();
+        List<Image>   images        = imageFacade.getByUserPaginated(user, pageSize, pageNumber);
+        PaginatedView paginatedView = new PaginatedView();
+        paginatedView.count = imageFacade.countByUser(user);
+        paginatedView.results = ImageDTO.list(images, ImageDTO::basic);
+
+        return Response.ok(gson.toJson(paginatedView)).build();
     }
 
     private class ReceivedCreateImage

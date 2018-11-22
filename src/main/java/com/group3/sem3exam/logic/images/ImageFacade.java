@@ -86,6 +86,26 @@ public class ImageFacade<T extends Transaction>
     }
 
     /**
+     * Returns the number of images by the user with the provided id.
+     *
+     * @param user The id of the user to return the number of images from.
+     * @return The number of images by the user with the provided id.
+     * @throws ResourceNotFoundException When the user with the provided id does not exist.
+     */
+    public int countByUser(Integer user) throws ResourceNotFoundException
+    {
+        try (T transaction = transactionFactory.get()) {
+            UserRepository  ur            = userRepositoryFactory.apply(transaction);
+            ImageRepository ir            = imageRepositoryFactory.apply(transaction);
+            User            retrievedUser = ur.get(user);
+            if (retrievedUser == null)
+                throw new ResourceNotFoundException(User.class, user);
+
+            return ir.countByUser(retrievedUser);
+        }
+    }
+
+    /**
      * Returns a paginated view of the images by the user with the provided id.
      *
      * @param user       The id of the user to return the image of.
