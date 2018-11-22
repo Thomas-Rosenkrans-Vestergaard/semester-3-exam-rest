@@ -52,15 +52,21 @@ public class PostFacade<T extends Transaction>
      *
      * @param title  The title of the post.
      * @param body   the body of the post.
-     * @param author The user who wrote the post (author).
+     * @param author The id of the user who wrote the post (author).
      * @return The newly created post instance.
+     * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public Post createPost(String title, String body, User author)
+    public Post createPost(String title, String body, Integer author) throws ResourceNotFoundException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
             PostRepository pr   = postRepositoryFactory.apply(transaction);
-            Post           post = pr.createPost(author, title, body, LocalDateTime.now());
+            UserRepository ur   = userRepositoryFactory.apply(transaction);
+            User           user = ur.get(author);
+            if (user == null)
+                throw new ResourceNotFoundException(User.class, author);
+
+            Post post = pr.createPost(user, title, body, LocalDateTime.now());
             transaction.commit();
             return post;
         }

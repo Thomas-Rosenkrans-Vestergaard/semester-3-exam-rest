@@ -16,6 +16,8 @@ import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.ws.rs.core.Response.Status.CREATED;
+
 @Path("posts")
 public class PostResource
 {
@@ -29,11 +31,11 @@ public class PostResource
     /*
     private static TokenAuthenticator tokenAuthenticator = new TokenAuthenticator();
 
-    @Path("user")
+    @Path("author")
     public Response getPostsByUser(@HeaderParam("token")String token) throws AuthenticationException
     {
     AuthenticationContext authenticationContext =tokenAuthenticator.authenticate(token);
-    User user = authenticationContext.getUser();
+    User author = authenticationContext.getUser();
     postFacade.
     }
     */
@@ -55,15 +57,15 @@ public class PostResource
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createPost(String content)
+    public Response createPost(String content) throws ResourceNotFoundException
     {
         ReceivedCreatePost post = gson.fromJson(content, ReceivedCreatePost.class);
         Post createdPost = postFacade.createPost(post.title,
                                                  post.contents,
-                                                 post.user);
+                                                 post.author);
 
 
-        return Response.ok(gson.toJson(PostDTO.basic(createdPost))).build();
+        return Response.status(CREATED).entity(gson.toJson(PostDTO.basic(createdPost))).build();
     }
 
     @GET
@@ -89,6 +91,6 @@ public class PostResource
     {
         private String contents;
         private String title;
-        private User   user;
+        private Integer   author;
     }
 }
