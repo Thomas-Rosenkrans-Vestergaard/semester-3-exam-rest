@@ -1,6 +1,7 @@
 package com.group3.sem3exam.data.entities;
 
 import com.group3.sem3exam.data.repositories.RepositoryEntity;
+import com.sun.istack.internal.Nullable;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -22,10 +23,10 @@ public class Post implements RepositoryEntity<Integer>
     @Column(length = 65535, columnDefinition = "TEXT")
     private String contents;
 
-    @Column
+    @Column(nullable = false)
     private String title;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private User author;
 
     @Column
