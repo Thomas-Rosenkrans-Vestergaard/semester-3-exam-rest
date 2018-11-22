@@ -8,6 +8,7 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.UserFacade;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
@@ -34,7 +35,9 @@ public class UserResource
     @POST
     @Produces(APPLICATION_JSON)
     @Consumes(APPLICATION_JSON)
-    public Response createUser(String content) throws ResourceNotFoundException, ResourceValidationException
+    public Response createUser(String content) throws ResourceNotFoundException,
+                                                      ResourceValidationException,
+                                                      ResourceConflictException
     {
         ReceivedCreateUser receivedUser = gson.fromJson(content, ReceivedCreateUser.class);
 
@@ -101,7 +104,7 @@ public class UserResource
     public Response createFriendship(@PathParam("userId") int uId, @PathParam("friendId") int fId) throws ResourceNotFoundException
     {
 
-        Friendship fs = userFacade.createFriendship(uId,fId);
-        return Response.ok(gson.toJson( fs )).build();
+        Friendship fs = userFacade.createFriendship(uId, fId);
+        return Response.ok(gson.toJson(fs)).build();
     }
 }

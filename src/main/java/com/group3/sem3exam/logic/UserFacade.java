@@ -85,11 +85,14 @@ public class UserFacade<T extends Transaction>
      * @param gender      The gender of the user to create.
      * @param dateOfBirth The date of birth of the user to create.
      * @return The newly created user entity.
-     * @throws ResourceNotFoundException When a city with the provided id does not exist.
+     * @throws ResourceConflictException   When a user with the provided {@code email} already exists.
+     * @throws ResourceNotFoundException   When a city with the provided id does not exist.
+     * @throws ResourceValidationException When the user could not be validated.
      */
     public User createUser(String name, String email, String password, Integer city, Gender gender, LocalDate dateOfBirth)
     throws ResourceNotFoundException,
-           ResourceValidationException
+           ResourceValidationException,
+           ResourceConflictException
     {
         validate(name, email, password, city, gender, dateOfBirth);
 
@@ -98,6 +101,9 @@ public class UserFacade<T extends Transaction>
             transaction.begin();
             UserRepository ur = userRepositoryFactory.apply(transaction);
             CityRepository cr = cityRepositoryFactory.apply(transaction);
+
+            if (ur.getByEmail(email) != null)
+                throw new ResourceConflictException(User.class, "A user with the provided email address already exists.");
 
             City retrievedCity = cr.get(city);
             if (retrievedCity == null)

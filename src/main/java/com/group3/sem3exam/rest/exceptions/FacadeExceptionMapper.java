@@ -3,6 +3,7 @@ package com.group3.sem3exam.rest.exceptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.logic.FacadeException;
+import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
@@ -26,6 +27,7 @@ public class FacadeExceptionMapper implements ExceptionMapper<FacadeException>
         codes.put(ResourceValidationException.class, 422);
         codes.put(ResourceNotFoundException.class, 404);
         codes.put(AuthenticationException.class, 401);
+        codes.put(ResourceConflictException.class, 409);
     }
 
     @Context
