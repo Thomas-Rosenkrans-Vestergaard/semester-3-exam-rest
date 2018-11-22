@@ -2,15 +2,18 @@ package com.group3.sem3exam.logic.authentication;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.group3.sem3exam.data.repositories.UserRepository;
-import com.group3.sem3exam.logic.authentication.jwt.FileJwtSecret;
+import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenUnpacker;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.function.Supplier;
 
 public class TokenAuthenticator
 {
+
+    /**
+     * The jwt secret used when authenticating users.
+     */
+    private final JwtSecret jwtSecret;
 
     /**
      * The factory that created user repositories used during authentication.
@@ -20,14 +23,14 @@ public class TokenAuthenticator
     /**
      * Creates a new {@link TokenAuthenticator}.
      *
+     * @param jwtSecret             The jwt secret used when authenticating users.
      * @param userRepositoryFactory The factory that created user repositories used during authentication.
      */
-    public TokenAuthenticator(Supplier<UserRepository> userRepositoryFactory)
+    public TokenAuthenticator(JwtSecret jwtSecret, Supplier<UserRepository> userRepositoryFactory)
     {
+        this.jwtSecret = jwtSecret;
         this.userRepositoryFactory = userRepositoryFactory;
     }
-
-
 
     /**
      * Authenticated the incoming token, returning an authentication context with information about the authenticated
@@ -39,41 +42,19 @@ public class TokenAuthenticator
      */
     public AuthenticationContext authenticate(String token) throws AuthenticationException
     {
-        try {
-            JwtTokenUnpacker   unpacker = new JwtTokenUnpacker(new FileJwtSecret(new File("jwt.secret")));
-            DecodedJWT         jwt      = unpacker.unpack(token);
-            AuthenticationType type     = AuthenticationType.valueOf(jwt.getClaim("type").asString());
+        JwtTokenUnpacker   unpacker = new JwtTokenUnpacker(jwtSecret);
+        DecodedJWT         jwt      = unpacker.unpack(token);
+        AuthenticationType type     = AuthenticationType.valueOf(jwt.getClaim("type").asString());
 
-            if (type == AuthenticationType.USER) {
-                Integer userId = jwt.getClaim("user").asInt();
-                return LazyAuthenticationContext.user(userId, () -> {
-                    try (UserRepository userRepository = userRepositoryFactory.get()) {
-                        return userRepository.get(userId);
-                    }
-                });
-            }
-
-            throw new AuthenticationException("Unsupported authentication type.");
-
-        } catch (IOException e) {
-            throw new AuthenticationException(e);
+        if (type == AuthenticationType.USER) {
+            Integer userId = jwt.getClaim("user").asInt();
+            return LazyAuthenticationContext.user(userId, () -> {
+                try (UserRepository userRepository = userRepositoryFactory.get()) {
+                    return userRepository.get(userId);
+                }
+            });
         }
-    }
 
-    /**
-     * @param header
-     * @return the given AuthenticationContext
-     * @throws AuthenticationException
-     */
-
-    public AuthenticationContext authenticateBearerHeader(String header) throws AuthenticationException
-    {
-        header = header.trim();
-        if (header.startsWith("Bearer ")) {
-            header = header.substring(7);
-            return this.authenticate(header);
-
-        }
-        throw new AuthenticationException("Unsupported HTTP Authorization type.");
+        throw new AuthenticationException("Unsupported authentication type.");
     }
 }

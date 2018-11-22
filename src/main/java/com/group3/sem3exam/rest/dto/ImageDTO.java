@@ -1,71 +1,43 @@
 package com.group3.sem3exam.rest.dto;
 
 import com.group3.sem3exam.data.entities.Image;
-import com.group3.sem3exam.data.entities.User;
 
 import javax.ejb.Stateless;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 
 @Stateless
 public class ImageDTO
 {
 
-    private Integer id;
-    private String title;
-    private String uri;
-    private User user;
+    public Integer id;
+    public String  title;
+    public String  uri;
+    public UserDTO user;
 
-
-    public ImageDTO(Image image, boolean withUser){
+    public ImageDTO(Image image, boolean withUser)
+    {
         this.id = image.getId();
         this.title = image.getTitle();
         this.uri = image.getUri();
-        if(withUser)
-            this.user = image.getUser();
+        if (withUser)
+            this.user = UserDTO.basic(image.getUser());
     }
 
-    public static ImageDTO basic(Image image){
+    public static ImageDTO basic(Image image)
+    {
         return new ImageDTO(image, true);
     }
 
-    public Integer getId()
+    public static List<ImageDTO> list(List<Image> images, Function<Image, ImageDTO> f)
     {
-        return id;
-    }
+        List<ImageDTO> results = new ArrayList<>();
+        for (Image image : images)
+            results.add(f.apply(image));
 
-    public void setId(Integer id)
-    {
-        this.id = id;
-    }
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-    public String getUri()
-    {
-        return uri;
-    }
-
-    public void setData(String uri)
-    {
-        this.uri = uri;
-    }
-
-    public User getUser()
-    {
-        return user;
-    }
-
-    public void setUser(User user)
-    {
-        this.user = user;
+        return results;
     }
 }
 
