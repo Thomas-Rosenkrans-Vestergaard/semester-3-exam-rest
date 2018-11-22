@@ -2,11 +2,11 @@ package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecretGenerationException;
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.security.SecureRandom;
+import java.util.Base64;
 
 public class JpaJwtSecret implements JwtSecret
 {
@@ -17,17 +17,13 @@ public class JpaJwtSecret implements JwtSecret
 
     public JpaJwtSecret(EntityManager entityManager, int bytes) throws JwtSecretGenerationException
     {
-        try {
-            this.entityManager = entityManager;
+        this.entityManager = entityManager;
 
-            JwtEntity jwt = fetch();
-            if (jwt != null)
-                secret = Base64.decode(jwt.getSecret());
-            else
-                secret = regenerate(bytes);
-        } catch (Base64DecodingException e) {
-            throw new JwtSecretGenerationException(e);
-        }
+        JwtEntity jwt = fetch();
+        if (jwt != null)
+            secret = Base64.getDecoder().decode(jwt.getSecret());
+        else
+            secret = regenerate(bytes);
     }
 
     @Override
@@ -44,7 +40,7 @@ public class JpaJwtSecret implements JwtSecret
             secureRandom.nextBytes(random);
             this.secret = random;
             JwtEntity jwt = store(secret);
-            this.secret = Base64.decode(jwt.getSecret());
+            this.secret = Base64.getDecoder().decode(jwt.getSecret());
             return this.secret;
         } catch (Exception e) {
             throw new JwtSecretGenerationException(e);
@@ -59,7 +55,7 @@ public class JpaJwtSecret implements JwtSecret
      */
     private JwtEntity store(byte[] bytes)
     {
-        String    encoded = Base64.encode(bytes);
+        String    encoded = Base64.getEncoder().encodeToString(bytes);
         JwtEntity jwt     = new JwtEntity(encoded);
         entityManager.getTransaction().begin();
         entityManager.persist(jwt);
