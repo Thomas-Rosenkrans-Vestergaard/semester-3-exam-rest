@@ -34,7 +34,7 @@ public class JpaFriendRequestRepositoryTest
 
             Friendship fr               = friendshipRepository.createFriendship(friendRequest);
             Friendship fr2              = friendshipRepository.createFriendship(friendRequest2);
-            List<User> ownerFriendships = friendshipRepository.getUserFriends(requester.getId());
+            List<User> ownerFriendships = friendshipRepository.getFriends(requester.getId());
 
             assertNotNull(requester.getId());
             assertNotNull(fr);

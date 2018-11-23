@@ -15,7 +15,6 @@ import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.UserFacade;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
-import com.group3.sem3exam.logic.authentication.TokenAuthenticator;
 import com.group3.sem3exam.rest.dto.FriendRequestDTO;
 
 import javax.ws.rs.*;
@@ -23,20 +22,20 @@ import javax.ws.rs.core.Response;
 
 import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-
 import static javax.ws.rs.core.Response.Status.CREATED;
 
 @Path("friendship")
 public class FriendshipResource
 {
-    private static Gson                       gson       = SpecializedGson.create();
-    private static UserFacade<JpaTransaction> userFacade = new UserFacade<>(
+    private static Gson                             gson             = SpecializedGson.create();
+    private static UserFacade<JpaTransaction>       userFacade       = new UserFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
             transaction -> new JpaUserRepository(transaction),
             transaction -> new JpaCityRepository(transaction)
     );
-    private static FriendshipFacade<JpaTransaction> friendshidshipFacade = new FriendshipFacade<>(
+    private static FriendshipFacade<JpaTransaction> friendshipFacade = new FriendshipFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
+            transaction -> new JpaUserRepository(transaction),
             transaction -> new JpaFriendshipRepository(transaction)
     );
 
@@ -63,7 +62,7 @@ public class FriendshipResource
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
 
         if (authenticationContext.getType() == USER) {
-            RecievedClass    recievedClass  = gson.fromJson(content, RecievedClass.class);
+            RecievedClass    recievedClass    = gson.fromJson(content, RecievedClass.class);
             User             requester        = authenticationContext.getUser();
             User             reciever         = userFacade.get(recievedClass.id);
             FriendRequest    friendRequest    = new FriendRequest(requester, reciever);
@@ -84,7 +83,7 @@ public class FriendshipResource
 
         if (authenticationContext.getType() == USER) {
             RecievedClass recievedClass = gson.fromJson(content, RecievedClass.class);
-            Friendship    friendship   = friendshidshipFacade.createFriendship( recievedClass.id );
+            Friendship    friendship    = friendshipFacade.createFriendship(recievedClass.id);
             return Response.ok(CREATED).entity(friendship).build();
         }
 

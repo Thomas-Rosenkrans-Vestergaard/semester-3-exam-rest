@@ -27,7 +27,7 @@ public class JpaFriendshipRepository extends AbstractJpaRepository implements Fr
     }
 
     @Override
-    public List<User> getUserFriends(Integer userId)
+    public List<User> getFriends(Integer userId)
     {
         return getEntityManager()
                 .createQuery("SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner.id = :id", User.class)

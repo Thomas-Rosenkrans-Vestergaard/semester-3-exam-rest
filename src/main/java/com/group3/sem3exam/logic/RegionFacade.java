@@ -43,7 +43,6 @@ public class RegionFacade
      * @return The region with the provided id.
      * @throws ResourceNotFoundException When the region with the provided id does not exist.
      */
-
     public Region get(Integer id) throws ResourceNotFoundException
     {
         try (RegionRepository rr = regionRepositoryFactory.get()) {
