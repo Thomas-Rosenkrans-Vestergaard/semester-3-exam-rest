@@ -4,7 +4,7 @@ import com.group3.sem3exam.data.entities.User;
 
 import java.util.Objects;
 
-import static com.group3.sem3exam.logic.authentication.AuthenticationType.THIRD_PARTY_REPRESENTING_USER;
+import static com.group3.sem3exam.logic.authentication.AuthenticationType.SERVICE_REPRESENTING_USER;
 import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
 
 public class EagerAuthenticationContext implements AuthenticationContext
@@ -17,7 +17,7 @@ public class EagerAuthenticationContext implements AuthenticationContext
 
     /**
      * The authenticated user, must not be null when the {@code type} of the {@link AuthenticationContext} is
-     * {@link AuthenticationType#USER} or {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * {@link AuthenticationType#USER} or {@link AuthenticationType#SERVICE_REPRESENTING_USER}.
      */
     private User user;
 
@@ -26,14 +26,14 @@ public class EagerAuthenticationContext implements AuthenticationContext
      *
      * @param type The type of the authenticated entity.
      * @param user The authenticated user, must not be null when the {@code type} of the {@link AuthenticationContext} is
-     *             * {@link AuthenticationType#USER} or {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     *             * {@link AuthenticationType#USER} or {@link AuthenticationType#SERVICE_REPRESENTING_USER}.
      */
     private EagerAuthenticationContext(AuthenticationType type, User user)
     {
         if (type == null)
             throw new IllegalArgumentException("AuthenticationType must not be null.");
 
-        if ((type == USER || type == THIRD_PARTY_REPRESENTING_USER) && user == null)
+        if ((type == USER || type == SERVICE_REPRESENTING_USER) && user == null)
             throw new IllegalArgumentException("User must not be null.");
 
         this.type = type;
@@ -63,10 +63,10 @@ public class EagerAuthenticationContext implements AuthenticationContext
 
     /**
      * Returns the id of the authenticated user, or the id of the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * {@link AuthenticationType#SERVICE_REPRESENTING_USER}.
      *
      * @return The id of the authenticated user, or the id of the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}. In all other cases this method returns
+     * {@link AuthenticationType#SERVICE_REPRESENTING_USER}. In all other cases this method returns
      * {@code null} to indicate that this authentication context does not contain user information.
      */
     @Override
@@ -77,10 +77,10 @@ public class EagerAuthenticationContext implements AuthenticationContext
 
     /**
      * Returns the authenticated user, or the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * {@link AuthenticationType#SERVICE_REPRESENTING_USER}.
      *
      * @return The authenticated user, or the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}. In all other cases this method returns
+     * {@link AuthenticationType#SERVICE_REPRESENTING_USER}. In all other cases this method returns
      * {@code null} to indicate that this authentication context does not contain user information.
      */
     @Override

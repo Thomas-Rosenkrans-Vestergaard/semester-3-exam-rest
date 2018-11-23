@@ -73,10 +73,10 @@ public class LazyAuthenticationContext implements AuthenticationContext
 
     /**
      * Returns the id of the authenticated user, or the id of the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * {@link AuthenticationType#SERVICE_REPRESENTING_USER}.
      *
      * @return The id of the authenticated user, or the id of the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}. In all other cases this method returns
+     * {@link AuthenticationType#SERVICE_REPRESENTING_USER}. In all other cases this method returns
      * {@code null} to indicate that this authentication context does not contain user information.
      */
     @Override
@@ -87,19 +87,19 @@ public class LazyAuthenticationContext implements AuthenticationContext
 
     /**
      * Returns the authenticated user, or the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * {@link AuthenticationType#SERVICE_REPRESENTING_USER}.
      * <p>
      * Note that this method works lazily. The user is only retrieved from the supplier when this method is
      * first called. On subsequent calls the result of the first supplier invocation is returned.
      *
      * @return The authenticated user, or the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}. In all other cases this method returns
+     * {@link AuthenticationType#SERVICE_REPRESENTING_USER}. In all other cases this method returns
      * {@code null} to indicate that this authentication context does not contain user information.
      */
     @Override
     public User getUser()
     {
-        if (authenticationType == AuthenticationType.THIRD_PARTY)
+        if (authenticationType == AuthenticationType.SERVICE)
             return null;
 
         if (lazyUserCache == null)
