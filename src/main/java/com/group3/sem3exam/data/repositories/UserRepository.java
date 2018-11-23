@@ -35,15 +35,4 @@ public interface UserRepository extends CrudRepository<User, Integer>, Transacti
      * @return The user with the provided email, {@code null} when no such user exists.
      */
     User getByEmail(String email);
-
-
-    /**
-     * Returns the friends of the provided users ID
-     *
-     * @param userId ID of the person that needs friends returned
-     * @return A List of the users friends
-     */
-    List<User> getFriends(Integer userId);
-
-    Friendship createFriendship( User owner, User friend );
 }

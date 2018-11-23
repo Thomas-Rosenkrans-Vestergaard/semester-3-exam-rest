@@ -6,9 +6,11 @@ import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
+import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.ResourceConflictException;
+import com.group3.sem3exam.logic.FriendshipFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.UserFacade;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
@@ -30,6 +32,11 @@ public class UserResource
             () -> new JpaTransaction(JpaConnection.create()),
             transaction -> new JpaUserRepository(transaction),
             transaction -> new JpaCityRepository(transaction)
+    );
+
+    private static FriendshipFacade<JpaTransaction> friendshipshipFacade = new FriendshipFacade<JpaTransaction>(
+            () -> new JpaTransaction(JpaConnection.create()),
+            transaction -> new JpaFriendshipRepository(transaction)
     );
 
     @POST
@@ -77,7 +84,7 @@ public class UserResource
     @Produces(APPLICATION_JSON)
     public Response getFriendsByOwnerId(@PathParam("id") Integer id)
     {
-        List<User> friends = userFacade.getFriends(id);
+        List<User> friends = friendshipshipFacade.getUserFriends(id); //unused
         String     jsonDTO = gson.toJson(UserDTO.list(friends, UserDTO::basic));
         throw new UnsupportedOperationException("Not supported yet");
     }
@@ -92,19 +99,5 @@ public class UserResource
             array.add(gender.name());
 
         return Response.ok(gson.toJson(array)).build();
-    }
-
-
-    //create new friendshipResource
-    //create auth for friendship
-    //request/target --> answer/request
-    @POST
-    @Path("{userId}/{friendId}")
-    @Produces(APPLICATION_JSON)
-    public Response createFriendship(@PathParam("userId") int uId, @PathParam("friendId") int fId) throws ResourceNotFoundException
-    {
-
-        Friendship fs = userFacade.createFriendship(uId, fId);
-        return Response.ok(gson.toJson(fs)).build();
     }
 }
