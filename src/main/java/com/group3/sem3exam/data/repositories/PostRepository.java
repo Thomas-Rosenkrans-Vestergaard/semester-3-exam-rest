@@ -9,7 +9,6 @@ import java.util.List;
 public interface PostRepository extends CrudRepository<Post, Integer>
 {
 
-
     /**
      * Creates a new post entity using the provided information.
      *
@@ -33,9 +32,9 @@ public interface PostRepository extends CrudRepository<Post, Integer>
     /**
      * Returns a specific set of posts from a users friends.
      *
-     * @param userId The id of the user to return the posts of.
+     * @param userId   The id of the user to return the posts of.
      * @param pageSize the amount of new posts to fetch
-     * @param last the offset from where to start to fetch posts
+     * @param last     the offset from where to start to fetch posts
      * @return The posts made by the user with the provided id.
      */
     List<Post> getTimelinePosts(Integer userId, Integer pageSize, Integer last);

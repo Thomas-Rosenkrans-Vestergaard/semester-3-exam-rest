@@ -1,12 +1,14 @@
 package com.group3.sem3exam.data.entities;
 
+import com.group3.sem3exam.data.repositories.RepositoryEntity;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-public class Service
+public class Service implements RepositoryEntity<Integer>
 {
 
     @Id
@@ -19,6 +21,8 @@ public class Service
     @Column(nullable = false)
     private String passwordHash;
 
+    private Status status;
+
     public Service()
     {
     }
@@ -27,6 +31,7 @@ public class Service
     {
         this.name = name;
         this.passwordHash = passwordHash;
+        this.status = Status.PENDING;
     }
 
     public Integer getId()
@@ -57,5 +62,22 @@ public class Service
     public void setPasswordHash(String passwordHash)
     {
         this.passwordHash = passwordHash;
+    }
+
+    public Status getStatus()
+    {
+        return this.status;
+    }
+
+    public void setStatus(Status status)
+    {
+        this.status = status;
+    }
+
+    public enum Status
+    {
+        PENDING,
+        ENABLED,
+        DISABLED
     }
 }
