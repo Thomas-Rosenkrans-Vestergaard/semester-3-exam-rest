@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Represents a data source of users. Defines read operations on the data source.
  */
-public interface CountryRepository extends ReadCrudRepository<Country, Integer>
+public interface CountryRepository extends ReadRepository<Country, Integer>
 {
 
     /**

@@ -13,7 +13,7 @@ public class JpaCrudRepositoryTester<
         E extends RepositoryEntity<K>,
         K extends Comparable<K>,
         I extends JpaCrudRepository<E, K>>
-        extends JpaReadCrudRepositoryTester<E, K, I>
+        extends JpaReadRepositoryTester<E, K, I>
 {
 
     public JpaCrudRepositoryTester(

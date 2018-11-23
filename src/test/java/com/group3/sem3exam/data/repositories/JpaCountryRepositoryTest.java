@@ -18,8 +18,8 @@ class JpaCountryRepositoryTest
     @TestFactory
     public Collection<DynamicTest> testCrudRepositoryMethods()
     {
-        JpaReadCrudRepositoryTester<Country, Integer, JpaCountryRepository> tester =
-                new JpaReadCrudRepositoryTester<>(
+        JpaReadRepositoryTester<Country, Integer, JpaCountryRepository> tester =
+                new JpaReadRepositoryTester<>(
                         () -> new JpaCountryRepository(JpaTestConnection.create()),
                         (repository) -> createCountryMap(repository),
                         -1

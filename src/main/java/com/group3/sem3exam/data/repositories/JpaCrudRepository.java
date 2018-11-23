@@ -6,14 +6,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 /**
- * An implementation of {@cide ReadCrudRepository}, implementing common read and write operations for some entity type
+ * An implementation of {@code ReadRepository}, implementing common read and write operations for some entity type
  * using a backing JPA data source.
  *
  * @param <E> The type of the entity managed by the repository.
  * @param <K> The type of the key of the entities managed by the repository.
  */
 public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
-        extends JpaReadCrudRepository<E, K>
+        extends JpaReadRepository<E, K>
         implements CrudRepository<E, K>
 {
 

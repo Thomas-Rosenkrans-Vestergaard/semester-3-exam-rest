@@ -18,8 +18,8 @@ class JpaCityRepositoryTest
     @TestFactory
     public Collection<DynamicTest> testCrudRepositoryMethods()
     {
-        JpaReadCrudRepositoryTester<City, Integer, JpaCityRepository> tester =
-                new JpaReadCrudRepositoryTester<>(
+        JpaReadRepositoryTester<City, Integer, JpaCityRepository> tester =
+                new JpaReadRepositoryTester<>(
                         () -> new JpaCityRepository(JpaTestConnection.create()),
                         (repository) -> createCityMap(repository),
                         -1
