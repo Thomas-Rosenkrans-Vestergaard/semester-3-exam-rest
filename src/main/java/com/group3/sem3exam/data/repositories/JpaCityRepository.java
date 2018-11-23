@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * An implementation of the {@code CityRepository} interface, backed by a JPA data source.
  */
-public class JpaCityRepository extends JpaReadCrudRepository<City, Integer> implements CityRepository
+public class JpaCityRepository extends JpaReadRepository<City, Integer> implements CityRepository
 {
 
     /**

@@ -18,8 +18,8 @@ class JpaRegionRepositoryTest
     @TestFactory
     public Collection<DynamicTest> testCrudRepositoryMethods()
     {
-        JpaReadCrudRepositoryTester<Region, Integer, JpaRegionRepository> tester =
-                new JpaReadCrudRepositoryTester<>(
+        JpaReadRepositoryTester<Region, Integer, JpaRegionRepository> tester =
+                new JpaReadRepositoryTester<>(
                         () -> new JpaRegionRepository(JpaTestConnection.create()),
                         (repository) -> createRegionMap(repository),
                         -1

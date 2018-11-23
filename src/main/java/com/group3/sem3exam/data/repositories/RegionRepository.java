@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Represents a data source of regions. Defines read operations on the data source.
  */
-public interface RegionRepository extends ReadCrudRepository<Region, Integer>
+public interface RegionRepository extends ReadRepository<Region, Integer>
 {
 
     /**

@@ -10,15 +10,15 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * An implementation of {@cide ReadCrudRepository}, implementing common read operations for some entity type using a
+ * An implementation of {@code ReadRepository}, implementing common read operations for some entity type using a
  * backing JPA data source.
  *
  * @param <E> The type of the entity managed by the repository.
  * @param <K> The type of the key of the entities managed by the repository.
  */
-public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
+public class JpaReadRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
         extends AbstractJpaRepository
-        implements ReadCrudRepository<E, K>
+        implements ReadRepository<E, K>
 {
 
     /**
@@ -27,38 +27,38 @@ public class JpaReadCrudRepository<E extends RepositoryEntity<K>, K extends Comp
     protected final Class<E> c;
 
     /**
-     * Creates a new {@link JpaReadCrudRepository} using the provided entity manager.
+     * Creates a new {@link JpaReadRepository} using the provided entity manager.
      *
      * @param entityManager The entity manager to perform operations upon.
      * @param c             The type of entity the operations are performed upon.
      */
-    public JpaReadCrudRepository(EntityManager entityManager, Class<E> c)
+    public JpaReadRepository(EntityManager entityManager, Class<E> c)
     {
         super(entityManager);
         this.c = c;
     }
 
     /**
-     * Creates a new {@link JpaReadCrudRepository} using the provided entity manager factory.
+     * Creates a new {@link JpaReadRepository} using the provided entity manager factory.
      *
      * @param entityManagerFactory The entity manager factory used to create the entity manager to perform operations
      *                             upon.
      * @param c                    The type of entity the operations are performed upon.
      */
-    public JpaReadCrudRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
+    public JpaReadRepository(EntityManagerFactory entityManagerFactory, Class<E> c)
     {
         super(entityManagerFactory);
         this.c = c;
     }
 
     /**
-     * Creates a new {@link JpaReadCrudRepository}.
+     * Creates a new {@link JpaReadRepository}.
      *
      * @param transaction The transaction from which the entity manager - that operations are performed upon - is
      *                    created.
      * @param c           The type of entity the operations are performed upon.
      */
-    public JpaReadCrudRepository(JpaTransaction transaction, Class<E> c)
+    public JpaReadRepository(JpaTransaction transaction, Class<E> c)
     {
         super(transaction);
         this.c = c;
