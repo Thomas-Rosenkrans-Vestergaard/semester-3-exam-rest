@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.CREATED;
 
 @Path("users")
 public class UserResource
@@ -48,7 +49,7 @@ public class UserResource
                                                  receivedUser.gender,
                                                  receivedUser.dateOfBirth);
 
-        return Response.ok(gson.toJson(UserDTO.basic(createdUser))).build();
+        return Response.status(CREATED).entity(gson.toJson(UserDTO.basic(createdUser))).build();
     }
 
     private class ReceivedCreateUser
