@@ -6,15 +6,17 @@ import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.UserFacade;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
+import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.TreeMap;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -70,20 +72,6 @@ public class JpaUserRepositoryTest
             assertNull(tur.getByEmail("some@email.com"));
             User user = tur.createUser("email-user", "some@email.com", "pass", city, Gender.FEMALE, LocalDate.now());
             assertEquals(user, tur.getByEmail("some@email.com"));
-        }
-    }
-
-    //untested
-    @Test
-    Friendship createFriendship()
-    {
-        try (JpaUserRepository tur = new JpaUserRepository(JpaTestConnection.create())) {
-            tur.begin();
-            City city = new JpaCityRepository(tur.getEntityManager()).get(1);
-            User owner  = tur.createUser("user-owner", "owner@email.com", "pass", city, Gender.FEMALE, LocalDate.now());
-            User friend = tur.createUser("user-friend", "friend@email.com", "pass", city, Gender.FEMALE, LocalDate.now());
-            Friendship fr = tur.createFriendship(owner, friend);
-            return fr;
         }
     }
 }

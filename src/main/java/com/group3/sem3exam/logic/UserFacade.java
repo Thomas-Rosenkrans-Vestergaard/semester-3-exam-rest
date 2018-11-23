@@ -1,10 +1,8 @@
 package com.group3.sem3exam.logic;
 
-import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.entities.Friendship;
-import com.group3.sem3exam.data.entities.Gender;
-import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.entities.*;
 import com.group3.sem3exam.data.repositories.CityRepository;
+import com.group3.sem3exam.data.repositories.FriendshipRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
@@ -179,24 +177,5 @@ public class UserFacade<T extends Transaction>
     }
 
 
-    public List<User> getUserFriends(Integer userId)
-    {
-        try (T transaction = transactionFactory.get()) {
-            transaction.begin();
-            UserRepository ur = userRepositoryFactory.apply(transaction);
-            return ur.getUserFriends(userId);
-        }
-    }
 
-    public Friendship createFriendship(int ownerId, int friendId) throws ResourceNotFoundException
-    {
-        User u = get(ownerId);
-        User f = get(friendId);
-        try (T transaction = transactionFactory.get()) {
-            transaction.begin();
-            UserRepository ur = userRepositoryFactory.apply(transaction);
-            Friendship     fr = ur.createFriendship(u, f);
-            return fr;
-        }
-    }
 }

@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
                       })
 public class Friendship
 {
-
     @EmbeddedId
     private FriendshipPK pk;
 
