@@ -23,6 +23,16 @@ public enum ImageType
     }
 
     /**
+     * Returns the extension of the {@link ImageType}.
+     *
+     * @return The extension of the {@link ImageType}.
+     */
+    public String getExtension()
+    {
+        return this.extension;
+    }
+
+    /**
      * Returns the {@link ImageType} of the provided mime type.
      *
      * @param mime The mime to find the {@link ImageType} of.

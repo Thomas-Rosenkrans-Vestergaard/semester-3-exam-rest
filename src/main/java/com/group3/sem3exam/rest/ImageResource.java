@@ -11,8 +11,8 @@ import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
+import com.group3.sem3exam.logic.images.ImageException;
 import com.group3.sem3exam.logic.images.ImageFacade;
-import com.group3.sem3exam.logic.images.UnsupportedImageTypeException;
 import com.group3.sem3exam.rest.dto.ImageDTO;
 
 import javax.ws.rs.*;
@@ -48,7 +48,7 @@ public class ImageResource
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@HeaderParam("Authorization") String token, String content)
-    throws AuthenticationException, UnsupportedImageTypeException
+    throws AuthenticationException, ImageException
     {
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
         if (authenticationContext.getType() == USER) {

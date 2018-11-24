@@ -20,8 +20,8 @@ public class DataUriEncoder
      */
     public String bytesToDataURI(byte[] data) throws UnsupportedImageTypeException
     {
-        String    mimeType  = getMimeType(data);
-        ImageType imageType = ImageType.fromMime(mimeType);
+        String mimeType = getMimeType(data);
+        ImageType.fromMime(mimeType);
         return String.format("data:%s;base64,%s", mimeType, Base64.getEncoder().encodeToString(data));
     }
 
@@ -32,7 +32,7 @@ public class DataUriEncoder
      * @return The mime type of the image in the provided byte data. {@code null} when the mime type could not be
      * read from the image byte data.
      */
-    private String getMimeType(byte[] data)
+    public String getMimeType(byte[] data)
     {
         try {
             InputStream is = new ByteArrayInputStream(data);

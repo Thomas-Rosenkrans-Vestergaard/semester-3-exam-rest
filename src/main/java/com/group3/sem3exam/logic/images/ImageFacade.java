@@ -6,7 +6,12 @@ import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import net.coobird.thumbnailator.Thumbnails;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
@@ -136,19 +141,55 @@ public class ImageFacade<T extends Transaction>
      * @param description The description of the image.
      * @param base64      The base64 encoded string containing the data in the image.
      * @return The created image.
-     * @throws UnsupportedImageTypeException When the image type is not supported.
+     * @throws ImageException When the provided image cannot be saved.
      */
-    public Image create(User user, String description, String base64) throws UnsupportedImageTypeException
+    public Image create(User user, String description, String base64) throws ImageException
     {
-        DataUriEncoder uriEncoder = new DataUriEncoder();
-        byte[]         data       = Base64.getDecoder().decode(base64);
-        String         dataUri    = uriEncoder.bytesToDataURI(data);
+        try {
 
-        try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
-            ir.begin();
-            Image image = ir.create(description, dataUri, null, user);
-            ir.commit();
-            return image;
+            DataUriEncoder uriEncoder = new DataUriEncoder();
+            byte[]         data       = Base64.getDecoder().decode(base64);
+            String         full       = uriEncoder.bytesToDataURI(data);
+            String         thumbnail  = createThumbnail(data);
+
+            try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
+                ir.begin();
+                Image image = ir.create(description, full, thumbnail, user);
+                ir.commit();
+                return image;
+            }
+
+        } catch (UnsupportedImageTypeException e) {
+            throw new ImageException("Could not save image.", e);
+        }
+    }
+
+    /**
+     * Creates a thumbnail data URI from the provided full image data.
+     *
+     * @param data The data from the full image.
+     * @return The resulting thumbnail data uri.
+     * @throws ImageException When the thumbnail cannot be created.
+     */
+    private String createThumbnail(byte[] data) throws ImageException
+    {
+        try {
+            BufferedImage  fullImage  = ImageIO.read(new ByteArrayInputStream(data));
+            DataUriEncoder uriEncoder = new DataUriEncoder();
+            String         mime       = uriEncoder.getMimeType(data);
+
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                Thumbnails.of(fullImage)
+                          .size(250, 250)
+                          .outputFormat(ImageType.fromMime(mime).getExtension())
+                          .outputQuality(1f)
+                          .toOutputStream(outputStream);
+
+                outputStream.flush();
+                return uriEncoder.bytesToDataURI(outputStream.toByteArray());
+            }
+        } catch (Exception e) {
+            throw new ImageException("Could not create thumbnail from image.", e);
         }
     }
 }
