@@ -1,8 +1,9 @@
 package com.group3.sem3exam.logic;
 
-import com.group3.sem3exam.data.entities.*;
+import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
-import com.group3.sem3exam.data.repositories.FriendshipRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.validation.IsAfterCheck;
@@ -16,7 +17,6 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.LocalDate;
 import java.time.temporal.Temporal;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 

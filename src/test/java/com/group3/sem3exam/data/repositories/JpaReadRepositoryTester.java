@@ -1,5 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.repositories.base.JpaReadRepository;
+import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.junit.jupiter.api.DynamicTest;
 
 import java.util.*;

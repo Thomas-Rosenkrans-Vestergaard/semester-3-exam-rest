@@ -1,7 +1,6 @@
 package com.group3.sem3exam.rest.dto;
 
 import com.group3.sem3exam.data.entities.FriendRequest;
-import com.group3.sem3exam.data.entities.User;
 
 public class FriendRequestDTO
 {

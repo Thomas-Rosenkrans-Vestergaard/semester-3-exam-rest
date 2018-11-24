@@ -1,10 +1,10 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
-import com.group3.sem3exam.data.repositories.JpaJwtSecret;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.rest.dto.AuthenticationDTO;
 
 import javax.ws.rs.Consumes;

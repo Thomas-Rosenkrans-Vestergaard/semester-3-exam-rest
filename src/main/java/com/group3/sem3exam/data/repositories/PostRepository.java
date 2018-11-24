@@ -2,6 +2,7 @@ package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.base.CrudRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,6 +1,5 @@
 package com.group3.sem3exam.data.entities;
 
-import com.group3.sem3exam.data.repositories.RepositoryEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;

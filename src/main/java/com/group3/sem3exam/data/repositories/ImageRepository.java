@@ -2,6 +2,7 @@ package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.base.CrudRepository;
 
 import java.util.List;
 

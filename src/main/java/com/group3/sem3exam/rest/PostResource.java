@@ -2,7 +2,6 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Post;
-import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaPostRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
