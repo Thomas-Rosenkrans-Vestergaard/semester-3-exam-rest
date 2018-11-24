@@ -13,15 +13,17 @@ public class ImageDTO
 {
 
     public Integer id;
-    public String  title;
-    public String  uri;
+    public String  description;
+    public String  full;
+    public String  thumbnail;
     public UserDTO user;
 
     public ImageDTO(Image image, boolean withUser)
     {
         this.id = image.getId();
-        this.title = image.getTitle();
-        this.uri = image.getUri();
+        this.description = image.getDescription();
+        this.full = image.getFull();
+        this.thumbnail = image.getThumbnail();
         if (withUser)
             this.user = UserDTO.basic(image.getUser());
     }

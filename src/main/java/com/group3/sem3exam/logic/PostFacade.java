@@ -50,7 +50,7 @@ public class PostFacade<T extends Transaction>
     /**
      * Creates a new post using the provided information.
      *
-     * @param title  The title of the post.
+     * @param title  The description of the post.
      * @param body   the body of the post.
      * @param author The id of the user who wrote the post (author).
      * @return The newly created post instance.

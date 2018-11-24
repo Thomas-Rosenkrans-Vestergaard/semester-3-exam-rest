@@ -55,7 +55,7 @@ public class ImageResource
             ReceivedCreateImage receivedCreateImage = gson.fromJson(content, ReceivedCreateImage.class);
             Image image = imageFacade.create(
                     authenticationContext.getUser(),
-                    receivedCreateImage.title,
+                    receivedCreateImage.description,
                     receivedCreateImage.data);
             return Response.ok(gson.toJson(ImageDTO.basic(image))).build();
         }
@@ -107,7 +107,7 @@ public class ImageResource
 
     private class ReceivedCreateImage
     {
-        public String title;
+        public String description;
         public String data;
     }
 }

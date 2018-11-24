@@ -132,13 +132,13 @@ public class ImageFacade<T extends Transaction>
     /**
      * Saves an image with the provided information to the database.
      *
-     * @param user   The owner of the image.
-     * @param title  The title of the image.
-     * @param base64 The base64 encoded string containing the data in the image.
+     * @param user        The owner of the image.
+     * @param description The description of the image.
+     * @param base64      The base64 encoded string containing the data in the image.
      * @return The created image.
      * @throws UnsupportedImageTypeException When the image type is not supported.
      */
-    public Image create(User user, String title, String base64) throws UnsupportedImageTypeException
+    public Image create(User user, String description, String base64) throws UnsupportedImageTypeException
     {
         DataUriEncoder uriEncoder = new DataUriEncoder();
         byte[]         data       = Base64.getDecoder().decode(base64);
@@ -146,7 +146,7 @@ public class ImageFacade<T extends Transaction>
 
         try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
             ir.begin();
-            Image image = ir.create(title, dataUri, user);
+            Image image = ir.create(description, dataUri, null, user);
             ir.commit();
             return image;
         }

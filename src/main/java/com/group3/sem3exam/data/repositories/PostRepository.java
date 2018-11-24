@@ -14,7 +14,7 @@ public interface PostRepository extends CrudRepository<Post, Integer>
      * Creates a new post entity using the provided information.
      *
      * @param user  The author of the new post.
-     * @param title The title of the new post.
+     * @param title The description of the new post.
      * @param body  The text body of the new post.
      * @param time  The time at which the post was made.
      * @return The newly created post.

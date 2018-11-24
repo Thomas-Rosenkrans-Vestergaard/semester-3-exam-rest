@@ -3,7 +3,6 @@ package com.group3.sem3exam.data.repositories;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.ResourceNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -48,9 +47,9 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
     }
 
     @Override
-    public Image create(String title, String uri, User user)
+    public Image create(String description, String full, String thumbnail, User user)
     {
-        Image image = new Image(title, uri, user);
+        Image image = new Image(description, full, thumbnail, user);
         getEntityManager().persist(image);
         return image;
     }

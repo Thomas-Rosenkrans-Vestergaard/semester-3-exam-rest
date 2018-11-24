@@ -18,11 +18,15 @@ public class Image implements RepositoryEntity<Integer>
     private Integer id;
 
     @Column(nullable = false)
-    private String title;
+    private String description;
 
     @Lob
     @Column(nullable = false)
-    private String uri;
+    private String full;
+
+    @Lob
+    @Column
+    private String thumbnail;
 
     @ManyToOne(fetch = EAGER, optional = false)
     private User user;
@@ -32,10 +36,11 @@ public class Image implements RepositoryEntity<Integer>
 
     }
 
-    public Image(String title, String uri, User user)
+    public Image(String description, String full, String thumbnail, User user)
     {
-        this.title = title;
-        this.uri = uri;
+        this.description = description;
+        this.full = full;
+        this.thumbnail = thumbnail;
         this.user = user;
     }
 
@@ -49,24 +54,34 @@ public class Image implements RepositoryEntity<Integer>
         this.id = id;
     }
 
-    public String getTitle()
+    public String getDescription()
     {
-        return this.title;
+        return this.description;
     }
 
-    public void setTitle(String title)
+    public void setDescription(String description)
     {
-        this.title = title;
+        this.description = description;
     }
 
-    public String getUri()
+    public String getFull()
     {
-        return this.uri;
+        return this.full;
     }
 
-    public void setData(String uri)
+    public void setFull(String full)
     {
-        this.uri = uri;
+        this.full = full;
+    }
+
+    public String getThumbnail()
+    {
+        return this.thumbnail;
+    }
+
+    public void setThumbnail(String thumbnail)
+    {
+        this.thumbnail = thumbnail;
     }
 
     public User getUser()
