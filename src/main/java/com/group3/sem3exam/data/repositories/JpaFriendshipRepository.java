@@ -37,6 +37,20 @@ public class JpaFriendshipRepository extends AbstractJpaRepository implements Fr
     }
 
     @Override
+    public List<User> getFriends(User user, Integer pageSize, Integer pageNumber, String search)
+    {
+        return getEntityManager()
+                .createQuery("SELECT f.pk.friend FROM Friendship f " +
+                             "WHERE f.pk.owner = :user AND f.pk.friend.name LIKE :search", User.class)
+                .setParameter("user", user)
+                .setParameter("search", '%' + search + '%')
+                .setMaxResults(pageSize)
+                .setFirstResult(pageSize * (pageNumber - 1))
+                .getResultList();
+    }
+
+
+    @Override
     public Friendship createFriendship(FriendRequest friendRequest)
     {
         Friendship friendship = new Friendship(friendRequest.getRequester(), friendRequest.getReceiver());
@@ -57,6 +71,4 @@ public class JpaFriendshipRepository extends AbstractJpaRepository implements Fr
     {
         return getEntityManager().find(FriendRequest.class, id);
     }
-
-
 }

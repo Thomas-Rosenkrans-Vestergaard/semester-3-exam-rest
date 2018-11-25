@@ -69,6 +69,33 @@ public class FriendshipFacade<T extends Transaction>
         }
     }
 
+    /**
+     * Returns a paginated view of the friends of the user with the provided id.
+     *
+     * @param userId     The id of the user to search the friends of.
+     * @param pageSize   The number of results on a single page. {@code pageSize >= 0}
+     * @param pageNumber The page number to return. {@code pageNumber > 0}.
+     * @param search     Optional parameter, search in the names.
+     * @return The paginated view of the friends of the user with the provided id.
+     * @throws ResourceNotFoundException When the user with the provided id does not exist.
+     */
+    public List<User> searchFriends(Integer userId, Integer pageSize, Integer pageNumber, String search)
+    throws ResourceNotFoundException
+    {
+        pageSize = Math.max(pageSize, 0);
+        pageNumber = Math.max(pageNumber, 1);
+
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            UserRepository       ur   = userRepositoryFactory.apply(transaction);
+            FriendshipRepository fr   = friendshipRepositoryFactory.apply(transaction);
+            User                 user = ur.get(userId);
+            if (user == null)
+                throw new ResourceNotFoundException(User.class, userId);
+            return fr.getFriends(user, pageSize, pageNumber, search);
+        }
+    }
+
     public Friendship createFriendship(int friendshipRequestId) throws ResourceNotFoundException
     {
         try (FriendshipRepository friendshipRepository = friendshipRepositoryFactory.apply(transactionFactory.get())) {

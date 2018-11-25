@@ -24,6 +24,7 @@ import com.group3.sem3exam.rest.dto.UserDTO;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;
+import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 
@@ -132,5 +133,28 @@ public class UserResource
     {
         public String   data;
         public CropArea crop;
+    }
+
+    @GET
+    @Path("{user: [0-9]+}/friends")
+    @Produces(APPLICATION_JSON)
+    public Response getFriends(@PathParam("user") Integer userId) throws ResourceNotFoundException
+    {
+        List<User> friends = friendshipFacade.getFriends(userId);
+        return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
+    }
+
+    @GET
+    @Path("{user: [0-9]+}/friends/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getFriends(
+            @PathParam("user") Integer userId,
+            @PathParam("pageSize") Integer pageSize,
+            @PathParam("pageNumber") Integer pageNumber,
+            @QueryParam("search") String search)
+    throws ResourceNotFoundException
+    {
+        List<User> friends = friendshipFacade.searchFriends(userId, pageSize, pageNumber, search);
+        return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
     }
 }

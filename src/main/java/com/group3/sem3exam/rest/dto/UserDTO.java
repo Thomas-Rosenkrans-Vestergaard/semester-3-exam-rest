@@ -24,15 +24,17 @@ public class UserDTO
     private List<FriendshipDTO> friendships;
     private ImageDTO            profilePicture;
 
-    public UserDTO(User user, boolean showFriendships, boolean showPosts)
+    public UserDTO(User user, boolean showFriendships, boolean showPosts, boolean showSensitive)
     {
         this.id = user.getId();
         this.name = user.getName();
-        this.email = user.getEmail();
+        if (showSensitive) {
+            this.email = user.getEmail();
+            this.dateOfBirth = user.getDateOfBirth();
+        }
         this.createdAt = user.getCreatedAt();
         this.city = CityDTO.basic(user.getCity());
         this.gender = user.getGender();
-        this.dateOfBirth = user.getDateOfBirth();
         if (showFriendships)
             this.friendships = user.getFriendships()
                                    .stream()
@@ -49,7 +51,12 @@ public class UserDTO
 
     public static UserDTO basic(User user)
     {
-        return new UserDTO(user, false, false);
+        return new UserDTO(user, false, false, true);
+    }
+
+    public static UserDTO hideSensitive(User user)
+    {
+        return new UserDTO(user, false, false, false);
     }
 
     public static List<UserDTO> list(List<User> users, Function<User, UserDTO> f)
