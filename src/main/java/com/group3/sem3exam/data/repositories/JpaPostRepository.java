@@ -3,7 +3,6 @@ package com.group3.sem3exam.data.repositories;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import org.hibernate.exception.SQLGrammarException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

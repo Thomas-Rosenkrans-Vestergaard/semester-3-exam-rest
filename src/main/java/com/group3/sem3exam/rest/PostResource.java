@@ -52,7 +52,7 @@ public class PostResource
                                                  post.author);
 
 
-        return Response.status(CREATED).entity(gson.toJson(PostDTO.basic(createdPost))).build();
+        return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
     }
 
     @GET
