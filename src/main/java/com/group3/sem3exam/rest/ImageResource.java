@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
+import static javax.ws.rs.core.Response.Status.CREATED;
 
 @Path("images")
 public class ImageResource
@@ -58,7 +59,7 @@ public class ImageResource
                     authenticationContext.getUser(),
                     receivedCreateImage.description,
                     receivedCreateImage.data);
-            return Response.ok(gson.toJson(ImageDTO.basic(image))).build();
+            return Response.status(CREATED).entity(gson.toJson(ImageDTO.basic(image))).build();
         }
 
         throw new AuthenticationException("Unsupported user type");
