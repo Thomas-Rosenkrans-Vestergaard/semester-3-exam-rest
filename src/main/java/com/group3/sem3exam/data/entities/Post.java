@@ -10,9 +10,8 @@ import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-@Entity
-@Table(name = "post")
-public class Post implements RepositoryEntity<Integer>
+@MappedSuperclass
+public abstract class Post implements RepositoryEntity<Integer>
 {
 
     @Id
