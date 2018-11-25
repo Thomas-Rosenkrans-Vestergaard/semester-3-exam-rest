@@ -1,21 +1,22 @@
 package com.group3.sem3exam.logic.images;
 
-import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.GalleryImage;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
-import net.coobird.thumbnailator.Thumbnails;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static com.group3.sem3exam.logic.images.ImageType.fromData;
 
 public class ImageFacade<T extends Transaction>
 {
@@ -60,12 +61,12 @@ public class ImageFacade<T extends Transaction>
      * @return The image with the provided id.
      * @throws ResourceNotFoundException When an image with the provided id does not exist.
      */
-    public Image get(Integer id) throws ResourceNotFoundException
+    public GalleryImage get(Integer id) throws ResourceNotFoundException
     {
         try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
-            Image image = ir.get(id);
+            GalleryImage image = ir.get(id);
             if (image == null)
-                throw new ResourceNotFoundException(Image.class, id);
+                throw new ResourceNotFoundException(GalleryImage.class, id);
 
             return image;
         }
@@ -78,7 +79,7 @@ public class ImageFacade<T extends Transaction>
      * @return The images by the user with the provided id.
      * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public List<Image> getByUser(Integer user) throws ResourceNotFoundException
+    public List<GalleryImage> getByUser(Integer user) throws ResourceNotFoundException
     {
         try (T transaction = transactionFactory.get()) {
             UserRepository  ur = userRepositoryFactory.apply(transaction);
@@ -119,7 +120,8 @@ public class ImageFacade<T extends Transaction>
      * @return The images by the user with the provided id.
      * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public List<Image> getByUserPaginated(Integer user, int pageSize, int pageNumber) throws ResourceNotFoundException
+    public List<GalleryImage> getByUserPaginated(Integer user, int pageSize, int pageNumber)
+    throws ResourceNotFoundException
     {
         pageSize = Math.max(pageSize, 0);
         pageNumber = Math.max(pageNumber, 1);
@@ -141,26 +143,23 @@ public class ImageFacade<T extends Transaction>
      * @param description The description of the image.
      * @param base64      The base64 encoded string containing the data in the image.
      * @return The created image.
-     * @throws ImageException When the provided image cannot be saved.
+     * @throws UnsupportedImageFormatException When the provided image is of an unsupported type.
+     * @throws ImageThumbnailerException       When a thumbnail of the image cannot be created.
      */
-    public Image create(User user, String description, String base64) throws ImageException
+    public GalleryImage create(User user, String description, String base64)
+    throws UnsupportedImageFormatException, ImageThumbnailerException
     {
-        try {
+        DataUriEncoder uriEncoder = new DataUriEncoder();
+        byte[]         data       = Base64.getDecoder().decode(base64);
+        ImageType      type       = fromData(data);
+        String         full       = uriEncoder.encode(data, type);
+        String         thumbnail  = createThumbnail(data, type);
 
-            DataUriEncoder uriEncoder = new DataUriEncoder();
-            byte[]         data       = Base64.getDecoder().decode(base64);
-            String         full       = uriEncoder.bytesToDataURI(data);
-            String         thumbnail  = createThumbnail(data);
-
-            try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
-                ir.begin();
-                Image image = ir.create(description, full, thumbnail, user);
-                ir.commit();
-                return image;
-            }
-
-        } catch (UnsupportedImageTypeException e) {
-            throw new ImageException("Could not save image.", e);
+        try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
+            ir.begin();
+            GalleryImage image = ir.create(description, full, thumbnail, user);
+            ir.commit();
+            return image;
         }
     }
 
@@ -169,27 +168,18 @@ public class ImageFacade<T extends Transaction>
      *
      * @param data The data from the full image.
      * @return The resulting thumbnail data uri.
-     * @throws ImageException When the thumbnail cannot be created.
+     * @throws ImageThumbnailerException When the thumbnail cannot be created.
      */
-    private String createThumbnail(byte[] data) throws ImageException
+    private String createThumbnail(byte[] data, ImageType type) throws ImageThumbnailerException
     {
         try {
-            BufferedImage  fullImage  = ImageIO.read(new ByteArrayInputStream(data));
-            DataUriEncoder uriEncoder = new DataUriEncoder();
-            String         mime       = uriEncoder.getMimeType(data);
-
-            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                Thumbnails.of(fullImage)
-                          .size(250, 250)
-                          .outputFormat(ImageType.fromMime(mime).getExtension())
-                          .outputQuality(1f)
-                          .toOutputStream(outputStream);
-
-                outputStream.flush();
-                return uriEncoder.bytesToDataURI(outputStream.toByteArray());
-            }
-        } catch (Exception e) {
-            throw new ImageException("Could not create thumbnail from image.", e);
+            ImageThumbnailer thumbnailMaker = new ImageThumbnailer(250, 250);
+            BufferedImage    full           = ImageIO.read(new ByteArrayInputStream(data));
+            BufferedImage    thumbnail      = thumbnailMaker.create(full);
+            DataUriEncoder   encoder        = new DataUriEncoder();
+            return encoder.encode(thumbnail, type);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

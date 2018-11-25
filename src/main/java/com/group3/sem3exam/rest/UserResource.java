@@ -3,16 +3,22 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.ProfilePicture;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
+import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.FriendshipFacade;
-import com.group3.sem3exam.logic.ResourceConflictException;
-import com.group3.sem3exam.logic.ResourceNotFoundException;
-import com.group3.sem3exam.logic.UserFacade;
+import com.group3.sem3exam.logic.*;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
+import com.group3.sem3exam.logic.images.CropArea;
+import com.group3.sem3exam.logic.images.ImageCropperException;
+import com.group3.sem3exam.logic.images.ImageThumbnailerException;
+import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
+import com.group3.sem3exam.rest.dto.ImageDTO;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
 import javax.ws.rs.*;
@@ -29,8 +35,22 @@ public class UserResource
     private static UserFacade<JpaTransaction> userFacade = new UserFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
             transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaCityRepository(transaction)
+            transaction -> new JpaCityRepository(transaction),
+            transaction -> new JpaImageRepository(transaction)
     );
+
+    private static AuthenticationFacade authenticationFacade;
+
+    static {
+        try {
+            authenticationFacade = new AuthenticationFacade(
+                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
+                    () -> new JpaUserRepository(JpaConnection.create())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static FriendshipFacade<JpaTransaction> friendshipFacade = new FriendshipFacade<JpaTransaction>(
             () -> new JpaTransaction(JpaConnection.create()),
@@ -87,5 +107,30 @@ public class UserResource
             array.add(gender.name());
 
         return Response.ok(gson.toJson(array)).build();
+    }
+
+    @PUT
+    @Path("{user: [0-9]+}/profile-image")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response updateProfileImage(
+            @HeaderParam("Authorization") String token,
+            @PathParam("user") Integer user,
+            String json) throws AuthenticationException, ResourceNotFoundException, ImageCropperException, UnsupportedImageFormatException, ImageThumbnailerException
+    {
+        UpdateProfileImagePost post = gson.fromJson(json, UpdateProfileImagePost.class);
+        ProfilePicture profileImage = userFacade.updateProfileImage(
+                authenticationFacade.authenticateBearerHeader(token),
+                user,
+                post.data,
+                post.crop);
+
+        return Response.ok(gson.toJson(ImageDTO.basic(profileImage))).build();
+    }
+
+    private class UpdateProfileImagePost
+    {
+        public String   data;
+        public CropArea crop;
     }
 }

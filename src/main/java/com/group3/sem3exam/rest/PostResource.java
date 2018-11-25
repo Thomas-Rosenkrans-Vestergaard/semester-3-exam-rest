@@ -27,18 +27,6 @@ public class PostResource
             transaction -> new JpaUserRepository(transaction)
     );
 
-    /*
-    private static TokenAuthenticator tokenAuthenticator = new TokenAuthenticator();
-
-    @Path("author")
-    public Response getPostsByUser(@HeaderParam("token")String token) throws AuthenticationException
-    {
-    AuthenticationContext authenticationContext =tokenAuthenticator.authenticate(token);
-    User author = authenticationContext.getUser();
-    postFacade.
-    }
-    */
-
     @GET
     @Path("user/{userId: [0-9]+}")
     public Response getPostByUser(@PathParam("userId") Integer id) throws ResourceNotFoundException
@@ -79,7 +67,7 @@ public class PostResource
     @Path("timeline/{userId}/{pageSize}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff) throws ResourceNotFoundException
+    public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff)
     {
         List<Post>    posts    = postFacade.getTimelinePosts(userId, pageSize, cutoff);
         List<PostDTO> postDTOs = PostDTO.list(posts, PostDTO::withAuthor);
@@ -88,8 +76,8 @@ public class PostResource
 
     private class ReceivedCreatePost
     {
-        private String contents;
-        private String title;
-        private Integer   author;
+        private String  contents;
+        private String  title;
+        private Integer author;
     }
 }

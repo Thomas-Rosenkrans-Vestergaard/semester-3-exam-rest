@@ -6,6 +6,7 @@ import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
+import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.AuthenticationFacade;
@@ -31,7 +32,8 @@ public class FriendshipResource
     private static UserFacade<JpaTransaction>       userFacade       = new UserFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
             transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaCityRepository(transaction)
+            transaction -> new JpaCityRepository(transaction),
+            transaction -> new JpaImageRepository(transaction)
     );
     private static FriendshipFacade<JpaTransaction> friendshipFacade = new FriendshipFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),

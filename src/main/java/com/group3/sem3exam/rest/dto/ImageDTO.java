@@ -1,6 +1,7 @@
 package com.group3.sem3exam.rest.dto;
 
-import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.GalleryImage;
+import com.group3.sem3exam.data.entities.ProfilePicture;
 
 import javax.ejb.Stateless;
 import java.util.ArrayList;
@@ -18,7 +19,10 @@ public class ImageDTO
     public String  thumbnail;
     public UserDTO user;
 
-    public ImageDTO(Image image, boolean withUser)
+    // Used by profile picture
+    public String  src;
+
+    public ImageDTO(GalleryImage image, boolean withUser)
     {
         this.id = image.getId();
         this.description = image.getDescription();
@@ -28,15 +32,29 @@ public class ImageDTO
             this.user = UserDTO.basic(image.getUser());
     }
 
-    public static ImageDTO basic(Image image)
+    public ImageDTO(ProfilePicture profilePicture, boolean withUser)
+    {
+        if (profilePicture != null) {
+            this.src = profilePicture.getSrc();
+            if (withUser)
+                this.user = UserDTO.basic(profilePicture.getUser());
+        }
+    }
+
+    public static ImageDTO basic(GalleryImage image)
     {
         return new ImageDTO(image, false);
     }
 
-    public static List<ImageDTO> list(List<Image> images, Function<Image, ImageDTO> f)
+    public static ImageDTO basic(ProfilePicture profilePicture)
+    {
+        return new ImageDTO(profilePicture, false);
+    }
+
+    public static List<ImageDTO> list(List<GalleryImage> images, Function<GalleryImage, ImageDTO> f)
     {
         List<ImageDTO> results = new ArrayList<>();
-        for (Image image : images)
+        for (GalleryImage image : images)
             results.add(f.apply(image));
 
         return results;

@@ -10,7 +10,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "image")
-public class Image implements RepositoryEntity<Integer>
+public class GalleryImage implements RepositoryEntity<Integer>
 {
 
     @Id
@@ -31,12 +31,12 @@ public class Image implements RepositoryEntity<Integer>
     @ManyToOne(fetch = EAGER, optional = false)
     private User user;
 
-    public Image()
+    public GalleryImage()
     {
 
     }
 
-    public Image(String description, String full, String thumbnail, User user)
+    public GalleryImage(String description, String full, String thumbnail, User user)
     {
         this.description = description;
         this.full = full;

@@ -2,10 +2,14 @@ package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.ProfilePicture;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
+import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.images.*;
 import com.group3.sem3exam.logic.validation.IsAfterCheck;
 import com.group3.sem3exam.logic.validation.IsBeforeCheck;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
@@ -15,8 +19,13 @@ import net.sf.oval.constraint.Length;
 import net.sf.oval.constraint.NotNull;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.Temporal;
+import java.util.Base64;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -39,20 +48,28 @@ public class UserFacade<T extends Transaction>
     private final Function<T, CityRepository> cityRepositoryFactory;
 
     /**
+     * The factory that produces image repositories used by this facade.
+     */
+    private final Function<T, ImageRepository> imageRepositoryFactory;
+
+    /**
      * Creates a new {@link UserFacade}.
      *
-     * @param transactionFactory    The factory that produces transactions used by this facade.
-     * @param userRepositoryFactory The factory that produces user repositories used by this facade.
-     * @param cityRepositoryFactory The factory that produces city repositories used by this facade.
+     * @param transactionFactory     The factory that produces transactions used by this facade.
+     * @param userRepositoryFactory  The factory that produces user repositories used by this facade.
+     * @param cityRepositoryFactory  The factory that produces city repositories used by this facade.
+     * @param imageRepositoryFactory The factory that produces image repositories used by this facade.
      */
     public UserFacade(
             Supplier<T> transactionFactory,
             Function<T, UserRepository> userRepositoryFactory,
-            Function<T, CityRepository> cityRepositoryFactory)
+            Function<T, CityRepository> cityRepositoryFactory,
+            Function<T, ImageRepository> imageRepositoryFactory)
     {
         this.transactionFactory = transactionFactory;
         this.userRepositoryFactory = userRepositoryFactory;
         this.cityRepositoryFactory = cityRepositoryFactory;
+        this.imageRepositoryFactory = imageRepositoryFactory;
     }
 
     /**
@@ -179,5 +196,51 @@ public class UserFacade<T extends Transaction>
     private String hash(String password)
     {
         return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+    /**
+     * Updates profile image of the provided user.
+     *
+     * @param authenticationContext The authentication context of the user performing the operation.
+     * @param userId                The id of the user to update the profile image of.
+     * @param base64data            The base64 data of the new profile picture.
+     * @param crop                  The crop details of the profile picture.
+     * @return The new image entity.
+     */
+    public ProfilePicture updateProfileImage(AuthenticationContext authenticationContext, Integer userId, String base64data, CropArea crop)
+    throws ResourceNotFoundException,
+           ImageCropperException,
+           UnsupportedImageFormatException,
+           ImageThumbnailerException
+    {
+        try (T transaction = transactionFactory.get()) {
+
+            transaction.begin();
+
+            UserRepository ur   = userRepositoryFactory.apply(transaction);
+            User           user = ur.get(userId);
+            if (user == null)
+                throw new ResourceNotFoundException(User.class, userId);
+
+            ur.updateProfilePicture(user, createProfilePicture(base64data, crop));
+            ur.commit();
+            return user.getProfilePicture();
+        }
+    }
+
+
+    private String createProfilePicture(String base64, CropArea crop) throws ImageCropperException, UnsupportedImageFormatException, ImageThumbnailerException
+    {
+        try {
+            byte[]           data                = Base64.getDecoder().decode(base64);
+            DataUriEncoder   encoder             = new DataUriEncoder();
+            ImageCropper     cropper             = new ImageCropper(crop);
+            BufferedImage    bufferedImage       = ImageIO.read(new ByteArrayInputStream(data));
+            BufferedImage    largeProfilePicture = cropper.crop(bufferedImage);
+            ImageThumbnailer imageThumbnailer    = new ImageThumbnailer(250, 250);
+            return encoder.encode(imageThumbnailer.create(largeProfilePicture), ImageType.fromData(data));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

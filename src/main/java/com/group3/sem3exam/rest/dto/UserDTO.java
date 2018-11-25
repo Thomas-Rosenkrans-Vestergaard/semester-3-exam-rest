@@ -22,6 +22,7 @@ public class UserDTO
     private LocalDateTime       createdAt;
     private List<PostDTO>       posts;
     private List<FriendshipDTO> friendships;
+    private ImageDTO            profilePicture;
 
     public UserDTO(User user, boolean showFriendships, boolean showPosts)
     {
@@ -42,6 +43,8 @@ public class UserDTO
                              .stream()
                              .map(posts -> new PostDTO(posts))
                              .collect(Collectors.toList());
+
+        this.profilePicture = ImageDTO.basic(user.getProfilePicture());
     }
 
     public static UserDTO basic(User user)
