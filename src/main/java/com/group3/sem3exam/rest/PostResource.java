@@ -30,18 +30,6 @@ public class PostResource
             transaction -> new JpaImagePostImageRepository(transaction)
     );
 
-    /*
-    private static TokenAuthenticator tokenAuthenticator = new TokenAuthenticator();
-
-    @Path("author")
-    public Response getPostsByUser(@HeaderParam("token")String token) throws AuthenticationException
-    {
-    AuthenticationContext authenticationContext =tokenAuthenticator.authenticate(token);
-    User author = authenticationContext.getUser();
-    postFacade.
-    }
-    */
-
     @GET
     @Path("user/{userId: [0-9]+}")
     public Response getPostByUser(@PathParam("userId") Integer id) throws ResourceNotFoundException
@@ -59,7 +47,7 @@ public class PostResource
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("textPost")
+    @Path("text")
     public Response createTextPost(String content) throws ResourceNotFoundException
     {
         ReceivedCreateTextPost post = gson.fromJson(content, ReceivedCreateTextPost.class);
@@ -72,7 +60,7 @@ public class PostResource
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("imagePost")
+    @Path("image")
     public Response createImagePost(String content) throws ResourceNotFoundException
     {
         ReceivedCreateImagePost post = gson.fromJson(content, ReceivedCreateImagePost.class);

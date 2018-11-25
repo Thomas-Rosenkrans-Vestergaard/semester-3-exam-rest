@@ -10,7 +10,8 @@ import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Post implements RepositoryEntity<Integer>
 {
 
@@ -18,11 +19,11 @@ public abstract class Post implements RepositoryEntity<Integer>
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(length = 65535, columnDefinition = "TEXT")
-    private String contents;
-
     @Column(nullable = false)
     private String title;
+
+    @Column(length = 65535, columnDefinition = "TEXT")
+    private String contents;
 
     @ManyToOne(optional = false)
     private User author;
@@ -55,16 +56,6 @@ public abstract class Post implements RepositoryEntity<Integer>
     public void setTitle(String title)
     {
         this.title = title;
-    }
-
-    public Integer getId()
-    {
-        return this.id;
-    }
-
-    public void setId(Integer id)
-    {
-        this.id = id;
     }
 
     public String getContents()
@@ -113,5 +104,15 @@ public abstract class Post implements RepositoryEntity<Integer>
     {
         this.comments.add(comment);
         comment.setPost(this);
+    }
+
+    public Integer getId()
+    {
+        return this.id;
+    }
+
+    public void setId(Integer id)
+    {
+        this.id = id;
     }
 }
