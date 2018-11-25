@@ -74,6 +74,17 @@ public class PostResource
         return Response.ok(gson.toJson(postDTOs)).build();
     }
 
+    @Path("user/{userId}/{pageSize}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRollingUserPosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff)
+    throws ResourceNotFoundException
+    {
+        List<Post>    posts    = postFacade.getRollingPostByUser(userId, pageSize, cutoff);
+        List<PostDTO> postDTOs = PostDTO.list(posts, PostDTO::withAuthor);
+        return Response.ok(gson.toJson(postDTOs)).build();
+    }
+
     private class ReceivedCreatePost
     {
         private String  contents;

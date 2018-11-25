@@ -32,12 +32,22 @@ public interface PostRepository extends CrudRepository<Post, Integer>
 
 
     /**
-     * Returns a specific set of posts from a users friends.
+     * Returns a specific set of posts from the friends of a user.
      *
-     * @param userId The id of the user to return the posts of.
+     * @param userId   The id of the user to return the posts of.
      * @param pageSize the amount of new posts to fetch
-     * @param last the offset from where to start to fetch posts
-     * @return The posts made by the user with the provided id.
+     * @param last     the offset from where to start to fetch posts
+     * @return The posts made by the friends of the user with the provided id.
      */
     List<Post> getTimelinePosts(Integer userId, Integer pageSize, Integer last);
+
+    /**
+     * Returns a rolling view of the posts created by the provided user.
+     *
+     * @param user     The user to return the posts of.
+     * @param pageSize The number of posts per page returned.
+     * @param last     the offset from where to start to fetch posts.
+     * @return The rolling view.
+     */
+    List<Post> getRollingPosts(User user, Integer pageSize, Integer last);
 }

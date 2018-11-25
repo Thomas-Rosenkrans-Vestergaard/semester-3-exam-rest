@@ -45,7 +45,6 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
         return getEntityManager().createQuery("SELECT Post FROM Post p where p.author = :author", Post.class)
                                  .setParameter("author", author)
                                  .getResultList();
-
     }
 
     @Override
@@ -58,6 +57,23 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
                                          "ORDER BY p.id DESC", Post.class);
             query.setParameter("userId", userId);
             query.setParameter("cutoff", cutoff == null ? Integer.MAX_VALUE : cutoff);
+            query.setMaxResults(pageSize);
+            List<Post> posts = query.getResultList();
+            return posts;
+        } catch (Exception e) {
+            return new ArrayList<>(); // TODO: fix SQLGrammarException, maybe caused by not having friends
+        }
+    }
+
+    @Override
+    public List<Post> getRollingPosts(User user, Integer pageSize, Integer last)
+    {
+        try {
+            EntityManager em = getEntityManager();
+            Query query = em.createQuery("SELECT p FROM Post p WHERE p.id < :last AND p.author = :user " +
+                                         "ORDER BY p.id DESC", Post.class);
+            query.setParameter("user", user);
+            query.setParameter("last", last == null ? Integer.MAX_VALUE : last);
             query.setMaxResults(pageSize);
             List<Post> posts = query.getResultList();
             return posts;

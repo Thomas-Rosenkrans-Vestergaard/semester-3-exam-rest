@@ -127,5 +127,29 @@ public class PostFacade<T extends Transaction>
             return pr.getByUser(user);
         }
     }
+
+    /**
+     * Returns a rolling paginated view of the posts created by the user with the provided id.
+     * <p>
+     * This method returns up to {@code pageSize} results after the provided {@code cutoff}, meaning that
+     * only posts older than the {@code cutoff} are retrieved.
+     *
+     * @param userId   The user to return the posts of.
+     * @param pageSize The maximum number of results per request.
+     * @param cutoff   The id of cutoff post. Meaning that the id of the first returned post is {@code cutoff + 1}.
+     * @return The paginated view of the posts created by the user with the provided id.
+     */
+    public List<Post> getRollingPostByUser(Integer userId, Integer pageSize, Integer cutoff) throws ResourceNotFoundException
+    {
+        try (T transaction = transactionFactory.get()) {
+            UserRepository ur   = userRepositoryFactory.apply(transaction);
+            PostRepository pr   = postRepositoryFactory.apply(transaction);
+            User           user = ur.get(userId);
+            if (user == null)
+                throw new ResourceNotFoundException(Post.class, user.getId());
+
+            return pr.getRollingPosts(user, pageSize, cutoff);
+        }
+    }
 }
 
