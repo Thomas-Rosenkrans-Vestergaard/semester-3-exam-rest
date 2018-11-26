@@ -19,18 +19,7 @@ public class AuthenticationResource
 {
 
     private static Gson                 gson = SpecializedGson.create();
-    private static AuthenticationFacade authenticationFacade;
-
-    static {
-        try {
-            authenticationFacade = new AuthenticationFacade(
-                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
-                    () -> new JpaUserRepository(JpaConnection.create())
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static AuthenticationFacade authenticationFacade = Facades.authentication;
 
     @POST
     @Path("user")

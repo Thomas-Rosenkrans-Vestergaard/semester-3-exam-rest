@@ -4,10 +4,6 @@ import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.FriendRequest;
 import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.JpaCityRepository;
-import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
-import com.group3.sem3exam.data.repositories.JpaImageRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.FriendshipFacade;
@@ -15,7 +11,6 @@ import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.UserFacade;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
-import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.rest.dto.FriendRequestDTO;
 
 import javax.ws.rs.*;
@@ -28,33 +23,11 @@ import static javax.ws.rs.core.Response.Status.CREATED;
 @Path("friendship")
 public class FriendshipResource
 {
-    private static Gson                             gson             = SpecializedGson.create();
-    private static UserFacade<JpaTransaction>       userFacade       = new UserFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaCityRepository(transaction),
-            transaction -> new JpaImageRepository(transaction)
-    );
-    private static FriendshipFacade<JpaTransaction> friendshipFacade = new FriendshipFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaFriendshipRepository(transaction)
-    );
+    private static Gson                             gson                 = SpecializedGson.create();
+    private static UserFacade<JpaTransaction>       userFacade           = Facades.user;
+    private static FriendshipFacade<JpaTransaction> friendshipFacade     = Facades.friendship;
+    private static AuthenticationFacade             authenticationFacade = Facades.authentication;
 
-    private static AuthenticationFacade authenticationFacade;
-
-    static {
-        try {
-            authenticationFacade = new AuthenticationFacade(
-                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
-                    () -> new JpaUserRepository(JpaConnection.create())
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    //uses auth
     @POST
     @Path("friend-request")
     @Produces(APPLICATION_JSON)

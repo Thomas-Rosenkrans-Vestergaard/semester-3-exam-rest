@@ -24,12 +24,7 @@ import static javax.ws.rs.core.Response.Status.CREATED;
 public class PostResource
 {
     private static Gson                       gson       = SpecializedGson.create();
-    private static PostFacade<JpaTransaction> postFacade = new PostFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaPostRepository(transaction),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaImagePostImageRepository(transaction)
-    );
+    private static PostFacade<JpaTransaction> postFacade = Facades.post;
 
     @GET
     @Path("user/{userId: [0-9]+}")

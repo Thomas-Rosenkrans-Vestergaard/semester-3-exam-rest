@@ -23,7 +23,7 @@ public class CountryResource
 {
 
     private static Gson          gson          = SpecializedGson.create();
-    private static CountryFacade countryFacade = new CountryFacade(() -> new JpaCountryRepository(JpaConnection.create()));
+    private static CountryFacade countryFacade = Facades.country;
 
     @GET
     @Produces(APPLICATION_JSON)
