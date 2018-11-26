@@ -149,37 +149,18 @@ public class ImageFacade<T extends Transaction>
     public GalleryImage create(User user, String description, String base64)
     throws UnsupportedImageFormatException, ImageThumbnailerException
     {
-        DataUriEncoder uriEncoder = new DataUriEncoder();
-        byte[]         data       = Base64.getDecoder().decode(base64);
-        ImageType      type       = fromData(data);
-        String         full       = uriEncoder.encode(data, type);
-        String         thumbnail  = createThumbnail(data, type);
+        DataUriEncoder   uriEncoder       = new DataUriEncoder();
+        byte[]           data             = Base64.getDecoder().decode(base64);
+        ImageType        type             = fromData(data);
+        String           full             = uriEncoder.encode(data, type);
+        ImageThumbnailer imageThumbnailer = new ImageThumbnailer(250, 250);
+        byte[]           thumbnail        = imageThumbnailer.createThumbnail(data, type);
 
         try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
             ir.begin();
-            GalleryImage image = ir.create(description, full, thumbnail, user);
+            GalleryImage image = ir.create(description, full, uriEncoder.encode(thumbnail, type), user);
             ir.commit();
             return image;
-        }
-    }
-
-    /**
-     * Creates a thumbnail data URI from the provided full image data.
-     *
-     * @param data The data from the full image.
-     * @return The resulting thumbnail data uri.
-     * @throws ImageThumbnailerException When the thumbnail cannot be created.
-     */
-    private String createThumbnail(byte[] data, ImageType type) throws ImageThumbnailerException
-    {
-        try {
-            ImageThumbnailer thumbnailMaker = new ImageThumbnailer(250, 250);
-            BufferedImage    full           = ImageIO.read(new ByteArrayInputStream(data));
-            BufferedImage    thumbnail      = thumbnailMaker.create(full);
-            DataUriEncoder   encoder        = new DataUriEncoder();
-            return encoder.encode(thumbnail, type);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 }
