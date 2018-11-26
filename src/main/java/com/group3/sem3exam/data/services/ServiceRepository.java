@@ -1,12 +1,22 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.services;
 
-import com.group3.sem3exam.data.entities.Service;
 import com.group3.sem3exam.data.repositories.base.ReadRepository;
 
 import java.util.List;
 
 public interface ServiceRepository extends ReadRepository<Service, Integer>
 {
+
+    /**
+     * Creates a new service using the provided information.
+     *
+     * @param name         The name of the service.
+     * @param passwordHash The hashed password of the service.
+     * @param secret       The secret value sent to the service to prove our identity.
+     * @param onAuth       The url posted to when a user authenticates through the service authentication.
+     * @return The newly created service.
+     */
+    Service create(String name, String passwordHash, String secret, String onAuth);
 
     /**
      * Returns the service with the provided name.

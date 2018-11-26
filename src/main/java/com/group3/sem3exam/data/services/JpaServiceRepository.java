@@ -1,6 +1,6 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.services;
 
-import com.group3.sem3exam.data.entities.Service;
+import com.group3.sem3exam.data.repositories.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -8,8 +8,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.util.List;
 
-import static com.group3.sem3exam.data.entities.Service.Status.DISABLED;
-import static com.group3.sem3exam.data.entities.Service.Status.ENABLED;
+import static com.group3.sem3exam.data.services.Service.Status.*;
 
 public class JpaServiceRepository extends JpaCrudRepository<Service, Integer> implements ServiceRepository
 {
@@ -44,6 +43,14 @@ public class JpaServiceRepository extends JpaCrudRepository<Service, Integer> im
     public JpaServiceRepository(JpaTransaction transaction)
     {
         super(transaction, Service.class);
+    }
+
+    @Override
+    public Service create(String name, String passwordHash, String secret, String onAuth)
+    {
+        Service service = new Service(name, passwordHash, PENDING, secret, onAuth);
+        getEntityManager().persist(service);
+        return service;
     }
 
     @Override

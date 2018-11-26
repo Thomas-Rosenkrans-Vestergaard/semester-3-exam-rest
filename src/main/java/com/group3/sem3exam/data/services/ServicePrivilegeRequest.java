@@ -1,12 +1,13 @@
-package com.group3.sem3exam.data.entities;
+package com.group3.sem3exam.data.services;
 
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-public class ServiceRequest implements RepositoryEntity<Integer>
+public class ServicePrivilegeRequest implements RepositoryEntity<Integer>
 {
 
     @Id
@@ -17,7 +18,7 @@ public class ServiceRequest implements RepositoryEntity<Integer>
     private User user;
 
     @ManyToOne(optional = false)
-    private ServiceRequestTemplate declaration;
+    private ServiceAuthTemplate declaration;
 
     @Column(nullable = false)
     private Status status;
@@ -26,12 +27,12 @@ public class ServiceRequest implements RepositoryEntity<Integer>
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public ServiceRequest()
+    public ServicePrivilegeRequest()
     {
 
     }
 
-    public ServiceRequest(User user, ServiceRequestTemplate declaration)
+    public ServicePrivilegeRequest(User user, ServiceAuthTemplate declaration)
     {
         this.user = user;
         this.declaration = declaration;
@@ -58,12 +59,12 @@ public class ServiceRequest implements RepositoryEntity<Integer>
         this.user = user;
     }
 
-    public ServiceRequestTemplate getDeclaration()
+    public ServiceAuthTemplate getDeclaration()
     {
         return this.declaration;
     }
 
-    public void setDeclaration(ServiceRequestTemplate declaration)
+    public void setDeclaration(ServiceAuthTemplate declaration)
     {
         this.declaration = declaration;
     }

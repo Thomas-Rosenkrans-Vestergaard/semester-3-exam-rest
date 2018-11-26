@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.entities;
+package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 
@@ -21,17 +21,26 @@ public class Service implements RepositoryEntity<Integer>
     @Column(nullable = false)
     private String passwordHash;
 
+    @Column(nullable = false)
     private Status status;
+
+    @Column(nullable = false)
+    private String secret;
+
+    @Column(nullable = false)
+    private String onAuth;
 
     public Service()
     {
     }
 
-    public Service(String name, String passwordHash)
+    public Service(String name, String passwordHash, Status status, String secret, String onAuth)
     {
         this.name = name;
         this.passwordHash = passwordHash;
-        this.status = Status.PENDING;
+        this.status = status;
+        this.secret = secret;
+        this.onAuth = onAuth;
     }
 
     public Integer getId()
@@ -72,6 +81,26 @@ public class Service implements RepositoryEntity<Integer>
     public void setStatus(Status status)
     {
         this.status = status;
+    }
+
+    public String getSecret()
+    {
+        return this.secret;
+    }
+
+    public void setSecret(String secret)
+    {
+        this.secret = secret;
+    }
+
+    public String getOnAuth()
+    {
+        return this.onAuth;
+    }
+
+    public void setOnAuth(String onAuth)
+    {
+        this.onAuth = onAuth;
     }
 
     public enum Status

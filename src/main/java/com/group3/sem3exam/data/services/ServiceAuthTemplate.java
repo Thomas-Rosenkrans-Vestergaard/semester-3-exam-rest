@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.entities;
+package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 
@@ -7,7 +7,7 @@ import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
-public class ServiceRequestTemplate implements RepositoryEntity<Integer>
+public class ServiceAuthTemplate implements RepositoryEntity<Integer>
 {
 
     @Id
@@ -25,12 +25,12 @@ public class ServiceRequestTemplate implements RepositoryEntity<Integer>
     @ManyToOne
     private Service service;
 
-    public ServiceRequestTemplate()
+    public ServiceAuthTemplate()
     {
 
     }
 
-    public ServiceRequestTemplate(String message, List<ServicePrivilege> privileges, Service service)
+    public ServiceAuthTemplate(String message, List<ServicePrivilege> privileges, Service service)
     {
         this.message = message;
         this.privileges = privileges;

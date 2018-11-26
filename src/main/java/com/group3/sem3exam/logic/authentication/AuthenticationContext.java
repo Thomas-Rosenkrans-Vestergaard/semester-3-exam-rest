@@ -1,6 +1,7 @@
 package com.group3.sem3exam.logic.authentication;
 
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.services.Service;
 
 public interface AuthenticationContext
 {
@@ -31,4 +32,20 @@ public interface AuthenticationContext
      * {@code null} to indicate that this authentication context does not contain user information.
      */
     User getUser();
+
+    /**
+     * Returns the id of the authenticated service.
+     *
+     * @return The authenticated service. In all other cases this method returns
+     * {@code null} to indicate that this authentication context does not contain service information.
+     */
+    Integer getServiceId();
+
+    /**
+     * Returns the authenticated service.
+     *
+     * @return The authenticated service. In all other cases this method returns
+     * {@code null} to indicate that this authentication context does not contain service information.
+     */
+    Service getService();
 }
