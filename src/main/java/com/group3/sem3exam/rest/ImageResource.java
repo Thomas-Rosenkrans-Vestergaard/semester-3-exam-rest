@@ -3,14 +3,11 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.group3.sem3exam.data.entities.GalleryImage;
-import com.group3.sem3exam.data.repositories.JpaImageRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
-import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.logic.images.ImageFacade;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
@@ -28,24 +25,9 @@ import static javax.ws.rs.core.Response.Status.CREATED;
 public class ImageResource
 {
 
-    private static Gson                        gson        = SpecializedGson.create();
-    private static ImageFacade<JpaTransaction> imageFacade = new ImageFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaImageRepository(transaction)
-    );
-    private static AuthenticationFacade        authenticationFacade;
-
-    static {
-        try {
-            authenticationFacade = new AuthenticationFacade(
-                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
-                    () -> new JpaUserRepository(JpaConnection.create())
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static Gson                        gson                 = SpecializedGson.create();
+    private static ImageFacade<JpaTransaction> imageFacade          = Facades.image;
+    private static AuthenticationFacade        authenticationFacade = Facades.authentication;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

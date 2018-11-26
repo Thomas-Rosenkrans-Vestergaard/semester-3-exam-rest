@@ -5,14 +5,9 @@ import com.google.gson.JsonArray;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.ProfilePicture;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.JpaCityRepository;
-import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
-import com.group3.sem3exam.data.repositories.JpaImageRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
-import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.logic.images.CropArea;
 import com.group3.sem3exam.logic.images.ImageCropperException;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
@@ -33,32 +28,10 @@ import static javax.ws.rs.core.Response.Status.CREATED;
 public class UserResource
 {
 
-    private static Gson                       gson       = SpecializedGson.create();
-    private static UserFacade<JpaTransaction> userFacade = new UserFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaCityRepository(transaction),
-            transaction -> new JpaImageRepository(transaction)
-    );
-
-    private static AuthenticationFacade authenticationFacade;
-
-    static {
-        try {
-            authenticationFacade = new AuthenticationFacade(
-                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
-                    () -> new JpaUserRepository(JpaConnection.create())
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static FriendshipFacade<JpaTransaction> friendshipFacade = new FriendshipFacade<JpaTransaction>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaFriendshipRepository(transaction)
-    );
+    private static Gson                             gson                 = SpecializedGson.create();
+    private static UserFacade<JpaTransaction>       userFacade           = Facades.user;
+    private static AuthenticationFacade             authenticationFacade = Facades.authentication;
+    private static FriendshipFacade<JpaTransaction> friendshipFacade     = Facades.friendship;
 
     @POST
     @Produces(APPLICATION_JSON)
