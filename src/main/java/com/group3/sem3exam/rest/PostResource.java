@@ -54,7 +54,7 @@ public class PostResource
         Post createdPost = postFacade.createTextPost(post.title,
                                                  post.contents,
                                                  post.author);
-        return Response.status(CREATED).entity(gson.toJson(PostDTO.basic(createdPost))).build();
+        return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
     }
 
     @POST
