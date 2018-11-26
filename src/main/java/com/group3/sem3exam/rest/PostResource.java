@@ -16,6 +16,7 @@ import com.group3.sem3exam.rest.dto.PostDTO;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class PostResource
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("image")
-    public Response createImagePost(String content) throws ResourceNotFoundException, ImageThumbnailerException, UnsupportedImageFormatException
+    public Response createImagePost(String content) throws Exception
     {
         ReceivedCreateImagePost post = gson.fromJson(content, ReceivedCreateImagePost.class);
         Post createdPost = postFacade.createImagePost(post.title,

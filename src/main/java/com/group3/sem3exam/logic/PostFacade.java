@@ -3,19 +3,26 @@ package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.entities.*;
 import com.group3.sem3exam.data.repositories.ImagePostImageRepository;
-import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.PostRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.images.*;
+import jdk.internal.util.xml.impl.Input;
 
-import java.awt.*;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class PostFacade<T extends Transaction>
 {
@@ -73,14 +80,13 @@ public class PostFacade<T extends Transaction>
             User           user = ur.get(author);
             if (user == null)
                 throw new ResourceNotFoundException(User.class, author);
-
             TextPost post = pr.createTextPost(user, title, body, LocalDateTime.now());
             transaction.commit();
             return post;
         }
     }
 
-    public ImagePost createImagePost(String title, String body, Integer author, List<String> images) throws ResourceNotFoundException, UnsupportedImageFormatException, ImageThumbnailerException
+    public ImagePost createImagePost(String title, String body, Integer author, List<String> images) throws Exception
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
@@ -95,12 +101,11 @@ public class PostFacade<T extends Transaction>
                 throw new ResourceNotFoundException(User.class, author);
 
             for(String image: images){
-                byte[] data = Base64.getDecoder().decode(image);
+                byte[] data = isUrl(image) ? getDataFrom(image) : Base64.getDecoder().decode(image);
                 data = imageThumbnailer.createThumbnail(data);
                 String uri = uriEncoder.encode(data, ImageType.fromData(data));
                 postImages.add(ir.create(image, user, uri));
             }
-
             ImagePost post = pr.createImagePost(user, title, body, LocalDateTime.now(), postImages);
             transaction.commit();
             return post;
@@ -187,5 +192,40 @@ public class PostFacade<T extends Transaction>
             return pr.getRollingPosts(user, pageSize, cutoff);
         }
     }
+
+           private Boolean isUrl (String data)
+           {
+               String regex = "^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]";
+               try {
+                   return Pattern.compile(regex).matcher(data).matches();
+               } catch (PatternSyntaxException exception) {
+                   return false;
+               }
+           }
+
+           private byte[] getDataFrom (String image) throws IOException
+           {
+               URL               url = new URL(image);
+               HttpURLConnection con = (HttpURLConnection) url.openConnection();
+               con.setRequestMethod("GET");
+               int status = con.getResponseCode();
+               if (status == 200) {
+                   ByteArrayOutputStream out = convertInputStreamToOutputStream(con.getInputStream());
+                   return out.toByteArray();
+               }
+               throw new IOException("det virkede ikke prøv igen fjols");
+           }
+
+
+           private ByteArrayOutputStream convertInputStreamToOutputStream(InputStream in) throws IOException
+           {
+               byte[] buffer = new byte[1024];
+               int len;
+               ByteArrayOutputStream out = new ByteArrayOutputStream();
+               while ((len = in.read(buffer)) != -1) {
+                   out.write(buffer, 0, len);
+               }
+               return out;
+           }
 }
 
