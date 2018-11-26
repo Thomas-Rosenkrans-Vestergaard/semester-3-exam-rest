@@ -9,7 +9,7 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 
 @Entity
-@Table(name = "image")
+@Table(name = "gallery_image")
 public class GalleryImage implements RepositoryEntity<Integer>
 {
 
