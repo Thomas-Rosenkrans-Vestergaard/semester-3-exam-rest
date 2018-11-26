@@ -3,7 +3,6 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.repositories.JpaImagePostImageRepository;
-import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaPostRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
@@ -52,8 +51,8 @@ public class PostResource
     {
         ReceivedCreateTextPost post = gson.fromJson(content, ReceivedCreateTextPost.class);
         Post createdPost = postFacade.createTextPost(post.title,
-                                                 post.contents,
-                                                 post.author);
+                                                     post.contents,
+                                                     post.author);
         return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
     }
 
@@ -65,12 +64,13 @@ public class PostResource
     {
         ReceivedCreateImagePost post = gson.fromJson(content, ReceivedCreateImagePost.class);
         Post createdPost = postFacade.createImagePost(post.title,
-                                                     post.contents,
-                                                     post.author,
+                                                      post.contents,
+                                                      post.author,
                                                       post.images);
 
         return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
     }
+
     @GET
     @Path("{id: [0-9]+}")
     public Response getPostById(@PathParam("id") Integer id) throws ResourceNotFoundException
@@ -103,19 +103,18 @@ public class PostResource
     }
 
 
-
     private class ReceivedCreateTextPost
     {
-    private String contents;
-    private String title;
-    private Integer author;
+        private String  contents;
+        private String  title;
+        private Integer author;
     }
 
     private class ReceivedCreateImagePost
     {
-        private String contents;
-        private String title;
-        private Integer author;
+        private String       contents;
+        private String       title;
+        private Integer      author;
         private List<String> images;
     }
 
