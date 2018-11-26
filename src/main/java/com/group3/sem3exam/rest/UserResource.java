@@ -2,16 +2,23 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.ProfilePicture;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.JpaCityRepository;
+import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
+import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.ResourceConflictException;
-import com.group3.sem3exam.logic.ResourceNotFoundException;
-import com.group3.sem3exam.logic.UserFacade;
+import com.group3.sem3exam.logic.*;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
+import com.group3.sem3exam.logic.images.CropArea;
+import com.group3.sem3exam.logic.images.ImageCropperException;
+import com.group3.sem3exam.logic.images.ImageThumbnailerException;
+import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
+import com.group3.sem3exam.rest.dto.ImageDTO;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
 import javax.ws.rs.*;
@@ -30,7 +37,27 @@ public class UserResource
     private static UserFacade<JpaTransaction> userFacade = new UserFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
             transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaCityRepository(transaction)
+            transaction -> new JpaCityRepository(transaction),
+            transaction -> new JpaImageRepository(transaction)
+    );
+
+    private static AuthenticationFacade authenticationFacade;
+
+    static {
+        try {
+            authenticationFacade = new AuthenticationFacade(
+                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
+                    () -> new JpaUserRepository(JpaConnection.create())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static FriendshipFacade<JpaTransaction> friendshipFacade = new FriendshipFacade<JpaTransaction>(
+            () -> new JpaTransaction(JpaConnection.create()),
+            transaction -> new JpaUserRepository(transaction),
+            transaction -> new JpaFriendshipRepository(transaction)
     );
 
     @POST
@@ -72,17 +99,6 @@ public class UserResource
         return Response.ok(jsonDTO).build();
     }
 
-
-    @Path("{id: 0-9+}/friends")
-    @GET
-    @Produces(APPLICATION_JSON)
-    public Response getFriendsByOwnerId(@PathParam("id") Integer id)
-    {
-        List<User> friends = userFacade.getFriends(id);
-        String     jsonDTO = gson.toJson(UserDTO.list(friends, UserDTO::basic));
-        throw new UnsupportedOperationException("Not supported yet");
-    }
-
     @GET
     @Path("genders")
     @Produces(APPLICATION_JSON)
@@ -95,17 +111,51 @@ public class UserResource
         return Response.ok(gson.toJson(array)).build();
     }
 
-
-    //create new friendshipResource
-    //create auth for friendship
-    //request/target --> answer/request
-    @POST
-    @Path("{userId}/{friendId}")
+    @PUT
+    @Path("{user: [0-9]+}/profile-image")
+    @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response createFriendship(@PathParam("userId") int uId, @PathParam("friendId") int fId) throws ResourceNotFoundException
+    public Response updateProfileImage(
+            @HeaderParam("Authorization") String token,
+            @PathParam("user") Integer user,
+            String json) throws AuthenticationException, ResourceNotFoundException, ImageCropperException, UnsupportedImageFormatException, ImageThumbnailerException
     {
+        UpdateProfileImagePost post = gson.fromJson(json, UpdateProfileImagePost.class);
+        ProfilePicture profileImage = userFacade.updateProfileImage(
+                authenticationFacade.authenticateBearerHeader(token),
+                user,
+                post.data,
+                post.crop);
 
-        Friendship fs = userFacade.createFriendship(uId, fId);
-        return Response.ok(gson.toJson(fs)).build();
+        return Response.ok(gson.toJson(ImageDTO.basic(profileImage))).build();
+    }
+
+    private class UpdateProfileImagePost
+    {
+        public String   data;
+        public CropArea crop;
+    }
+
+    @GET
+    @Path("{user: [0-9]+}/friends")
+    @Produces(APPLICATION_JSON)
+    public Response getFriends(@PathParam("user") Integer userId) throws ResourceNotFoundException
+    {
+        List<User> friends = friendshipFacade.getFriends(userId);
+        return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
+    }
+
+    @GET
+    @Path("{user: [0-9]+}/friends/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getFriends(
+            @PathParam("user") Integer userId,
+            @PathParam("pageSize") Integer pageSize,
+            @PathParam("pageNumber") Integer pageNumber,
+            @QueryParam("search") String search)
+    throws ResourceNotFoundException
+    {
+        List<User> friends = friendshipFacade.searchFriends(userId, pageSize, pageNumber, search);
+        return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
     }
 }

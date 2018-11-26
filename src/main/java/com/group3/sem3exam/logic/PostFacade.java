@@ -1,13 +1,16 @@
 package com.group3.sem3exam.logic;
 
 
-import com.group3.sem3exam.data.entities.Post;
-import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.entities.*;
+import com.group3.sem3exam.data.repositories.ImagePostImageRepository;
+import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.PostRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 
+import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,7 +31,8 @@ public class PostFacade<T extends Transaction>
     /**
      * A factory that creates a new {@link UserRepository} from a provided {@link T}.
      */
-    private final Function<T, UserRepository> userRepositoryFactory;
+    private final Function<T, UserRepository>           userRepositoryFactory;
+    private final Function<T, ImagePostImageRepository> imagePostImageRepositoryFactory;
 
     /**
      * Creates a new {@link PostFacade}.
@@ -40,23 +44,25 @@ public class PostFacade<T extends Transaction>
     public PostFacade(
             Supplier<T> transactionFactory,
             Function<T, PostRepository> postRepositoryFactory,
-            Function<T, UserRepository> userRepositoryFactory)
+            Function<T, UserRepository> userRepositoryFactory,
+            Function<T, ImagePostImageRepository> imagePostImageRepositoryFactory)
     {
         this.transactionFactory = transactionFactory;
         this.postRepositoryFactory = postRepositoryFactory;
         this.userRepositoryFactory = userRepositoryFactory;
+         this.imagePostImageRepositoryFactory = imagePostImageRepositoryFactory;
     }
 
     /**
      * Creates a new post using the provided information.
      *
-     * @param title  The title of the post.
+     * @param title  The description of the post.
      * @param body   the body of the post.
      * @param author The id of the user who wrote the post (author).
      * @return The newly created post instance.
      * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public Post createPost(String title, String body, Integer author) throws ResourceNotFoundException
+    public TextPost createTextPost(String title, String body, Integer author) throws ResourceNotFoundException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
@@ -66,11 +72,36 @@ public class PostFacade<T extends Transaction>
             if (user == null)
                 throw new ResourceNotFoundException(User.class, author);
 
-            Post post = pr.createPost(user, title, body, LocalDateTime.now());
+            TextPost post = pr.createTextPost(user, title, body, LocalDateTime.now());
             transaction.commit();
             return post;
         }
     }
+
+    public ImagePost createImagePost(String title, String body, Integer author, List<String> images) throws ResourceNotFoundException
+    {
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            PostRepository pr   = postRepositoryFactory.apply(transaction);
+            UserRepository ur   = userRepositoryFactory.apply(transaction);
+            ImagePostImageRepository ir = imagePostImageRepositoryFactory.apply(transaction);
+            User           user = ur.get(author);
+            List<ImagePostImage> postImages = new ArrayList<>();
+            if (user == null)
+                throw new ResourceNotFoundException(User.class, author);
+
+
+            //lav thumbnail her
+            for(String image: images){
+                postImages.add(ir.create(image, user, "jsdf"));
+            }
+
+            ImagePost post = pr.createImagePost(user, title, body, LocalDateTime.now(), postImages);
+            transaction.commit();
+            return post;
+        }
+    }
+
 
     /**
      * Returns the post with the provided id.
@@ -125,6 +156,30 @@ public class PostFacade<T extends Transaction>
                 throw new ResourceNotFoundException(Post.class, user.getId());
 
             return pr.getByUser(user);
+        }
+    }
+
+    /**
+     * Returns a rolling paginated view of the posts created by the user with the provided id.
+     * <p>
+     * This method returns up to {@code pageSize} results after the provided {@code cutoff}, meaning that
+     * only posts older than the {@code cutoff} are retrieved.
+     *
+     * @param userId   The user to return the posts of.
+     * @param pageSize The maximum number of results per request.
+     * @param cutoff   The id of cutoff post. Meaning that the id of the first returned post is {@code cutoff + 1}.
+     * @return The paginated view of the posts created by the user with the provided id.
+     */
+    public List<Post> getRollingPostByUser(Integer userId, Integer pageSize, Integer cutoff) throws ResourceNotFoundException
+    {
+        try (T transaction = transactionFactory.get()) {
+            UserRepository ur   = userRepositoryFactory.apply(transaction);
+            PostRepository pr   = postRepositoryFactory.apply(transaction);
+            User           user = ur.get(userId);
+            if (user == null)
+                throw new ResourceNotFoundException(Post.class, user.getId());
+
+            return pr.getRollingPosts(user, pageSize, cutoff);
         }
     }
 }

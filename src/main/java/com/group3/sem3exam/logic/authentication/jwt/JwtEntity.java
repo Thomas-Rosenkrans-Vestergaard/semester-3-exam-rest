@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.logic.authentication.jwt;
 
 import javax.persistence.*;
 

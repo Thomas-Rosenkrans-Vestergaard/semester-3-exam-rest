@@ -1,13 +1,14 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.Region;
+import com.group3.sem3exam.data.repositories.base.ReadRepository;
 
 import java.util.List;
 
 /**
  * Represents a data source of regions. Defines read operations on the data source.
  */
-public interface RegionRepository extends ReadCrudRepository<Region, Integer>
+public interface RegionRepository extends ReadRepository<Region, Integer>
 {
 
     /**

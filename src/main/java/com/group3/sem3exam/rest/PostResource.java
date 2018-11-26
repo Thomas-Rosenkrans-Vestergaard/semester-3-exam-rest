@@ -2,7 +2,8 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Post;
-import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.JpaImagePostImageRepository;
+import com.group3.sem3exam.data.repositories.JpaImageRepository;
 import com.group3.sem3exam.data.repositories.JpaPostRepository;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
@@ -25,20 +26,9 @@ public class PostResource
     private static PostFacade<JpaTransaction> postFacade = new PostFacade<>(
             () -> new JpaTransaction(JpaConnection.create()),
             transaction -> new JpaPostRepository(transaction),
-            transaction -> new JpaUserRepository(transaction)
+            transaction -> new JpaUserRepository(transaction),
+            transaction -> new JpaImagePostImageRepository(transaction)
     );
-
-    /*
-    private static TokenAuthenticator tokenAuthenticator = new TokenAuthenticator();
-
-    @Path("author")
-    public Response getPostsByUser(@HeaderParam("token")String token) throws AuthenticationException
-    {
-    AuthenticationContext authenticationContext =tokenAuthenticator.authenticate(token);
-    User author = authenticationContext.getUser();
-    postFacade.
-    }
-    */
 
     @GET
     @Path("user/{userId: [0-9]+}")
@@ -57,17 +47,30 @@ public class PostResource
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response createPost(String content) throws ResourceNotFoundException
+    @Path("text")
+    public Response createTextPost(String content) throws ResourceNotFoundException
     {
-        ReceivedCreatePost post = gson.fromJson(content, ReceivedCreatePost.class);
-        Post createdPost = postFacade.createPost(post.title,
+        ReceivedCreateTextPost post = gson.fromJson(content, ReceivedCreateTextPost.class);
+        Post createdPost = postFacade.createTextPost(post.title,
                                                  post.contents,
                                                  post.author);
-
-
         return Response.status(CREATED).entity(gson.toJson(PostDTO.basic(createdPost))).build();
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("image")
+    public Response createImagePost(String content) throws ResourceNotFoundException
+    {
+        ReceivedCreateImagePost post = gson.fromJson(content, ReceivedCreateImagePost.class);
+        Post createdPost = postFacade.createImagePost(post.title,
+                                                     post.contents,
+                                                     post.author,
+                                                      post.images);
+
+        return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
+    }
     @GET
     @Path("{id: [0-9]+}")
     public Response getPostById(@PathParam("id") Integer id) throws ResourceNotFoundException
@@ -87,10 +90,34 @@ public class PostResource
         return Response.ok(gson.toJson(postDTOs)).build();
     }
 
-    private class ReceivedCreatePost
+
+    @Path("user/{userId}/{pageSize}")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getRollingUserPosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff)
+    throws ResourceNotFoundException
+    {
+        List<Post>    posts    = postFacade.getRollingPostByUser(userId, pageSize, cutoff);
+        List<PostDTO> postDTOs = PostDTO.list(posts, PostDTO::withAuthor);
+        return Response.ok(gson.toJson(postDTOs)).build();
+    }
+
+
+
+    private class ReceivedCreateTextPost
+    {
+    private String contents;
+    private String title;
+    private Integer author;
+    }
+
+    private class ReceivedCreateImagePost
     {
         private String contents;
         private String title;
-        private Integer   author;
+        private Integer author;
+        private List<String> images;
     }
+
+
 }

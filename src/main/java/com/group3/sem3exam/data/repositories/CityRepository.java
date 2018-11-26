@@ -1,13 +1,14 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.repositories.base.ReadRepository;
 
 import java.util.List;
 
 /**
  * Represents a data source of users. Defines read operations on the data source.
  */
-public interface CityRepository extends ReadCrudRepository<City, Integer>
+public interface CityRepository extends ReadRepository<City, Integer>
 {
 
     /**

@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.repositories.base;
 
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.data.repositories.transactions.TransactionalRepository;
@@ -97,7 +97,6 @@ public class AbstractJpaRepository implements TransactionalRepository
      *
      * @return The currently active entity manager.
      */
-    @Override
     public EntityManager getEntityManager()
     {
         return entityManager;
@@ -106,10 +105,9 @@ public class AbstractJpaRepository implements TransactionalRepository
     /**
      * Sets the currently active entity manager instance.
      *
-     * @param entityManger The new active manager.
+     * @param entityManager The new active manager.
      */
-    @Override
-    public void setEntityManager(EntityManager entityManger)
+    public void setEntityManager(EntityManager entityManager)
     {
         this.entityManager = entityManager;
     }

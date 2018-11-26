@@ -1,6 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.repositories.base.JpaReadRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * An implementation of the {@code CityRepository} interface, backed by a JPA data source.
  */
-public class JpaCityRepository extends JpaReadCrudRepository<City, Integer> implements CityRepository
+public class JpaCityRepository extends JpaReadRepository<City, Integer> implements CityRepository
 {
 
     /**

@@ -1,5 +1,6 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.junit.jupiter.api.DynamicTest;
 
 import java.util.Collection;
@@ -13,7 +14,7 @@ public class JpaCrudRepositoryTester<
         E extends RepositoryEntity<K>,
         K extends Comparable<K>,
         I extends JpaCrudRepository<E, K>>
-        extends JpaReadCrudRepositoryTester<E, K, I>
+        extends JpaReadRepositoryTester<E, K, I>
 {
 
     public JpaCrudRepositoryTester(

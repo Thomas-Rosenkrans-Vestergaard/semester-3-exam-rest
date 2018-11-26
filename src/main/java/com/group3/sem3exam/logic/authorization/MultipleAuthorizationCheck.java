@@ -30,9 +30,10 @@ public class MultipleAuthorizationCheck implements AuthorizationCheck
      * Performs the authorization check provided the authentication context.
      *
      * @param authenticationContext The authentication context to perform the check upon.
+     * @throws AuthorizationException When the check fails.
      */
     @Override
-    public void check(AuthenticationContext authenticationContext)
+    public void check(AuthenticationContext authenticationContext) throws AuthorizationException
     {
         for (AuthorizationCheck check : authorizationChecks)
             check.check(authenticationContext);

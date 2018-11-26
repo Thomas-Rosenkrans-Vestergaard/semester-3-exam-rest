@@ -1,6 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.Country;
+import com.group3.sem3exam.data.repositories.base.JpaReadRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * An implementation of the {@code CountryRepository} interface, backed by a JPA data source.
  */
-public class JpaCountryRepository extends JpaReadCrudRepository<Country, Integer>
+public class JpaCountryRepository extends JpaReadRepository<Country, Integer>
         implements CountryRepository
 {
 

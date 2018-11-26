@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.repositories.base;
 
 import com.group3.sem3exam.data.repositories.transactions.TransactionalRepository;
 
@@ -9,7 +9,7 @@ import com.group3.sem3exam.data.repositories.transactions.TransactionalRepositor
  * @param <K> The type of the key of the entities managed by the repository.
  */
 public interface CrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
-        extends ReadCrudRepository<E, K>,
+        extends ReadRepository<E, K>,
                 TransactionalRepository
 {
 

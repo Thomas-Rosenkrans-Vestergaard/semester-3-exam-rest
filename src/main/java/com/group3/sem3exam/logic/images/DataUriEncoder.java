@@ -1,44 +1,46 @@
 package com.group3.sem3exam.logic.images;
 
-import java.io.ByteArrayInputStream;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLConnection;
 import java.util.Base64;
 
-
+/**
+ * Encodes image data to data uri.
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Data_URI_scheme">https://en.wikipedia.org/wiki/Data_URI_scheme</a>
+ */
 public class DataUriEncoder
 {
 
     /**
-     * Converts a byte image to a data uri.
+     * Converts a image byte array to a data uri.
      *
      * @param data The data to convert to a data uri.
+     * @param type The type of the image to convert.
      * @return The generated data uri.
-     * @throws UnsupportedImageTypeException When the image type is not supported.
-     * @see <a href="https://en.wikipedia.org/wiki/Data_URI_scheme">https://en.wikipedia.org/wiki/Data_URI_scheme</a>
      */
-    public String bytesToDataURI(byte[] data) throws UnsupportedImageTypeException
+    public String encode(byte[] data, ImageType type)
     {
-        String    mimeType  = getMimeType(data);
-        ImageType imageType = ImageType.fromMime(mimeType);
-        return String.format("data:%s;base64,%s", mimeType, Base64.getEncoder().encodeToString(data));
+        return String.format("data:%s;base64,%s", type.getMime(), Base64.getEncoder().encodeToString(data));
     }
 
     /**
-     * Finds the mime type of the image in the provided byte data.
+     * Converts a provided buffered image to a data uri.
      *
-     * @param data The image byte data to return the mime type of.
-     * @return The mime type of the image in the provided byte data. {@code null} when the mime type could not be
-     * read from the image byte data.
+     * @param bufferedImage The image to convert to a data uri.
+     * @param type          The type of the image to convert.
+     * @return The generated data uri.
      */
-    private String getMimeType(byte[] data)
+    public String encode(BufferedImage bufferedImage, ImageType type)
     {
         try {
-            InputStream is = new ByteArrayInputStream(data);
-            return URLConnection.guessContentTypeFromStream(is);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(bufferedImage, type.getExtension(), outputStream);
+            return encode(outputStream.toByteArray(), type);
         } catch (IOException e) {
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }

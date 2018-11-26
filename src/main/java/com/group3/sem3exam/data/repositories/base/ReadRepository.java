@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.repositories.base;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Set;
  * @param <E> The type of the entity managed by the repository.
  * @param <K> The type of the key of the entities managed by the repository.
  */
-public interface ReadCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>> extends Repository
+public interface ReadRepository<E extends RepositoryEntity<K>, K extends Comparable<K>> extends Repository
 {
 
     /**

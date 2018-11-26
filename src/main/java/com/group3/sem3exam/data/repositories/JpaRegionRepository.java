@@ -1,6 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.Region;
+import com.group3.sem3exam.data.repositories.base.JpaReadRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * An implementation of the {@code RegionRepository} interface, backed by a JPA data source.
  */
-public class JpaRegionRepository extends JpaReadCrudRepository<Region, Integer> implements RegionRepository
+public class JpaRegionRepository extends JpaReadRepository<Region, Integer> implements RegionRepository
 {
 
     /**

@@ -1,5 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
+import com.group3.sem3exam.data.repositories.base.JpaReadRepository;
+import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.junit.jupiter.api.DynamicTest;
 
 import java.util.*;
@@ -8,17 +10,17 @@ import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class JpaReadCrudRepositoryTester<
+public class JpaReadRepositoryTester<
         E extends RepositoryEntity<K>,
         K extends Comparable<K>,
-        I extends JpaReadCrudRepository<E, K>>
+        I extends JpaReadRepository<E, K>>
 {
 
     protected final Supplier<I>                constructor;
     protected final Function<I, TreeMap<K, E>> dataProducer;
     protected final K                          unknownKey;
 
-    public JpaReadCrudRepositoryTester(
+    public JpaReadRepositoryTester(
             Supplier<I> constructor,
             Function<I, TreeMap<K, E>> dataProducer,
             K unknownKey)
