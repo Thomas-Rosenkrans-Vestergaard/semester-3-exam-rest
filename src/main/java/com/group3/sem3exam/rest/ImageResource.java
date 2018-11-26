@@ -2,17 +2,18 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.GalleryImage;
 import com.group3.sem3exam.data.repositories.JpaImageRepository;
-import com.group3.sem3exam.data.repositories.JpaJwtSecret;
 import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.logic.images.ImageFacade;
-import com.group3.sem3exam.logic.images.UnsupportedImageTypeException;
+import com.group3.sem3exam.logic.images.ImageThumbnailerException;
+import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.rest.dto.ImageDTO;
 
 import javax.ws.rs.*;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 
 import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
+import static javax.ws.rs.core.Response.Status.CREATED;
 
 @Path("images")
 public class ImageResource
@@ -48,16 +50,16 @@ public class ImageResource
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(@HeaderParam("Authorization") String token, String content)
-    throws AuthenticationException, UnsupportedImageTypeException
+    throws UnsupportedImageFormatException, AuthenticationException, ImageThumbnailerException
     {
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
         if (authenticationContext.getType() == USER) {
             ReceivedCreateImage receivedCreateImage = gson.fromJson(content, ReceivedCreateImage.class);
-            Image image = imageFacade.create(
+            GalleryImage image = imageFacade.create(
                     authenticationContext.getUser(),
-                    receivedCreateImage.title,
+                    receivedCreateImage.description,
                     receivedCreateImage.data);
-            return Response.ok(gson.toJson(ImageDTO.basic(image))).build();
+            return Response.status(CREATED).entity(gson.toJson(ImageDTO.basic(image))).build();
         }
 
         throw new AuthenticationException("Unsupported user type");
@@ -68,8 +70,8 @@ public class ImageResource
     public Response getByUser(@PathParam("user") int user)
     throws ResourceNotFoundException
     {
-        List<Image> images = imageFacade.getByUser(user);
-        String      json   = gson.toJson(ImageDTO.list(images, ImageDTO::basic));
+        List<GalleryImage> images = imageFacade.getByUser(user);
+        String             json   = gson.toJson(ImageDTO.list(images, ImageDTO::basic));
         return Response.ok(json).build();
     }
 
@@ -97,8 +99,8 @@ public class ImageResource
             @PathParam("pageNumber") int pageNumber)
     throws ResourceNotFoundException
     {
-        List<Image>   images        = imageFacade.getByUserPaginated(user, pageSize, pageNumber);
-        PaginatedView paginatedView = new PaginatedView();
+        List<GalleryImage> images        = imageFacade.getByUserPaginated(user, pageSize, pageNumber);
+        PaginatedView      paginatedView = new PaginatedView();
         paginatedView.count = imageFacade.countByUser(user);
         paginatedView.results = ImageDTO.list(images, ImageDTO::basic);
 
@@ -107,7 +109,7 @@ public class ImageResource
 
     private class ReceivedCreateImage
     {
-        public String title;
+        public String description;
         public String data;
     }
 }

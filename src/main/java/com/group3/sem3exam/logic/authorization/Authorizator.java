@@ -2,16 +2,13 @@ package com.group3.sem3exam.logic.authorization;
 
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
-import java.util.concurrent.Callable;
-import java.util.function.Supplier;
-
 /**
  * Performs checks on an {@link AuthenticationContext} before performing some operation.
  * <p>
  * An example of the usage:
  * <code>
  * int userToRetrieve = 5;
- * return new Authorizator(authenticationContext).attempt(new SensitiveDataCheck(userToRetrieve), () -> {
+ * new Authorizator(authenticationContext).check(new SensitiveDataCheck(userToRetrieve);
  * UserFacade userFacade = new UserFacade();
  * return userFacade.getSensitiveData(userToRetrieve);
  * });
@@ -36,42 +33,14 @@ public class Authorizator
     }
 
     /**
-     * Performs the provided {@code operation} when the provided check passes. The operation cannot return a value.
+     * Checks that the provided {@link AuthenticationContext} passes all the provided checks.
      *
-     * @param check     The check that must check for the operation to be performed.
-     * @param operation The operation to perform when the provided {@code check} passes.
-     * @throws Exception Any error thrown from the operation or the provided {@code check}.
-     * @see Authorizator#attempt(AuthorizationCheck, Callable)
+     * @param checks The checks the {@link AuthenticationContext} must pass.
+     * @throws AuthorizationException When one or more of the check fails.
      */
-    public void attempt(AuthorizationCheck check, ExceptionRunnable operation) throws Exception
+    public void check(AuthorizationCheck... checks) throws AuthorizationException
     {
-        check.check(this.authenticationContext);
-
-
-        operation.run();
-    }
-
-    /**
-     * Performs the provided {@code operation} when the provided check passes. The method returns the value returned by
-     * the provided {@code operation}.
-     *
-     * @param check     The check that must check for the operation to be performed.
-     * @param operation The operation to perform when the provided {@code check} passes.
-     * @return The value returned by the {@code operation}.
-     * @throws Exception Any error thrown from the operation or the provided {@code check}.
-     * @see Authorizator#attempt(AuthorizationCheck, ExceptionRunnable)
-     */
-    public <T> T attempt(AuthorizationCheck check, Supplier<T> operation) throws Exception
-    {
-        check.check(authenticationContext);
-
-        return operation.get();
-    }
-
-
-    @FunctionalInterface
-    public interface ExceptionRunnable
-    {
-        public void run() throws Exception;
+        for (AuthorizationCheck check : checks)
+            check.check(this.authenticationContext);
     }
 }

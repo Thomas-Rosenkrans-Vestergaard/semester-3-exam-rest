@@ -18,6 +18,17 @@ public interface FriendshipRepository extends TransactionalRepository
      */
     List<User> getFriends(Integer userId);
 
+    /**
+     * Returns a paginated view of the friends of the provided user.
+     *
+     * @param user       The user to search the friends of.
+     * @param pageSize   The number of results on a single page. {@code pageSize >= 0}
+     * @param pageNumber The page number to return. {@code pageNumber > 0}.
+     * @param search     Optional parameter, search in the names.
+     * @return The paginated view of the friends of the provided user.
+     */
+    List<User> getFriends(User user, Integer pageSize, Integer pageNumber, String search);
+
     Friendship createFriendship(FriendRequest friendRequest);
 
     FriendRequest createFriendRequest(User requester, User reciever);

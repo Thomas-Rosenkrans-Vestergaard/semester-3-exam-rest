@@ -10,8 +10,9 @@
         <class>com.group3.sem3exam.data.entities.City</class>
         <class>com.group3.sem3exam.data.entities.Region</class>
         <class>com.group3.sem3exam.data.entities.Country</class>
-        <class>com.group3.sem3exam.data.entities.Image</class>
-        <class>com.group3.sem3exam.data.repositories.JwtEntity</class>
+        <class>com.group3.sem3exam.data.entities.GalleryImage</class>
+        <class>com.group3.sem3exam.data.entities.ProfilePicture</class>
+        <class>com.group3.sem3exam.logic.authentication.jwt.JwtEntity</class>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:derby:memory:unit-testing;create=true"/>
             <property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.EmbeddedDriver"/>

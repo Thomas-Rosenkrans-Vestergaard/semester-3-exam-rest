@@ -1,6 +1,6 @@
 package com.group3.sem3exam.data.entities;
 
-import com.group3.sem3exam.data.repositories.RepositoryEntity;
+import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -12,7 +12,6 @@ import java.util.Objects;
 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -55,10 +54,10 @@ public class User implements RepositoryEntity<Integer>
     private List<Friendship> friendships = new ArrayList<>();
 
     @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "user")
-    private List<Image> images = new ArrayList<>();
+    private List<GalleryImage> images = new ArrayList<>();
 
-    @OneToOne(fetch = EAGER, optional = true)
-    private Image profilePicture;
+    @OneToOne(fetch = LAZY, cascade = ALL, mappedBy = "user")
+    private ProfilePicture profilePicture;
 
     public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
     {
@@ -189,27 +188,27 @@ public class User implements RepositoryEntity<Integer>
         this.dateOfBirth = dateOfBirth;
     }
 
-    public List<Image> getImages()
+    public List<GalleryImage> getImages()
     {
         return this.images;
     }
 
-    public void setImages(List<Image> images)
+    public void setImages(List<GalleryImage> images)
     {
         this.images = images;
     }
 
-    public void addImage(Image image)
+    public void addImage(GalleryImage image)
     {
         this.images.add(image);
     }
 
-    public Image getProfilePicture()
+    public ProfilePicture getProfilePicture()
     {
         return this.profilePicture;
     }
 
-    public void setProfilePicture(Image profilePicture)
+    public void setProfilePicture(ProfilePicture profilePicture)
     {
         this.profilePicture = profilePicture;
     }

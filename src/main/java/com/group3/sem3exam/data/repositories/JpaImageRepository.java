@@ -1,9 +1,8 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.GalleryImage;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.ResourceNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -12,7 +11,7 @@ import java.util.List;
 /**
  * An implementation of the {@code ImageRepository} interface, backed by a JPA data source.
  */
-public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implements ImageRepository
+public class JpaImageRepository extends JpaCrudRepository<GalleryImage, Integer> implements ImageRepository
 {
 
     /**
@@ -22,7 +21,7 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
      */
     public JpaImageRepository(EntityManager entityManager)
     {
-        super(entityManager, Image.class);
+        super(entityManager, GalleryImage.class);
     }
 
     /**
@@ -33,7 +32,7 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
      */
     public JpaImageRepository(EntityManagerFactory entityManagerFactory)
     {
-        super(entityManagerFactory, Image.class);
+        super(entityManagerFactory, GalleryImage.class);
     }
 
     /**
@@ -44,34 +43,34 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
      */
     public JpaImageRepository(JpaTransaction transaction)
     {
-        super(transaction, Image.class);
+        super(transaction, GalleryImage.class);
     }
 
     @Override
-    public Image create(String title, String uri, User user)
+    public GalleryImage create(String description, String full, String thumbnail, User user)
     {
-        Image image = new Image(title, uri, user);
+        GalleryImage image = new GalleryImage(description, full, thumbnail, user);
         getEntityManager().persist(image);
         return image;
     }
 
     @Override
-    public List<Image> getByUser(Integer user)
+    public List<GalleryImage> getByUser(Integer user)
     {
         return getEntityManager()
-                .createQuery("SELECT i FROM Image i WHERE i.user.id = :user", Image.class)
+                .createQuery("SELECT i FROM GalleryImage i WHERE i.user.id = :user", GalleryImage.class)
                 .setParameter("user", user)
                 .getResultList();
     }
 
     @Override
-    public List<Image> getByUserPaginated(Integer user, int pageSize, int pageNumber)
+    public List<GalleryImage> getByUserPaginated(Integer user, int pageSize, int pageNumber)
     {
         pageSize = Math.max(pageSize, 0);
         pageNumber = Math.max(pageNumber, 1);
 
         return getEntityManager()
-                .createQuery("SELECT i FROM Image i WHERE i.user.id = :user", Image.class)
+                .createQuery("SELECT i FROM GalleryImage i WHERE i.user.id = :user", GalleryImage.class)
                 .setFirstResult((pageNumber - 1) * pageSize)
                 .setMaxResults(pageSize)
                 .setParameter("user", user)

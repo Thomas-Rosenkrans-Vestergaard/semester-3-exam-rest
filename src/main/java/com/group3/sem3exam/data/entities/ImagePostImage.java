@@ -1,42 +1,39 @@
 package com.group3.sem3exam.data.entities;
 
-import com.group3.sem3exam.data.repositories.RepositoryEntity;
+import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
-
 @Entity
-@Table(name = "image")
-public class Image implements RepositoryEntity<Integer>
+public class ImagePostImage implements RepositoryEntity<Integer>
 {
-
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private String title;
-
     @Lob
     @Column(nullable = false)
-    private String uri;
+    private String data;
+
+    @Lob
+    @Column
+    private String thumbnail;
 
     @ManyToOne(fetch = EAGER, optional = false)
     private User user;
 
-    public Image()
+    public ImagePostImage(String data, String thumbnail, User user)
     {
-
+        this.data = data;
+        this.thumbnail = thumbnail;
+        this.user = user;
     }
 
-    public Image(String title, String uri, User user)
+    public ImagePostImage()
     {
-        this.title = title;
-        this.uri = uri;
-        this.user = user;
     }
 
     public Integer getId()
@@ -49,24 +46,24 @@ public class Image implements RepositoryEntity<Integer>
         this.id = id;
     }
 
-    public String getTitle()
+    public String getData()
     {
-        return this.title;
+        return data;
     }
 
-    public void setTitle(String title)
+    public void setData(String data)
     {
-        this.title = title;
+        this.data = data;
     }
 
-    public String getUri()
+    public String getThumbnail()
     {
-        return this.uri;
+        return thumbnail;
     }
 
-    public void setData(String uri)
+    public void setThumbnail(String thumbnail)
     {
-        this.uri = uri;
+        this.thumbnail = thumbnail;
     }
 
     public User getUser()

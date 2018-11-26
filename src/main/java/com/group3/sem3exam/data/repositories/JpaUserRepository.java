@@ -1,8 +1,8 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.ProfilePicture;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
@@ -10,7 +10,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.time.LocalDate;
-import java.util.List;
 
 /**
  * An implementation of the {@code UserRepository} interface, backed by a JPA data source.
@@ -86,5 +85,20 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    @Override
+    public User updateProfilePicture(User user, String src)
+    {
+        ProfilePicture existing = user.getProfilePicture();
+        if (existing != null)
+            existing.setSrc(src);
+        else {
+            ProfilePicture profilePicture = new ProfilePicture(src, user);
+            getEntityManager().persist(profilePicture);
+            user.setProfilePicture(profilePicture);
+        }
+
+        return user;
     }
 }

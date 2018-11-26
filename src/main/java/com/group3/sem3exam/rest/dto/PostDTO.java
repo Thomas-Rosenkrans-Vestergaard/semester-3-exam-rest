@@ -1,10 +1,8 @@
 package com.group3.sem3exam.rest.dto;
 
 import com.group3.sem3exam.data.entities.Post;
-import com.group3.sem3exam.data.entities.User;
 
 import javax.ejb.Stateless;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

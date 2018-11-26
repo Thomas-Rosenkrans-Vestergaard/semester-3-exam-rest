@@ -1,7 +1,4 @@
-package com.group3.sem3exam.data.repositories;
-
-import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
-import com.group3.sem3exam.logic.authentication.jwt.JwtSecretGenerationException;
+package com.group3.sem3exam.logic.authentication.jwt;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;

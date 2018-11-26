@@ -1,6 +1,6 @@
 package com.group3.sem3exam.data.entities;
 
-import com.group3.sem3exam.data.repositories.RepositoryEntity;
+import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
@@ -11,19 +11,19 @@ import java.util.List;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "post")
-public class Post implements RepositoryEntity<Integer>
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Post implements RepositoryEntity<Integer>
 {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(length = 65535, columnDefinition = "TEXT")
-    private String contents;
-
     @Column(nullable = false)
     private String title;
+
+    @Column(length = 65535, columnDefinition = "TEXT")
+    private String contents;
 
     @ManyToOne(optional = false)
     private User author;
@@ -56,16 +56,6 @@ public class Post implements RepositoryEntity<Integer>
     public void setTitle(String title)
     {
         this.title = title;
-    }
-
-    public Integer getId()
-    {
-        return this.id;
-    }
-
-    public void setId(Integer id)
-    {
-        this.id = id;
     }
 
     public String getContents()
@@ -114,5 +104,15 @@ public class Post implements RepositoryEntity<Integer>
     {
         this.comments.add(comment);
         comment.setPost(this);
+    }
+
+    public Integer getId()
+    {
+        return this.id;
+    }
+
+    public void setId(Integer id)
+    {
+        this.id = id;
     }
 }

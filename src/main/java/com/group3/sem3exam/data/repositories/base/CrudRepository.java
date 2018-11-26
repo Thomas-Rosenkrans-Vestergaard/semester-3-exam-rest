@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.repositories.base;
 
 import com.group3.sem3exam.data.repositories.transactions.TransactionalRepository;
 

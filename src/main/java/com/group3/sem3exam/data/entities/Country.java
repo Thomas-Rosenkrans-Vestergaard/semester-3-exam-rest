@@ -1,6 +1,6 @@
 package com.group3.sem3exam.data.entities;
 
-import com.group3.sem3exam.data.repositories.RepositoryEntity;
+import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 
 import javax.persistence.*;
 import java.util.ArrayList;

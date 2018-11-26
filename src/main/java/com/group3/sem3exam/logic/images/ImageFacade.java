@@ -1,16 +1,22 @@
 package com.group3.sem3exam.logic.images;
 
-import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.GalleryImage;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static com.group3.sem3exam.logic.images.ImageType.fromData;
 
 public class ImageFacade<T extends Transaction>
 {
@@ -55,12 +61,12 @@ public class ImageFacade<T extends Transaction>
      * @return The image with the provided id.
      * @throws ResourceNotFoundException When an image with the provided id does not exist.
      */
-    public Image get(Integer id) throws ResourceNotFoundException
+    public GalleryImage get(Integer id) throws ResourceNotFoundException
     {
         try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
-            Image image = ir.get(id);
+            GalleryImage image = ir.get(id);
             if (image == null)
-                throw new ResourceNotFoundException(Image.class, id);
+                throw new ResourceNotFoundException(GalleryImage.class, id);
 
             return image;
         }
@@ -73,7 +79,7 @@ public class ImageFacade<T extends Transaction>
      * @return The images by the user with the provided id.
      * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public List<Image> getByUser(Integer user) throws ResourceNotFoundException
+    public List<GalleryImage> getByUser(Integer user) throws ResourceNotFoundException
     {
         try (T transaction = transactionFactory.get()) {
             UserRepository  ur = userRepositoryFactory.apply(transaction);
@@ -114,7 +120,8 @@ public class ImageFacade<T extends Transaction>
      * @return The images by the user with the provided id.
      * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public List<Image> getByUserPaginated(Integer user, int pageSize, int pageNumber) throws ResourceNotFoundException
+    public List<GalleryImage> getByUserPaginated(Integer user, int pageSize, int pageNumber)
+    throws ResourceNotFoundException
     {
         pageSize = Math.max(pageSize, 0);
         pageNumber = Math.max(pageNumber, 1);
@@ -132,21 +139,26 @@ public class ImageFacade<T extends Transaction>
     /**
      * Saves an image with the provided information to the database.
      *
-     * @param user   The owner of the image.
-     * @param title  The title of the image.
-     * @param base64 The base64 encoded string containing the data in the image.
+     * @param user        The owner of the image.
+     * @param description The description of the image.
+     * @param base64      The base64 encoded string containing the data in the image.
      * @return The created image.
-     * @throws UnsupportedImageTypeException When the image type is not supported.
+     * @throws UnsupportedImageFormatException When the provided image is of an unsupported type.
+     * @throws ImageThumbnailerException       When a thumbnail of the image cannot be created.
      */
-    public Image create(User user, String title, String base64) throws UnsupportedImageTypeException
+    public GalleryImage create(User user, String description, String base64)
+    throws UnsupportedImageFormatException, ImageThumbnailerException
     {
-        DataUriEncoder uriEncoder = new DataUriEncoder();
-        byte[]         data       = Base64.getDecoder().decode(base64);
-        String         dataUri    = uriEncoder.bytesToDataURI(data);
+        DataUriEncoder   uriEncoder       = new DataUriEncoder();
+        byte[]           data             = Base64.getDecoder().decode(base64);
+        ImageType        type             = fromData(data);
+        String           full             = uriEncoder.encode(data, type);
+        ImageThumbnailer imageThumbnailer = new ImageThumbnailer(250, 250);
+        byte[]           thumbnail        = imageThumbnailer.createThumbnail(data, type);
 
         try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
             ir.begin();
-            Image image = ir.create(title, dataUri, user);
+            GalleryImage image = ir.create(description, full, uriEncoder.encode(thumbnail, type), user);
             ir.commit();
             return image;
         }
