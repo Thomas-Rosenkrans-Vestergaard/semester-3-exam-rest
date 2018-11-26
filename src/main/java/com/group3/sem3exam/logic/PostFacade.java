@@ -7,10 +7,12 @@ import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.PostRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.logic.images.*;
 
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -78,22 +80,25 @@ public class PostFacade<T extends Transaction>
         }
     }
 
-    public ImagePost createImagePost(String title, String body, Integer author, List<String> images) throws ResourceNotFoundException
+    public ImagePost createImagePost(String title, String body, Integer author, List<String> images) throws ResourceNotFoundException, UnsupportedImageFormatException, ImageThumbnailerException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
-            PostRepository pr   = postRepositoryFactory.apply(transaction);
-            UserRepository ur   = userRepositoryFactory.apply(transaction);
-            ImagePostImageRepository ir = imagePostImageRepositoryFactory.apply(transaction);
-            User           user = ur.get(author);
-            List<ImagePostImage> postImages = new ArrayList<>();
+            PostRepository           pr               = postRepositoryFactory.apply(transaction);
+            UserRepository           ur               = userRepositoryFactory.apply(transaction);
+            ImagePostImageRepository ir               = imagePostImageRepositoryFactory.apply(transaction);
+            User                     user             = ur.get(author);
+            List<ImagePostImage>     postImages       = new ArrayList<>();
+            ImageThumbnailer         imageThumbnailer = new ImageThumbnailer(250, 250);
+            DataUriEncoder               uriEncoder       = new DataUriEncoder();
             if (user == null)
                 throw new ResourceNotFoundException(User.class, author);
 
-
-            //lav thumbnail her
             for(String image: images){
-                postImages.add(ir.create(image, user, "jsdf"));
+                byte[] data = Base64.getDecoder().decode(image);
+                data = imageThumbnailer.createThumbnail(data);
+                String uri = uriEncoder.encode(data, ImageType.fromData(data));
+                postImages.add(ir.create(image, user, uri));
             }
 
             ImagePost post = pr.createImagePost(user, title, body, LocalDateTime.now(), postImages);

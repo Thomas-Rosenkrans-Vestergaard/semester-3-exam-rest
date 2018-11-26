@@ -9,6 +9,8 @@ import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.PostFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.images.ImageThumbnailerException;
+import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.rest.dto.PostDTO;
 
 import javax.ws.rs.*;
@@ -61,7 +63,7 @@ public class PostResource
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("image")
-    public Response createImagePost(String content) throws ResourceNotFoundException
+    public Response createImagePost(String content) throws ResourceNotFoundException, ImageThumbnailerException, UnsupportedImageFormatException
     {
         ReceivedCreateImagePost post = gson.fromJson(content, ReceivedCreateImagePost.class);
         Post createdPost = postFacade.createImagePost(post.title,

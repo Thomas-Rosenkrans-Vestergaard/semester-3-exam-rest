@@ -2,7 +2,11 @@ package com.group3.sem3exam.logic.images;
 
 import net.coobird.thumbnailator.Thumbnails;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 /**
  * Creates a thumbnail of a desired size from a provided buffered image.
@@ -89,5 +93,41 @@ public class ImageThumbnailer
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Creates thumbnail data from the provided full image data.
+     *
+     * @param data The data from the full image.
+     * @param type The type of image.
+     * @return The resulting thumbnail data.
+     * @throws ImageThumbnailerException When the thumbnail cannot be created.
+     */
+    public byte[] createThumbnail(byte[] data, ImageType type) throws ImageThumbnailerException
+    {
+        try {
+            ImageThumbnailer      thumbnailMaker = new ImageThumbnailer(250, 250);
+            BufferedImage         full           = ImageIO.read(new ByteArrayInputStream(data));
+            BufferedImage         thumbnail      = thumbnailMaker.create(full);
+            ByteArrayOutputStream outputStream   = new ByteArrayOutputStream();
+            ImageIO.write(thumbnail, type.getExtension(), outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
+     * Creates thumbnail data from the provided full image data.
+     *
+     * @param data The data from the full image.
+     * @return The resulting thumbnail data.
+     * @throws ImageThumbnailerException When the thumbnail cannot be created.
+     * @throws UnsupportedImageFormatException When the provided data is in an unsupported format.
+     */
+    public byte[] createThumbnail(byte[] data) throws ImageThumbnailerException, UnsupportedImageFormatException
+    {
+        return createThumbnail(data, ImageType.fromData(data));
     }
 }
