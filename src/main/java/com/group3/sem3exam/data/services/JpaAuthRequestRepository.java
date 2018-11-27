@@ -43,9 +43,9 @@ public class JpaAuthRequestRepository extends JpaCrudRepository<AuthRequest, Str
     }
 
     @Override
-    public AuthRequest create(Service service, String callback, Integer timeout, PermissionTemplate template)
+    public AuthRequest create(Service service, String callback, PermissionTemplate template)
     {
-        AuthRequest authRequest = new AuthRequest(service, callback, timeout, template);
+        AuthRequest authRequest = new AuthRequest(service, callback, template);
         getEntityManager().persist(authRequest);
         return authRequest;
     }
