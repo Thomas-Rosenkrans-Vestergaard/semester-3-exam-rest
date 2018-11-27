@@ -1,15 +1,20 @@
 package com.group3.sem3exam.logic;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.data.services.*;
-import com.group3.sem3exam.logic.authentication.AuthenticationContext;
-import com.group3.sem3exam.logic.authentication.AuthenticationException;
-import com.group3.sem3exam.logic.authentication.IncorrectCredentialsException;
-import com.group3.sem3exam.logic.authentication.LazyAuthenticationContext;
-import com.group3.sem3exam.logic.authorization.AuthorizationException;
+import com.group3.sem3exam.logic.authentication.*;
+import com.group3.sem3exam.logic.authorization.*;
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -18,22 +23,25 @@ import java.util.function.Supplier;
 public class ServiceFacade<T extends Transaction>
 {
 
-    private final Supplier<T>                                transactionFactory;
-    private final Function<T, ServiceRepository>             serviceRepositoryFactory;
-    private final Function<T, ServiceAuthRequestRepository>  requestRepositoryFactory;
-    private final Function<T, ServiceAuthTemplateRepository> templateRepositoryFactory;
-    private final Function<T, UserRepository>                userRepositoryFactory;
+    private final Supplier<T>                               transactionFactory;
+    private final Function<T, ServiceRepository>            serviceRepositoryFactory;
+    private final Function<T, AuthRequestRepository>        requestRepositoryFactory;
+    private final Function<T, PermissionRequestRepository>  permissionRequestRepositoryFactory;
+    private final Function<T, PermissionTemplateRepository> templateRepositoryFactory;
+    private final Function<T, UserRepository>               userRepositoryFactory;
 
     public ServiceFacade(
             Supplier<T> transactionFactory,
             Function<T, ServiceRepository> serviceRepositoryFactory,
-            Function<T, ServiceAuthRequestRepository> requestRepositoryFactory,
-            Function<T, ServiceAuthTemplateRepository> templateRepositoryFactory,
+            Function<T, AuthRequestRepository> authRequestRepositoryFactory,
+            Function<T, PermissionRequestRepository> permissionRequestRepositoryFactory,
+            Function<T, PermissionTemplateRepository> templateRepositoryFactory,
             Function<T, UserRepository> userRepositoryFactory)
     {
         this.transactionFactory = transactionFactory;
         this.serviceRepositoryFactory = serviceRepositoryFactory;
-        this.requestRepositoryFactory = requestRepositoryFactory;
+        this.requestRepositoryFactory = authRequestRepositoryFactory;
+        this.permissionRequestRepositoryFactory = permissionRequestRepositoryFactory;
         this.templateRepositoryFactory = templateRepositoryFactory;
         this.userRepositoryFactory = userRepositoryFactory;
     }
@@ -60,6 +68,35 @@ public class ServiceFacade<T extends Transaction>
     }
 
     /**
+     * Registers a new service account.
+     *
+     * @param name     The name of the service account.
+     * @param password The password of the service account
+     * @return The newly created service.
+     */
+    public Service register(String name, String password)
+    {
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            ServiceRepository serviceRepository = serviceRepositoryFactory.apply(transaction);
+            Service           service           = serviceRepository.create(name, hash(password));
+            transaction.commit();
+            return service;
+        }
+    }
+
+    /**
+     * Hashes the provided password.
+     *
+     * @param password The password to hash.
+     * @return The hashed password.
+     */
+    private String hash(String password)
+    {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+    /**
      * Checks that the provided {@code password} matches the provided {@code hash} using the b-crypt algorithm.
      *
      * @param password The plaintext password.
@@ -72,9 +109,9 @@ public class ServiceFacade<T extends Transaction>
         return BCrypt.checkpw(password, hash);
     }
 
-    public ServiceAuthTemplate createTemplate(AuthenticationContext service, String message, List<String> privileges)
+    public PermissionTemplate createTemplate(AuthenticationContext service, String message, List<String> privileges)
     {
-        try (ServiceAuthTemplateRepository tr = templateRepositoryFactory.apply(transactionFactory.get())) {
+        try (PermissionTemplateRepository tr = templateRepositoryFactory.apply(transactionFactory.get())) {
             return tr.create(message, toEnum(privileges), service.getService());
         }
     }
@@ -86,12 +123,12 @@ public class ServiceFacade<T extends Transaction>
      * @param strings The strings to convert.
      * @return The list of enums.
      */
-    private List<ServicePrivilege> toEnum(List<String> strings)
+    private List<Permission> toEnum(List<String> strings)
     {
-        List<ServicePrivilege> enums = new ArrayList<>(strings.size());
+        List<Permission> enums = new ArrayList<>(strings.size());
         for (String string : strings) {
             try {
-                enums.add(ServicePrivilege.valueOf(string));
+                enums.add(Permission.valueOf(string));
             } catch (IllegalArgumentException e) {
             }
         }
@@ -103,49 +140,228 @@ public class ServiceFacade<T extends Transaction>
      * Requests privileges from the provided user.
      *
      * @param service  The service requesting privileges from the user.
-     * @param template The id of the template containing the .
-     * @param user     The user to request authorization from.
      * @param callback The callback to call when the user authenticates.
+     * @param timeout  The number of minutes to wait before timing out the request. Default is 5.
      * @return The service auth request that was created.
-     * @throws ResourceNotFoundException When the provided request template does not exist.
-     * @throws AuthorizationException    When the provided template is not owned by the provided service.
+     * @throws AuthorizationException When the provided auth context is not a service.
      */
-    public ServicePrivilegeRequest request(
-            AuthenticationContext service,
-            AuthenticationContext user,
-            Integer template,
-            String callback)
+    public AuthRequest requestAuth(AuthenticationContext service, String callback, Integer timeout)
+    throws AuthorizationException
+    {
+        timeout = timeout == null ? 5 : timeout;
+
+        new Authorizator(service).check(new IsService());
+
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            AuthRequestRepository requestRepository = requestRepositoryFactory.apply(transaction);
+            AuthRequest           authRequest       = requestRepository.create(service.getService(), callback, timeout);
+            transaction.commit();
+            return authRequest;
+        }
+    }
+
+    /**
+     * Returns the template with the provided id.
+     *
+     * @param service The service requesting privileges from the user.
+     * @param id      The id of the template to return.
+     * @return The template with the provided id.
+     * @throws AuthorizationException    When the provided auth context is not a service.
+     * @throws AuthorizationException    When the template with the provided id is not owned by the service.
+     * @throws ResourceNotFoundException When the template with the provided id does not exist.
+     */
+    public PermissionTemplate getTemplate(AuthenticationContext service, String id)
     throws ResourceNotFoundException, AuthorizationException
     {
+        new Authorizator(service).check(new IsService());
+
         try (T transaction = transactionFactory.get()) {
-            ServiceAuthRequestRepository  requestRepository  = requestRepositoryFactory.apply(transaction);
-            ServiceAuthTemplateRepository templateRepository = templateRepositoryFactory.apply(transaction);
+            transaction.begin();
+            PermissionTemplateRepository templateRepository = templateRepositoryFactory.apply(transaction);
+            PermissionTemplate           template           = templateRepository.get(id);
+            if (template == null)
+                throw new ResourceNotFoundException(PermissionTemplate.class, id);
+            if (template.getService().getId() != service.getServiceId())
+                throw new ResourceAccessException(PermissionTemplate.class, id);
 
-            ServiceAuthTemplate fetchedTemplate = templateRepository.get(template);
-            if (fetchedTemplate == null)
-                throw new ResourceNotFoundException(ServiceAuthTemplate.class, template);
-            if (service.getService().getId() != fetchedTemplate.getService().getId())
-                throw new AuthorizationException("Your service does not own that template.");
-
-            return requestRepository.request(fetchedTemplate, user.getUser());
+            transaction.commit();
+            return template;
         }
     }
 
     /**
      * Authenticates a user on behalf of a service authentication request.
      *
-     * @param service  The service to authenticate on behalf of.
+     * @param request  The id of the request to the user is authenticating for.
      * @param email    The email address of the user attempting to authenticate.
      * @param password The password of the user attempting to authenticate.
      * @return The authentication context.
-     * @throws ResourceNotFoundException When the provided service does not exist.
+     * @throws ResourceNotFoundException When the request does not exist.
      * @throws AuthenticationException   When the user cannot be authenticated.
      */
     public AuthenticationContext authenticateServiceUser(
-            Integer service,
+            String request,
             String email,
             String password)
-    throws AuthenticationException, ResourceNotFoundException
+    throws ResourceNotFoundException, AuthenticationException
+    {
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            AuthRequestRepository requestRepository = requestRepositoryFactory.apply(transaction);
+            AuthRequest           authRequest       = requestRepository.get(request);
+            if (authRequest == null)
+                throw new ResourceNotFoundException(AuthRequest.class, request);
+            UserAuthenticator     userAuthenticator = new UserAuthenticator(() -> userRepositoryFactory.apply(transaction));
+            AuthenticationContext userContext       = userAuthenticator.authenticate(email, password);
+
+            try {
+                requestRepository.completed(authRequest);
+                notifyServiceOnAuth(authRequest, userContext.getUser());
+                transaction.commit();
+            } catch (IOException e) {
+                transaction.rollback();
+                e.printStackTrace();
+            }
+
+            return LazyAuthenticationContext.representing(authRequest.getService(), userContext.getUser());
+        }
+    }
+
+    /**
+     * Notifies a service that a user has successfully authenticated in response to
+     * an authentication request sent to the
+     *
+     * @param request The request the user authenticated in response to.
+     * @param user    The user who was authenticated.
+     * @throws IOException When the connection to the service could not be made.
+     */
+    private void notifyServiceOnAuth(AuthRequest request, User user) throws IOException
+    {
+        AuthenticationNotifyTransfer transfer = new AuthenticationNotifyTransfer();
+        transfer.request = request.getId();
+        transfer.user = new UserTransfer(user);
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        post(request.getCallback(), gson.toJson(transfer));
+    }
+
+    /**
+     * Posts the provided JSON {@code contents} to the provided {@code address}.
+     *
+     * @param address  The address to post the contents to.
+     * @param contents The contents to post to the address.
+     * @throws IOException When the post could not be made.
+     */
+    private void post(String address, String contents) throws IOException
+    {
+        URL               url = new URL(address);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.addRequestProperty("Content-Type", "application/json;charset=UTF-8");
+        con.setRequestProperty("Accept", "application/json;charset=UTF-8");
+        con.setRequestProperty("User-Agent", "Server");
+
+        con.setDoOutput(true);
+        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
+            wr.write(contents.getBytes("UTF-8"));
+        }
+    }
+
+    /**
+     * The response to send to the service when a user successfully authenticates
+     * as a response to a authentication request.
+     */
+    private class AuthenticationNotifyTransfer
+    {
+        private String       request;
+        private UserTransfer user;
+    }
+
+    /**
+     * The view of the authenticated user sent to the service, when the user
+     * successfully authenticates as a response to a authentication request.
+     */
+    private class UserTransfer
+    {
+        private Integer       id;
+        private String        name;
+        private String        email;
+        private LocalDateTime createdAt;
+
+        public UserTransfer(User user)
+        {
+            this.id = user.getId();
+            this.name = user.getName();
+            this.email = user.getEmail();
+            this.createdAt = user.getCreatedAt();
+        }
+    }
+
+    /**
+     * Requests permissions from the provided {@code serviceUser}.
+     *
+     * @param serviceUser The user to request permissions from.
+     * @param template    The permissions to request.
+     * @return The newly created permission request.
+     * @throws ResourceNotFoundException When the provided template does not exist.
+     * @throws ResourceAccessException   When the provided template does not belong to the service.
+     * @throws AuthorizationException    When the provided authentication context is not a service user.
+     */
+    public PermissionRequest requestPermissions(AuthenticationContext serviceUser, String template)
+    throws ResourceNotFoundException, AuthorizationException
+    {
+        new Authorizator(serviceUser).check(new IsServiceUser());
+
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+
+            PermissionTemplateRepository templateRepository = templateRepositoryFactory.apply(transaction);
+
+            PermissionTemplate fetchedTemplate = templateRepository.get(template);
+            if (fetchedTemplate == null)
+                throw new ResourceNotFoundException(PermissionTemplate.class, template);
+            if (fetchedTemplate.getService().getId() != serviceUser.getServiceId())
+                throw new ResourceAccessException(PermissionTemplate.class, template);
+
+            PermissionRequestRepository requestRepository = permissionRequestRepositoryFactory.apply(transaction);
+            PermissionRequest permissionRequest = requestRepository.create(
+                    serviceUser.getUser(),
+                    fetchedTemplate
+            );
+
+            transaction.commit();
+
+            return permissionRequest;
+        }
+    }
+
+    public PermissionRequest rejectPermissionRequest(AuthenticationContext user, String request)
+    {
+        return updatePermissionRequest(user, request, PermissionRequest.Status.REJECTED);
+    }
+
+    public PermissionRequest acceptPermissionRequest(AuthenticationContext user, String request)
+    {
+        return updatePermissionRequest(user, request, PermissionRequest.Status.ACCEPTED);
+    }
+
+    /**
+     * Updates the state of the the provided permission request.
+     *
+     * @param user     The owner of the request.
+     * @param request  The request.
+     * @param response The response to the request.
+     * @return The updated permission request.
+     * @throws ResourceNotFoundException When the provided request does not exist.
+     * @throws ResourceAccessException   When the provided request is not owned by the provided user.
+     * @throws ResourceConflictException When the provided request has already been set.
+     */
+    private PermissionRequest updatePermissionRequest(
+            AuthenticationContext user,
+            String request,
+            PermissionRequest.Status response)
+    throws ResourceNotFoundException, ResourceAccessException, ResourceConflictException
     {
 
     }

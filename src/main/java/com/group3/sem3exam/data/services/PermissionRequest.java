@@ -3,22 +3,27 @@ package com.group3.sem3exam.data.services;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-public class ServicePrivilegeRequest implements RepositoryEntity<Integer>
+
+@Entity
+@Table(name = "permission_request")
+public class PermissionRequest implements RepositoryEntity<String>
 {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(generator = SecureRandomGenerator.name)
+    @GenericGenerator(name = SecureRandomGenerator.name, strategy = "com.group3.sem3exam.data.services.SecureRandomGenerator")
+    private String id;
 
     @ManyToOne(optional = false)
     private User user;
 
     @ManyToOne(optional = false)
-    private ServiceAuthTemplate declaration;
+    private PermissionTemplate declaration;
 
     @Column(nullable = false)
     private Status status;
@@ -27,24 +32,24 @@ public class ServicePrivilegeRequest implements RepositoryEntity<Integer>
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public ServicePrivilegeRequest()
+    public PermissionRequest()
     {
 
     }
 
-    public ServicePrivilegeRequest(User user, ServiceAuthTemplate declaration)
+    public PermissionRequest(User user, PermissionTemplate declaration)
     {
         this.user = user;
         this.declaration = declaration;
         this.status = Status.PENDING;
     }
 
-    public Integer getId()
+    public String getId()
     {
         return this.id;
     }
 
-    public void setId(Integer id)
+    public void setId(String id)
     {
         this.id = id;
     }
@@ -59,12 +64,12 @@ public class ServicePrivilegeRequest implements RepositoryEntity<Integer>
         this.user = user;
     }
 
-    public ServiceAuthTemplate getDeclaration()
+    public PermissionTemplate getDeclaration()
     {
         return this.declaration;
     }
 
-    public void setDeclaration(ServiceAuthTemplate declaration)
+    public void setDeclaration(PermissionTemplate declaration)
     {
         this.declaration = declaration;
     }

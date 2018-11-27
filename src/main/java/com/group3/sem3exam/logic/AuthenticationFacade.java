@@ -5,6 +5,7 @@ import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authentication.TokenAuthenticator;
 import com.group3.sem3exam.logic.authentication.UserAuthenticator;
+import com.group3.sem3exam.logic.authentication.jwt.JwtGenerationException;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenGenerator;
 
@@ -40,9 +41,9 @@ public class AuthenticationFacade
      *
      * @param authenticationContext The authentication context to generate the JWT token from.
      * @return The resulting JWT token.
-     * @throws Exception When
+     * @throws JwtGenerationException When the jwt token cannot be generated.
      */
-    public String generateAuthenticationToken(AuthenticationContext authenticationContext) throws Exception
+    public String generateAuthenticationToken(AuthenticationContext authenticationContext) throws JwtGenerationException
     {
         JwtTokenGenerator generator = new JwtTokenGenerator(jwtSecret);
         return generator.generate(authenticationContext);

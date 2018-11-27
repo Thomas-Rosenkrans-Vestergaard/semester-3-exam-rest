@@ -46,9 +46,9 @@ public class JpaServiceRepository extends JpaCrudRepository<Service, Integer> im
     }
 
     @Override
-    public Service create(String name, String passwordHash, String secret, String onAuth)
+    public Service create(String name, String passwordHash)
     {
-        Service service = new Service(name, passwordHash, PENDING, secret, onAuth);
+        Service service = new Service(name, passwordHash, PENDING);
         getEntityManager().persist(service);
         return service;
     }

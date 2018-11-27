@@ -2,12 +2,12 @@ package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
+@Entity
+@Table(name = "service")
 public class Service implements RepositoryEntity<Integer>
 {
 
@@ -15,7 +15,7 @@ public class Service implements RepositoryEntity<Integer>
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false)
@@ -24,23 +24,15 @@ public class Service implements RepositoryEntity<Integer>
     @Column(nullable = false)
     private Status status;
 
-    @Column(nullable = false)
-    private String secret;
-
-    @Column(nullable = false)
-    private String onAuth;
-
     public Service()
     {
     }
 
-    public Service(String name, String passwordHash, Status status, String secret, String onAuth)
+    public Service(String name, String passwordHash, Status status)
     {
         this.name = name;
         this.passwordHash = passwordHash;
         this.status = status;
-        this.secret = secret;
-        this.onAuth = onAuth;
     }
 
     public Integer getId()
@@ -81,26 +73,6 @@ public class Service implements RepositoryEntity<Integer>
     public void setStatus(Status status)
     {
         this.status = status;
-    }
-
-    public String getSecret()
-    {
-        return this.secret;
-    }
-
-    public void setSecret(String secret)
-    {
-        this.secret = secret;
-    }
-
-    public String getOnAuth()
-    {
-        return this.onAuth;
-    }
-
-    public void setOnAuth(String onAuth)
-    {
-        this.onAuth = onAuth;
     }
 
     public enum Status

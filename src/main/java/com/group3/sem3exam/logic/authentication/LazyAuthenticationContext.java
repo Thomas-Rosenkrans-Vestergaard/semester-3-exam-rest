@@ -99,6 +99,24 @@ public class LazyAuthenticationContext implements AuthenticationContext
     }
 
     /**
+     * Creates a new {@link LazyAuthenticationContext} of type {@link AuthenticationType#SERVICE_REPRESENTING_USER}.
+     * <p>
+     * This context allows services to act on behalf of a user.
+     *
+     * @param service The service representing the user.
+     * @param user    The user being represented by the user.
+     * @return The newly created authentication context.
+     */
+    public static AuthenticationContext representing(Service service, User user)
+    {
+        return new LazyAuthenticationContext(AuthenticationType.SERVICE_REPRESENTING_USER,
+                                             user.getId(),
+                                             () -> user,
+                                             service.getId(),
+                                             () -> service);
+    }
+
+    /**
      * Returns the type of the authenticated entity.
      *
      * @return The type of the authenticated entity.
