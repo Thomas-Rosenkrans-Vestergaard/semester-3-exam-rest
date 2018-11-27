@@ -6,6 +6,7 @@ import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.data.services.*;
 import com.group3.sem3exam.logic.AuthenticationFacade;
+import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.ServiceFacade;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
@@ -31,7 +32,8 @@ public class ServiceResource
             transaction -> new JpaAuthRequestRepository(transaction),
             transaction -> new JpaPermissionRequestRepository(transaction),
             transaction -> new JpaPermissionTemplateRepository(transaction),
-            transaction -> new JpaUserRepository(transaction)
+            transaction -> new JpaUserRepository(transaction),
+            transaction -> new JpaPermissionRepository(transaction)
     );
 
     private static AuthenticationFacade authenticationFacade = Facades.authentication;
@@ -39,7 +41,7 @@ public class ServiceResource
     @POST
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response register(String json)
+    public Response register(String json) throws ResourceConflictException
     {
         RegisterRequest  registerRequest = gson.fromJson(json, RegisterRequest.class);
         Service          service         = facade.register(registerRequest.name, registerRequest.password);
@@ -152,7 +154,7 @@ public class ServiceResource
         AuthenticateUserRequest request = gson.fromJson(json, AuthenticateUserRequest.class);
         AuthenticationContext authenticationContext = facade.authenticateServiceUser(
                 request.request,
-                request.username,
+                request.email,
                 request.password
         );
 
@@ -172,7 +174,15 @@ public class ServiceResource
     private class AuthenticateUserRequest
     {
         public String request;
-        public String username;
+        public String email;
         public String password;
+    }
+
+    @POST
+    @Path("callback")
+    @Consumes(APPLICATION_JSON)
+    public void callback(String json)
+    {
+        System.out.println(json);
     }
 }

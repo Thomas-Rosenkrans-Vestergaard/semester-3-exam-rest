@@ -25,6 +25,7 @@ public class AuthRequest implements RepositoryEntity<String>
     @ManyToOne(optional = false)
     private Service service;
 
+    @Column
     private Status status;
 
     @Column

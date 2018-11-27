@@ -8,12 +8,13 @@ import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.data.services.*;
 import com.group3.sem3exam.logic.authentication.*;
 import com.group3.sem3exam.logic.authorization.*;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.mindrot.jbcrypt.BCrypt;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ServiceFacade<T extends Transaction>
     private final Function<T, PermissionRequestRepository>  permissionRequestRepositoryFactory;
     private final Function<T, PermissionTemplateRepository> templateRepositoryFactory;
     private final Function<T, UserRepository>               userRepositoryFactory;
+    private final Function<T, PermissionRepository>         permissionRepositoryFactory;
 
     public ServiceFacade(
             Supplier<T> transactionFactory,
@@ -38,7 +40,8 @@ public class ServiceFacade<T extends Transaction>
             Function<T, AuthRequestRepository> authRequestRepositoryFactory,
             Function<T, PermissionRequestRepository> permissionRequestRepositoryFactory,
             Function<T, PermissionTemplateRepository> templateRepositoryFactory,
-            Function<T, UserRepository> userRepositoryFactory)
+            Function<T, UserRepository> userRepositoryFactory,
+            Function<T, PermissionRepository> permissionRepositoryFactory)
     {
         this.transactionFactory = transactionFactory;
         this.serviceRepositoryFactory = serviceRepositoryFactory;
@@ -46,6 +49,7 @@ public class ServiceFacade<T extends Transaction>
         this.permissionRequestRepositoryFactory = permissionRequestRepositoryFactory;
         this.templateRepositoryFactory = templateRepositoryFactory;
         this.userRepositoryFactory = userRepositoryFactory;
+        this.permissionRepositoryFactory = permissionRepositoryFactory;
     }
 
     /**
@@ -75,13 +79,17 @@ public class ServiceFacade<T extends Transaction>
      * @param name     The name of the service account.
      * @param password The password of the service account
      * @return The newly created service.
+     * @throws ResourceConflictException When a service account with the provided name already exists.
      */
-    public Service register(String name, String password)
+    public Service register(String name, String password) throws ResourceConflictException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
             ServiceRepository serviceRepository = serviceRepositoryFactory.apply(transaction);
-            Service           service           = serviceRepository.create(name, hash(password));
+            if (serviceRepository.getByName(name) != null)
+                throw new ResourceConflictException(Service.class, "A service account with the provided name exists.");
+
+            Service service = serviceRepository.create(name, hash(password));
             transaction.commit();
             return service;
         }
@@ -122,8 +130,12 @@ public class ServiceFacade<T extends Transaction>
      */
     public PermissionTemplate createTemplate(AuthenticationContext service, String message, List<String> permissions)
     {
-        try (PermissionTemplateRepository tr = templateRepositoryFactory.apply(transactionFactory.get())) {
-            return tr.create(message, toEnum(permissions), service.getService());
+        try (T transaction = transactionFactory.get()) {
+            transaction.begin();
+            PermissionTemplateRepository tr       = templateRepositoryFactory.apply(transaction);
+            PermissionTemplate           template = tr.create(message, toEnum(permissions), service.getService());
+            transaction.commit();
+            return template;
         }
     }
 
@@ -230,8 +242,9 @@ public class ServiceFacade<T extends Transaction>
             AuthRequest           authRequest       = requestRepository.get(request);
             if (authRequest == null)
                 throw new ResourceNotFoundException(AuthRequest.class, request);
-            UserAuthenticator     userAuthenticator = new UserAuthenticator(() -> userRepositoryFactory.apply(transaction));
-            AuthenticationContext userContext       = userAuthenticator.authenticate(email, password);
+            UserAuthenticator userAuthenticator = new UserAuthenticator(
+                    () -> userRepositoryFactory.apply(transactionFactory.get())); // Use new transaction
+            AuthenticationContext userContext = userAuthenticator.authenticate(email, password);
 
             // We should also allow the template.
             if (authRequest.getTemplate() != null) {
@@ -269,7 +282,9 @@ public class ServiceFacade<T extends Transaction>
         AuthenticationNotifyTransfer transfer = new AuthenticationNotifyTransfer();
         transfer.request = request.getId();
         transfer.user = new UserTransfer(user);
-
+        try (PermissionRepository permissionRepository = permissionRepositoryFactory.apply(transactionFactory.get())) {
+            transfer.permissions = permissionRepository.getPermissionsFor(request.getService(), user);
+        }
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         post(request.getCallback(), gson.toJson(transfer));
     }
@@ -283,17 +298,12 @@ public class ServiceFacade<T extends Transaction>
      */
     private void post(String address, String contents) throws IOException
     {
-        URL               url = new URL(address);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.addRequestProperty("Content-Type", "application/json;charset=UTF-8");
-        con.setRequestProperty("Accept", "application/json;charset=UTF-8");
-        con.setRequestProperty("User-Agent", "Server");
-
-        con.setDoOutput(true);
-        try (DataOutputStream wr = new DataOutputStream(con.getOutputStream())) {
-            wr.write(contents.getBytes("UTF-8"));
-        }
+        HttpClient   httpClient = HttpClientBuilder.create().build();
+        HttpPost     request    = new HttpPost(address);
+        StringEntity params     = new StringEntity(contents);
+        request.addHeader("Content-Type", "application/json");
+        request.setEntity(params);
+        httpClient.execute(request);
     }
 
     /**
@@ -302,8 +312,9 @@ public class ServiceFacade<T extends Transaction>
      */
     private class AuthenticationNotifyTransfer
     {
-        String       request;
-        UserTransfer user;
+        String           request;
+        UserTransfer     user;
+        List<Permission> permissions;
     }
 
     /**

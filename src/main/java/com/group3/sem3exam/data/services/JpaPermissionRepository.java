@@ -6,7 +6,7 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class JpaPermissionRepository extends AbstractJpaRepository implements PermissionRepository
@@ -30,18 +30,31 @@ public class JpaPermissionRepository extends AbstractJpaRepository implements Pe
     @Override
     public List<Permission> getPermissionsFor(Service service, User user)
     {
-        List<List> lists = getEntityManager()
-                .createQuery("SELECT pr.template.permissions FROM PermissionRequest pr " +
-                             "WHERE pr.template.service = :service AND pr.user = :user", List.class)
-                .setParameter("service", service)
-                .setParameter("user", user)
-                .getResultList();
+//        List<List> lists = getEntityManager()
+//                .createQuery("SELECT pr.template.permissions FROM PermissionRequest pr " +
+//                             "WHERE pr.template.service = :service AND pr.user = :user", List.class)
+//                .setParameter("service", service)
+//                .setParameter("user", user)
+//                .getResultList();
 
 
-        List collect = new ArrayList();
-        for (List list : lists)
-            collect.addAll(list);
+//        List collect = new ArrayList();
+//        for (List list : lists)
+//            collect.addAll(list);
+//
+//        return (List<Permission>) collect; // TODO: fix this
 
-        return (List<Permission>) collect;
+        /**
+         * entity PermissionMapping {
+         *
+         *      Template parent;
+         *      Permission permission;
+         *
+         *      SELECT pm.permission FROM PermissionMapping pm WHERE pm.parent IN
+         *      (SELECT perm_request.template FROM PermRequest user = :user )
+         * }
+         */
+
+        return Arrays.asList(Permission.values());
     }
 }

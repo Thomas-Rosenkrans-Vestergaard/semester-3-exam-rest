@@ -1,10 +1,11 @@
 package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.base.Repository;
 
 import java.util.List;
 
-public interface PermissionRepository
+public interface PermissionRepository extends Repository
 {
 
     /**

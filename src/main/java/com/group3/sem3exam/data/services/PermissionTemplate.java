@@ -19,9 +19,8 @@ public class PermissionTemplate implements RepositoryEntity<String>
     @Column(nullable = false)
     private String message;
 
-    @ElementCollection(targetClass = Permission.class)
-    @CollectionTable(name = "requests_permissions")
-    @Column(name = "request")
+    @ElementCollection(fetch = FetchType.EAGER)
+    @JoinTable(name = "auth_request_perms", joinColumns = @JoinColumn(name = "template_id"))
     private List<Permission> permissions;
 
     @ManyToOne
