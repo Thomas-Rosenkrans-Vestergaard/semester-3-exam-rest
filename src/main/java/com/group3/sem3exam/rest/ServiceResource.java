@@ -29,6 +29,7 @@ public class ServiceResource
             () -> new JpaTransaction(JpaConnection.create()),
             transaction -> new JpaServiceRepository(transaction),
             transaction -> new JpaAuthRequestRepository(transaction),
+            transaction -> new JpaPermissionRequestRepository(transaction),
             transaction -> new JpaPermissionTemplateRepository(transaction),
             transaction -> new JpaUserRepository(transaction)
     );
@@ -127,20 +128,19 @@ public class ServiceResource
     @Path("request-auth")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response requestAuth(@HeaderParam("Authorization") String auth, String json) throws AuthenticationException,
-                                                                                               AuthorizationException,
-                                                                                               ResourceNotFoundException
+    public Response requestAuth(@HeaderParam("Authorization") String auth, String json)
+    throws AuthenticationException, AuthorizationException, ResourceNotFoundException
     {
         AuthRequestRequest    posted                = gson.fromJson(json, AuthRequestRequest.class);
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
-        AuthRequest           template              = facade.requestAuth(authenticationContext, posted.callback, posted.timeout);
+        AuthRequest           template              = facade.requestAuth(authenticationContext, posted.callback, posted.template);
         return Response.status(Response.Status.CREATED).entity(gson.toJson(template)).build();
     }
 
     public class AuthRequestRequest
     {
-        public Integer timeout; // minutes
-        public String  callback;
+        public String callback;
+        public String template;
     }
 
     @POST

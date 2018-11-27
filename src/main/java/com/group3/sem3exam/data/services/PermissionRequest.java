@@ -22,8 +22,11 @@ public class PermissionRequest implements RepositoryEntity<String>
     @ManyToOne(optional = false)
     private User user;
 
+    @Column(nullable = false)
+    private String callback;
+
     @ManyToOne(optional = false)
-    private PermissionTemplate declaration;
+    private PermissionTemplate template;
 
     @Column(nullable = false)
     private Status status;
@@ -37,10 +40,11 @@ public class PermissionRequest implements RepositoryEntity<String>
 
     }
 
-    public PermissionRequest(User user, PermissionTemplate declaration)
+    public PermissionRequest(User user, String callback, PermissionTemplate template)
     {
         this.user = user;
-        this.declaration = declaration;
+        this.callback = callback;
+        this.template = template;
         this.status = Status.PENDING;
     }
 
@@ -64,14 +68,24 @@ public class PermissionRequest implements RepositoryEntity<String>
         this.user = user;
     }
 
-    public PermissionTemplate getDeclaration()
+    public String getCallback()
     {
-        return this.declaration;
+        return this.callback;
     }
 
-    public void setDeclaration(PermissionTemplate declaration)
+    public void setCallback(String callback)
     {
-        this.declaration = declaration;
+        this.callback = callback;
+    }
+
+    public PermissionTemplate getTemplate()
+    {
+        return this.template;
+    }
+
+    public void setTemplate(PermissionTemplate declaration)
+    {
+        this.template = declaration;
     }
 
     public void setStatus(Status status)

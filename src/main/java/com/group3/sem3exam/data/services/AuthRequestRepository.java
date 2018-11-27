@@ -10,10 +10,11 @@ public interface AuthRequestRepository extends ReadRepository<AuthRequest, Strin
      *
      * @param service  The service requesting authentication.
      * @param callback The callback to post to when the user authenticates.
-     * @param timeout  The timeout of the auth request.
+     * @param template An optional permission template that should be accepted when the user authenticates.
+     *                 Can be {@code null}.
      * @return The newly created authentication request.
      */
-    AuthRequest create(Service service, String callback, Integer timeout);
+    AuthRequest create(Service service, String callback, PermissionTemplate template);
 
     /**
      * Marks the provided authentication request {@link AuthRequest.Status#COMPLETED}.

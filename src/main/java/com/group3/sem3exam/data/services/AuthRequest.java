@@ -20,9 +20,6 @@ public class AuthRequest implements RepositoryEntity<String>
     private String id;
 
     @Column(nullable = false)
-    private Integer timeout;
-
-    @Column(nullable = false)
     private String callback;
 
     @ManyToOne(optional = false)
@@ -34,17 +31,20 @@ public class AuthRequest implements RepositoryEntity<String>
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @ManyToOne
+    private PermissionTemplate template;
+
     public AuthRequest()
     {
 
     }
 
-    public AuthRequest(Service service, String callback, Integer timeout)
+    public AuthRequest(Service service, String callback, PermissionTemplate template)
     {
         this.service = service;
         this.callback = callback;
-        this.timeout = timeout;
         this.status = Status.READY;
+        this.template = template;
     }
 
     @Override
@@ -92,17 +92,6 @@ public class AuthRequest implements RepositoryEntity<String>
         return this;
     }
 
-    public Integer getTimeout()
-    {
-        return this.timeout;
-    }
-
-    public AuthRequest setTimeout(Integer timeout)
-    {
-        this.timeout = timeout;
-        return this;
-    }
-
     public enum Status
     {
         READY,
@@ -118,5 +107,15 @@ public class AuthRequest implements RepositoryEntity<String>
     {
         this.status = status;
         return this;
+    }
+
+    public PermissionTemplate getTemplate()
+    {
+        return this.template;
+    }
+
+    public void setTemplate(PermissionTemplate template)
+    {
+        this.template = template;
     }
 }

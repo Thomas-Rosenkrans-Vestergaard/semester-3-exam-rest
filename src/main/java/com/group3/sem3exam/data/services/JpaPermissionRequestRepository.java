@@ -27,25 +27,17 @@ public class JpaPermissionRequestRepository extends JpaCrudRepository<Permission
     }
 
     @Override
-    public PermissionRequest accept(PermissionRequest request)
+    public PermissionRequest updateStatus(PermissionRequest request, PermissionRequest.Status status)
     {
-        request.setStatus(PermissionRequest.Status.ACCEPTED);
+        request.setStatus(status);
         update(request);
         return request;
     }
 
     @Override
-    public PermissionRequest reject(PermissionRequest request)
+    public PermissionRequest create(User user, String callback, PermissionTemplate template)
     {
-        request.setStatus(PermissionRequest.Status.REJECTED);
-        update(request);
-        return request;
-    }
-
-    @Override
-    public PermissionRequest create(User user, PermissionTemplate template)
-    {
-        PermissionRequest permissionRequest = new PermissionRequest(user, template);
+        PermissionRequest permissionRequest = new PermissionRequest(user, callback, template);
         getEntityManager().persist(permissionRequest);
         return permissionRequest;
     }

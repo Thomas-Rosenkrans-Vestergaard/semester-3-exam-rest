@@ -11,24 +11,18 @@ public interface PermissionRequestRepository extends ReadRepository<PermissionRe
      * with the permissions defined in the provided template.
      *
      * @param user     The user that is being asked for permission from the service.
+     * @param callback The callback to call when the user updates the permissions of the request.
      * @param template The template containing the permissions granted to the user, if the request is accepted.
      * @return The newly create permission request.
      */
-    PermissionRequest create(User user, PermissionTemplate template);
+    PermissionRequest create(User user, String callback, PermissionTemplate template);
 
     /**
-     * Marks the provided service request as {@link PermissionRequest.Status#ACCEPTED}.
+     * Updates the status of the permission request.
      *
      * @param request The request to mark as accepted.
+     * @param status  The new status of the permission request.
      * @return The updated entity.
      */
-    PermissionRequest accept(PermissionRequest request);
-
-    /**
-     * Marks the provided service request as {@link PermissionRequest.Status#REJECTED}.
-     *
-     * @param request The request to mark as rejected.
-     * @return The updated entity.
-     */
-    PermissionRequest reject(PermissionRequest request);
+    PermissionRequest updateStatus(PermissionRequest request, PermissionRequest.Status status);
 }
