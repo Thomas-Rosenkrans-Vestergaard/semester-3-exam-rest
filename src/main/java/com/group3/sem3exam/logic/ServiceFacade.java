@@ -487,4 +487,21 @@ public class ServiceFacade<T extends Transaction>
         List<Permission>         permissions;
         UserTransfer             user;
     }
+
+    /**
+     * Returns the permission templates of the provided service.
+     *
+     * @param service The service to return the permission templates of.
+     * @return The permission templates of the provided service.
+     * @throws AuthorizationException When the provided authentication context is not a service.
+     */
+    List<PermissionTemplate> getTemplates(AuthenticationContext service) throws AuthorizationException
+    {
+        new Authorizator(service).check(new IsService());
+
+        try (T transaction = transactionFactory.get()) {
+            PermissionTemplateRepository templateRepository = templateRepositoryFactory.apply(transaction);
+            return templateRepository.getByService(service.getService());
+        }
+    }
 }

@@ -10,10 +10,18 @@ public interface PermissionTemplateRepository extends ReadRepository<PermissionT
     /**
      * Create a new service request template.
      *
-     * @param message    The message to display to the user.
+     * @param message     The message to display to the user.
      * @param permissions The permissions the service is asking for.
-     * @param service    The service requesting the permissions.
+     * @param service     The service requesting the permissions.
      * @return The newly creates {@link PermissionTemplate}.
      */
     PermissionTemplate create(String message, List<Permission> permissions, Service service);
+
+    /**
+     * Returns the templates owned by the provided service.
+     *
+     * @param service The service to return the templates of.
+     * @return The templates owned by the provided service.
+     */
+    List<PermissionTemplate> getByService(Service service);
 }

@@ -33,4 +33,13 @@ public class JpaPermissionTemplateRepository extends JpaCrudRepository<Permissio
         getEntityManager().persist(template);
         return template;
     }
+
+    @Override
+    public List<PermissionTemplate> getByService(Service service)
+    {
+        return getEntityManager()
+                .createQuery("SELECT pt FROM PermissionTemplate pt WHERE pt.service = :service")
+                .setParameter("service", service)
+                .getResultList();
+    }
 }
