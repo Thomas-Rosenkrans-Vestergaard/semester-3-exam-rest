@@ -95,7 +95,12 @@ public class LazyAuthenticationContext implements AuthenticationContext
      */
     public static LazyAuthenticationContext service(Service service)
     {
-        return new LazyAuthenticationContext(AuthenticationType.SERVICE, null, () -> null, service.getId(), () -> service);
+        return service(service.getId(), () -> service);
+    }
+
+    public static LazyAuthenticationContext service(Integer serviceId, Supplier<Service> serviceSupplier)
+    {
+        return new LazyAuthenticationContext(AuthenticationType.SERVICE, null, () -> null, serviceId, serviceSupplier);
     }
 
     /**
@@ -103,17 +108,26 @@ public class LazyAuthenticationContext implements AuthenticationContext
      * <p>
      * This context allows services to act on behalf of a user.
      *
-     * @param service The service representing the user.
+     * @param service The service serviceUser the user.
      * @param user    The user being represented by the user.
      * @return The newly created authentication context.
      */
-    public static AuthenticationContext representing(Service service, User user)
+    public static AuthenticationContext serviceUser(Service service, User user)
+    {
+        return serviceUser(service.getId(), () -> service, user.getId(), () -> user);
+    }
+
+    public static AuthenticationContext serviceUser(
+            Integer serviceId,
+            Supplier<Service> serviceSupplier,
+            Integer userId,
+            Supplier<User> userSupplier)
     {
         return new LazyAuthenticationContext(AuthenticationType.SERVICE_REPRESENTING_USER,
-                                             user.getId(),
-                                             () -> user,
-                                             service.getId(),
-                                             () -> service);
+                                             userId,
+                                             userSupplier,
+                                             serviceId,
+                                             serviceSupplier);
     }
 
     /**

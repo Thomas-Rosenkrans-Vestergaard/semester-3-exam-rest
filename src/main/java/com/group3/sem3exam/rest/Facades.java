@@ -2,6 +2,7 @@ package com.group3.sem3exam.rest;
 
 import com.group3.sem3exam.data.repositories.*;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.data.services.JpaServiceRepository;
 import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.logic.images.ImageFacade;
@@ -44,7 +45,8 @@ public class Facades
         try {
             authentication = new AuthenticationFacade(
                     new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
-                    () -> new JpaUserRepository(JpaConnection.create()));
+                    () -> new JpaUserRepository(JpaConnection.create()),
+                    () -> new JpaServiceRepository(JpaConnection.create()));
 
 
         } catch (Exception e) {

@@ -111,10 +111,19 @@ public class ServiceFacade<T extends Transaction>
         return BCrypt.checkpw(password, hash);
     }
 
-    public PermissionTemplate createTemplate(AuthenticationContext service, String message, List<String> privileges)
+    /**
+     * Creates a new permission template.
+     * The template contains information about the permissions required to perform some operation.
+     *
+     * @param service     The service creating the template.
+     * @param message     The message to display to the user when they are
+     * @param permissions The permissions required by the service.
+     * @return The newly created template.
+     */
+    public PermissionTemplate createTemplate(AuthenticationContext service, String message, List<String> permissions)
     {
         try (PermissionTemplateRepository tr = templateRepositoryFactory.apply(transactionFactory.get())) {
-            return tr.create(message, toEnum(privileges), service.getService());
+            return tr.create(message, toEnum(permissions), service.getService());
         }
     }
 
@@ -243,7 +252,7 @@ public class ServiceFacade<T extends Transaction>
                 e.printStackTrace();
             }
 
-            return LazyAuthenticationContext.representing(authRequest.getService(), userContext.getUser());
+            return LazyAuthenticationContext.serviceUser(authRequest.getService(), userContext.getUser());
         }
     }
 

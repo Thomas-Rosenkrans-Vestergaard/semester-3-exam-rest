@@ -64,7 +64,7 @@ public class ServiceResource
     }
 
     @POST
-    @Path("authentication")
+    @Path("authentication-service")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response authenticate(String json) throws Exception
@@ -100,14 +100,14 @@ public class ServiceResource
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
         PermissionTemplate template = facade.createTemplate(authenticationContext,
                                                             request.message,
-                                                            request.privileges);
+                                                            request.permissions);
         return Response.status(Response.Status.CREATED).entity(gson.toJson(template)).build();
     }
 
     private class TemplateRequest
     {
         public String       message;
-        public List<String> privileges;
+        public List<String> permissions;
     }
 
     @POST
