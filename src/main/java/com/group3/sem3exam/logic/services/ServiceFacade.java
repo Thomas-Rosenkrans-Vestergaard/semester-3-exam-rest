@@ -246,12 +246,13 @@ public class ServiceFacade<T extends Transaction>
      * @return The authentication context.
      * @throws ResourceNotFoundException When the request does not exist.
      * @throws AuthenticationException   When the user cannot be authenticated.
+     * @throws ResourceConflictException When the provided request has already been used.
      */
     public AuthenticationContext authenticateServiceUser(
             String request,
             String email,
             String password)
-    throws ResourceNotFoundException, AuthenticationException, JwtGenerationException
+    throws ResourceNotFoundException, AuthenticationException, JwtGenerationException, ResourceConflictException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
@@ -259,6 +260,9 @@ public class ServiceFacade<T extends Transaction>
             AuthRequest           authRequest       = requestRepository.get(request);
             if (authRequest == null)
                 throw new ResourceNotFoundException(AuthRequest.class, request);
+            if (authRequest.getStatus() != AuthRequest.Status.READY)
+                throw new ResourceConflictException(AuthRequest.class, "The authentication request has already been used.");
+
             UserAuthenticator userAuthenticator = new UserAuthenticator(
                     () -> userRepositoryFactory.apply(transactionFactory.get())); // Use new transaction
             AuthenticationContext userContext = userAuthenticator.authenticate(email, password);
@@ -321,8 +325,8 @@ public class ServiceFacade<T extends Transaction>
      */
     private void post(String address, String contents) throws IOException
     {
-        HttpClient   httpClient = HttpClientBuilder.create().build();
-        HttpPost     request    = new HttpPost(address);
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpPost   request    = new HttpPost(address);
         try {
             StringEntity params = new StringEntity(contents);
             request.addHeader("Content-Type", "application/json");
@@ -473,6 +477,24 @@ public class ServiceFacade<T extends Transaction>
 
         Gson gson = SpecializedGson.create();
         post(request.getCallback(), gson.toJson(transfer));
+    }
+
+    /**
+     * Returns the request with the provided id.
+     *
+     * @param id The id of the request to return.
+     * @return The request with the provided id.
+     * @throws ResourceNotFoundException When a request with the provided id does not exist.
+     */
+    public Object getRequest(String id) throws ResourceNotFoundException
+    {
+        try (AuthRequestRepository repository = requestRepositoryFactory.apply(transactionFactory.get())) {
+            AuthRequest fetched = repository.get(id);
+            if (fetched == null)
+                throw new ResourceNotFoundException(AuthRequest.class, id);
+
+            return fetched;
+        }
     }
 
     private class PermissionNotifyTransfer

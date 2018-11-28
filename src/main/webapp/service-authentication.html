@@ -46,6 +46,10 @@
             box-sizing: border-box;
         }
 
+        input {
+            border: #ddd 1px solid;
+        }
+
         label {
             font-weight: bold;
         }
@@ -56,6 +60,26 @@
 
         h1 {
             margin-bottom: 10px;
+        }
+
+        #messages {
+            margin-top: 15px;
+        }
+
+        #messages li {
+            list-style: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+        }
+
+        #messages li.success {
+            color: #4F8A10;
+            background-color: #DFF2BF;
+        }
+
+        #messages li.error {
+            color: #D8000C;
+            background-color: #FFD2D2;
         }
 
     </style>
@@ -70,33 +94,120 @@
         <input type="password" name="password" required>
         <input type="submit" name="submit" id="submit" value="Authenticate">
     </form>
+    <ul id="messages">
+
+    </ul>
     <script>
         var form = document.getElementById("authentication-form");
+        var messages = document.getElementById("messages");
+
+        getRequest(getParam("request")).then(function (response) {
+            if (response.code === 200) {
+                showRequestDetails(response.body);
+                return;
+            }
+            if (response.code === 404) {
+                showError("Unknown authentication request.")
+                return;
+            }
+        });
+
+        function showRequestDetails(details) {
+            if (details.status !== "READY") {
+                showError("The authentication request has already been used.");
+                return;
+            }
+
+
+        }
 
         form.addEventListener("submit", function (e) {
             e.preventDefault();
-            var request = getParam("request");
-            var credentials = {request: request, email: form.email.value, password: form.password.value};
 
-            fetch("api/services/authenticate-user", {
+            authenticate(getParam("request"), form.email.value, form.password.value).then(function (response) {
+
+                if (response.code === 200) {
+                    showSuccess("You were successfully authenticated.");
+                    return;
+                }
+
+                if (response.code === 404) {
+                    showError("The provided authentication request could not be found.");
+                    return;
+                }
+
+                if (response.code === 401) {
+                    showError("The provided credentials are incorrect.");
+                    return;
+                }
+
+                if (response.code === 409) {
+                    showError("The provided authentication request has already been used.")
+                    return;
+                }
+
+                if (response.code === 500) {
+                    showError("An internal error occurred.");
+                    return;
+                }
+            });
+        });
+
+        function showError(message) {
+            messages.innerHTML = "<li class='error'>" + message + "</li>";
+        }
+
+        function showSuccess(message) {
+            messages.innerHTML = "<li class='success'>" + message + "</li>";
+        }
+
+        function getParam(name) {
+            if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search))
+                return decodeURIComponent(name[1]);
+        }
+
+        function getRequest(id) {
+            var status = -1;
+
+            return fetch("api/services/request/" + id)
+                .then(function (response) {
+                    status = response.status;
+                    return response.json();
+                })
+                .then(function (data) {
+                    return {
+                        code: status,
+                        body: data
+                    }
+                })
+        }
+
+        function authenticate(request, email, password) {
+
+            var status = -1;
+
+            return fetch("api/services/authenticate-user", {
                 method: "post",
                 headers: {
                     "Content-Type": "application/json",
                     "Accept": "application/json"
                 },
-                body: JSON.stringify(credentials)
+                body: JSON.stringify({
+                    request: request,
+                    email: email,
+                    password: password
+                })
             })
                 .then(function (response) {
+                    status = response.status;
                     return response.json();
                 })
                 .then(function (data) {
-                    console.log(data);
+                    return {
+                        code: status,
+                        body: data
+                    }
                 })
-        });
-
-        function getParam(name) {
-            if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search))
-                return decodeURIComponent(name[1]);
         }
 
     </script>

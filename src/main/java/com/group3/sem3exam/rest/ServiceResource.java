@@ -70,6 +70,14 @@ public class ServiceResource
         public Service.Status status;
     }
 
+    @GET
+    @Path("request/{request}")
+    @Produces
+    public Response getRequest(@PathParam("request") String request) throws ResourceNotFoundException
+    {
+        return Response.ok(gson.toJson(facade.getRequest(request))).build();
+    }
+
     @POST
     @Path("authenticate-service")
     @Consumes(APPLICATION_JSON)
@@ -141,8 +149,8 @@ public class ServiceResource
     public Response getTemplate(@HeaderParam("Authorization") String authToken, @PathParam("id") String id)
     throws ResourceNotFoundException, AuthorizationException, AuthenticationException
     {
-        AuthenticationContext auth               = authenticationFacade.authenticateBearerHeader(authToken);
-        PermissionTemplate    permissionTemplate = facade.getTemplate(auth, id);
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(authToken);
+        PermissionTemplate    permissionTemplate    = facade.getTemplate(authenticationContext, id);
         return Response.ok(gson.toJson(permissionTemplate)).build();
     }
 
@@ -180,7 +188,10 @@ public class ServiceResource
     @Path("authenticate-user")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response authenticateUser(String json) throws ResourceNotFoundException, AuthenticationException, JwtGenerationException
+    public Response authenticateUser(String json) throws ResourceNotFoundException,
+                                                         AuthenticationException,
+                                                         JwtGenerationException,
+                                                         ResourceConflictException
     {
         AuthenticateUserRequest request = gson.fromJson(json, AuthenticateUserRequest.class);
         AuthenticationContext authenticationContext = facade.authenticateServiceUser(
