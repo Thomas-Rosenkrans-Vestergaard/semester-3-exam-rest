@@ -1,4 +1,4 @@
-package com.group3.sem3exam.rest;
+package com.group3.sem3exam.logic;
 
 import com.google.gson.*;
 

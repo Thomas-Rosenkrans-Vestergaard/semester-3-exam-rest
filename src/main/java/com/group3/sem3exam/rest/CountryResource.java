@@ -3,9 +3,9 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Country;
-import com.group3.sem3exam.data.repositories.JpaCountryRepository;
 import com.group3.sem3exam.logic.CountryFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.SpecializedGson;
 import com.group3.sem3exam.rest.dto.CountryDTO;
 
 import javax.ws.rs.GET;

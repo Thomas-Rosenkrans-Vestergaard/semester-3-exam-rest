@@ -8,6 +8,7 @@ import com.group3.sem3exam.data.services.*;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.SpecializedGson;
 import com.group3.sem3exam.logic.services.ServiceFacade;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;

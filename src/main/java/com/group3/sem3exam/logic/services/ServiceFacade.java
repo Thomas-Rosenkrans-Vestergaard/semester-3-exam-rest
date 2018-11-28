@@ -8,6 +8,7 @@ import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.data.services.*;
 import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.SpecializedGson;
 import com.group3.sem3exam.logic.authentication.*;
 import com.group3.sem3exam.logic.authorization.*;
 import org.apache.http.client.HttpClient;
@@ -287,7 +288,7 @@ public class ServiceFacade<T extends Transaction>
         try (PermissionRepository permissionRepository = permissionRepositoryFactory.apply(transactionFactory.get())) {
             transfer.permissions = permissionRepository.getPermissionsFor(request.getService(), user);
         }
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = SpecializedGson.create();
         post(request.getCallback(), gson.toJson(transfer));
     }
 
@@ -477,7 +478,7 @@ public class ServiceFacade<T extends Transaction>
         transfer.permissions = new ArrayList<>();
         transfer.user = new UserTransfer(user);
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = SpecializedGson.create();
         post(request.getCallback(), gson.toJson(transfer));
     }
 

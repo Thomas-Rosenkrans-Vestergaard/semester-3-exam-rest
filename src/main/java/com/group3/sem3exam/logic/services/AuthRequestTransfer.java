@@ -20,6 +20,7 @@ public class AuthRequestTransfer
         this.service = withService ? new ServiceTransfer(request.getService()) : null;
         this.status = request.getStatus();
         this.createdAt = request.getCreatedAt();
-        this.template = withTemplate ? new PermissionTemplateTransfer(request.getTemplate(), false) : null;
+        this.template = request.getTemplate() != null && withTemplate ?
+                        new PermissionTemplateTransfer(request.getTemplate(), false) : null;
     }
 }

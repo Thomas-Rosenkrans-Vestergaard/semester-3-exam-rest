@@ -2,12 +2,10 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Post;
-import com.group3.sem3exam.data.repositories.JpaImagePostImageRepository;
-import com.group3.sem3exam.data.repositories.JpaPostRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.PostFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.SpecializedGson;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.rest.dto.PostDTO;
