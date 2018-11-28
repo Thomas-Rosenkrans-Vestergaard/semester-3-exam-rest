@@ -42,7 +42,7 @@ class LazyAuthenticationContextTest
     @Test
     void getUserIdReturnsNull()
     {
-        LazyAuthenticationContext lac = new LazyAuthenticationContext(AuthenticationType.SERVICE, null, null);
+        LazyAuthenticationContext lac = LazyAuthenticationContext.user(null, null);
         assertNull(lac.getUserId());
     }
 
@@ -64,7 +64,7 @@ class LazyAuthenticationContextTest
     @Test
     void getUserReturnsNull()
     {
-        LazyAuthenticationContext lac = new LazyAuthenticationContext(AuthenticationType.SERVICE, null, null);
+        LazyAuthenticationContext lac = LazyAuthenticationContext.service(null, null);
         assertNull(lac.getUser());
     }
 }
