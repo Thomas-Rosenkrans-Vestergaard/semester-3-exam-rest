@@ -1,7 +1,6 @@
 package com.group3.sem3exam.logic.services;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
@@ -9,7 +8,13 @@ import com.group3.sem3exam.data.services.*;
 import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.SpecializedGson;
-import com.group3.sem3exam.logic.authentication.*;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.logic.authentication.IncorrectCredentialsException;
+import com.group3.sem3exam.logic.authentication.UserAuthenticator;
+import com.group3.sem3exam.logic.authentication.jwt.BasicJwtSecret;
+import com.group3.sem3exam.logic.authentication.jwt.JwtGenerationException;
+import com.group3.sem3exam.logic.authentication.jwt.JwtTokenGenerator;
 import com.group3.sem3exam.logic.authorization.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -18,13 +23,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.group3.sem3exam.data.services.PermissionRequest.Status.ACCEPTED;
+import static com.group3.sem3exam.logic.authentication.LazyAuthenticationContext.service;
+import static com.group3.sem3exam.logic.authentication.LazyAuthenticationContext.serviceUser;
 
 public class ServiceFacade<T extends Transaction>
 {
@@ -72,7 +78,7 @@ public class ServiceFacade<T extends Transaction>
             if (!check(password, service.getPasswordHash()))
                 throw new AuthenticationException(new IncorrectCredentialsException());
 
-            return LazyAuthenticationContext.service(service);
+            return service(service);
         }
     }
 
@@ -127,16 +133,24 @@ public class ServiceFacade<T extends Transaction>
      * The template contains information about the permissions required to perform some operation.
      *
      * @param service     The service creating the template.
+     * @param name        The name of the template. The name is unique for a given service.
      * @param message     The message to display to the user when they are
      * @param permissions The permissions required by the service.
      * @return The newly created template.
+     * @throws AuthorizationException    When the provided auth context is not a service.
+     * @throws ResourceConflictException When a template with the same name already exists for the provided service.
      */
-    public PermissionTemplate createTemplate(AuthenticationContext service, String message, List<String> permissions)
+    public PermissionTemplate createTemplate(AuthenticationContext service, String name, String message, List<String> permissions)
+    throws AuthorizationException, ResourceConflictException
     {
+        new Authorizator(service).check(new IsService());
+
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
-            PermissionTemplateRepository tr       = templateRepositoryFactory.apply(transaction);
-            PermissionTemplate           template = tr.create(message, toEnum(permissions), service.getService());
+            PermissionTemplateRepository tr = templateRepositoryFactory.apply(transaction);
+            if (tr.getByName(service.getService(), name) != null)
+                throw new ResourceConflictException(PermissionTemplate.class, "A template with that name already exists.");
+            PermissionTemplate template = tr.create(name, message, toEnum(permissions), service.getService());
             transaction.commit();
             return template;
         }
@@ -196,7 +210,7 @@ public class ServiceFacade<T extends Transaction>
     /**
      * Returns the template with the provided id.
      *
-     * @param service The service requesting privileges from the user.
+     * @param service The service retrieving the template.
      * @param id      The id of the template to return.
      * @return The template with the provided id.
      * @throws AuthorizationException    When the provided auth context is not a service.
@@ -237,7 +251,7 @@ public class ServiceFacade<T extends Transaction>
             String request,
             String email,
             String password)
-    throws ResourceNotFoundException, AuthenticationException
+    throws ResourceNotFoundException, AuthenticationException, JwtGenerationException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
@@ -259,16 +273,18 @@ public class ServiceFacade<T extends Transaction>
                 permissionRequestRepository.updateStatus(permissionRequest, ACCEPTED);
             }
 
+            AuthenticationContext authenticationContext = serviceUser(authRequest.getService(), userContext.getUser());
+
             try {
                 requestRepository.completed(authRequest);
-                notifyServiceOnAuth(authRequest, userContext.getUser());
+                notifyServiceOnAuth(authRequest, generateToken(authenticationContext), userContext.getUser());
                 transaction.commit();
             } catch (IOException e) {
                 transaction.rollback();
                 e.printStackTrace();
             }
 
-            return LazyAuthenticationContext.serviceUser(authRequest.getService(), userContext.getUser());
+            return authenticationContext;
         }
     }
 
@@ -277,19 +293,23 @@ public class ServiceFacade<T extends Transaction>
      * an authentication request sent to the
      *
      * @param request The request the user authenticated in response to.
+     * @param token   The jwt token.
      * @param user    The user who was authenticated.
      * @throws IOException When the connection to the service could not be made.
      */
-    private void notifyServiceOnAuth(AuthRequest request, User user) throws IOException
+    private void notifyServiceOnAuth(AuthRequest request, String token, User user) throws IOException
     {
-        AuthenticationNotifyTransfer transfer = new AuthenticationNotifyTransfer();
-        transfer.request = request.getId();
-        transfer.user = new UserTransfer(user);
-        try (PermissionRepository permissionRepository = permissionRepositoryFactory.apply(transactionFactory.get())) {
-            transfer.permissions = permissionRepository.getPermissionsFor(request.getService(), user);
+        try (PermissionRepository pr = permissionRepositoryFactory.apply(transactionFactory.get())) {
+            AuthResponseTransfer transfer = new AuthResponseTransfer(
+                    request,
+                    user,
+                    token,
+                    pr.getPermissionsFor(request.getService(), user)
+            );
+
+            Gson gson = SpecializedGson.create();
+            post(request.getCallback(), gson.toJson(transfer));
         }
-        Gson gson = SpecializedGson.create();
-        post(request.getCallback(), gson.toJson(transfer));
     }
 
     /**
@@ -303,40 +323,13 @@ public class ServiceFacade<T extends Transaction>
     {
         HttpClient   httpClient = HttpClientBuilder.create().build();
         HttpPost     request    = new HttpPost(address);
-        StringEntity params     = new StringEntity(contents);
-        request.addHeader("Content-Type", "application/json");
-        request.setEntity(params);
-        httpClient.execute(request);
-    }
-
-    /**
-     * The response to send to the service when a user successfully authenticates
-     * as a response to a authentication request.
-     */
-    private class AuthenticationNotifyTransfer
-    {
-        String           request;
-        UserTransfer     user;
-        List<Permission> permissions;
-    }
-
-    /**
-     * The view of the authenticated user sent to the service, when the user
-     * successfully authenticates as a response to a authentication request.
-     */
-    private class UserTransfer
-    {
-        Integer       id;
-        String        name;
-        String        email;
-        LocalDateTime createdAt;
-
-        public UserTransfer(User user)
-        {
-            this.id = user.getId();
-            this.name = user.getName();
-            this.email = user.getEmail();
-            this.createdAt = user.getCreatedAt();
+        try {
+            StringEntity params = new StringEntity(contents);
+            request.addHeader("Content-Type", "application/json");
+            request.setEntity(params);
+            httpClient.execute(request);
+        } finally {
+            request.releaseConnection();
         }
     }
 
@@ -498,7 +491,7 @@ public class ServiceFacade<T extends Transaction>
      * @return The permission templates of the provided service.
      * @throws AuthorizationException When the provided authentication context is not a service.
      */
-    List<PermissionTemplate> getTemplates(AuthenticationContext service) throws AuthorizationException
+    public List<PermissionTemplate> getTemplates(AuthenticationContext service) throws AuthorizationException
     {
         new Authorizator(service).check(new IsService());
 
@@ -506,5 +499,33 @@ public class ServiceFacade<T extends Transaction>
             PermissionTemplateRepository templateRepository = templateRepositoryFactory.apply(transaction);
             return templateRepository.getByService(service.getService());
         }
+    }
+
+    /**
+     * Returns the template owned by the provided service with the provided name.
+     *
+     * @param service The owner of the templates to search in.
+     * @param name    The name of the template to return.
+     * @return The template owned by the provided service with the provided name.
+     * @throws AuthorizationException    When the provided authentication context is not a service.
+     * @throws ResourceNotFoundException When no template with the provided name exist.
+     */
+    public PermissionTemplate getTemplateByName(AuthenticationContext service, String name)
+    throws AuthorizationException, ResourceNotFoundException
+    {
+        new Authorizator(service).check(new IsService());
+
+        try (PermissionTemplateRepository repository = templateRepositoryFactory.apply(transactionFactory.get())) {
+            PermissionTemplate fetched = repository.getByName(service.getService(), name);
+            if (fetched == null)
+                throw new ResourceNotFoundException(PermissionTemplate.class, name);
+            return fetched;
+        }
+    }
+
+    private String generateToken(AuthenticationContext authenticationContext) throws JwtGenerationException
+    {
+        JwtTokenGenerator tokenGenerator = new JwtTokenGenerator(new BasicJwtSecret(new byte[512 / 8]));
+        return tokenGenerator.generate(authenticationContext);
     }
 }

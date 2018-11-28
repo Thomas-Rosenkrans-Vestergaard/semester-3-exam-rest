@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import java.util.List;
 
 public class JpaPermissionTemplateRepository extends JpaCrudRepository<PermissionTemplate, String>
@@ -27,9 +28,9 @@ public class JpaPermissionTemplateRepository extends JpaCrudRepository<Permissio
     }
 
     @Override
-    public PermissionTemplate create(String message, List<Permission> permissions, Service service)
+    public PermissionTemplate create(String name, String message, List<Permission> permissions, Service service)
     {
-        PermissionTemplate template = new PermissionTemplate(message, permissions, service);
+        PermissionTemplate template = new PermissionTemplate(name, message, permissions, service);
         getEntityManager().persist(template);
         return template;
     }
@@ -41,5 +42,20 @@ public class JpaPermissionTemplateRepository extends JpaCrudRepository<Permissio
                 .createQuery("SELECT pt FROM PermissionTemplate pt WHERE pt.service = :service")
                 .setParameter("service", service)
                 .getResultList();
+    }
+
+    @Override
+    public PermissionTemplate getByName(Service service, String name)
+    {
+        try {
+            return getEntityManager()
+                    .createQuery("SELECT pt FROM PermissionTemplate pt " +
+                                 "WHERE pt.service = :service AND pt.name = :name", PermissionTemplate.class)
+                    .setParameter("service", service)
+                    .setParameter("name", name)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 }

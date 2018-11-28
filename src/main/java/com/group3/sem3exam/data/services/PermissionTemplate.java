@@ -17,6 +17,9 @@ public class PermissionTemplate implements RepositoryEntity<String>
     private String id;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String message;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -31,8 +34,9 @@ public class PermissionTemplate implements RepositoryEntity<String>
 
     }
 
-    public PermissionTemplate(String message, List<Permission> permissions, Service service)
+    public PermissionTemplate(String name, String message, List<Permission> permissions, Service service)
     {
+        this.name = name;
         this.message = message;
         this.permissions = permissions;
         this.service = service;
@@ -47,6 +51,17 @@ public class PermissionTemplate implements RepositoryEntity<String>
     public void setId(String id)
     {
         this.id = id;
+    }
+
+    public String getName()
+    {
+        return this.name;
+    }
+
+    public PermissionTemplate setName(String name)
+    {
+        this.name = name;
+        return this;
     }
 
     public String getMessage()

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Service Authentication</title>
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI";
+        }
+
+        html, body {
+            height: 100%;
+            position: relative;
+        }
+
+        body {
+            background-image: url("http://www.psdgraphics.com/file/2017/abstract-geometric-background.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        #container {
+            background: #fff;
+            margin: auto;
+            max-width: 512px;
+            min-width: 512px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: auto;
+            padding: 20px;
+        }
+
+        label, input {
+            padding: 10px;
+            display: blocK;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        #submit {
+            margin-top: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="container">
+    <h1>Service Authentication</h1>
+    <form id="authentication-form">
+        <label>Email</label>
+        <input type="email" name="email" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
+        <input type="submit" name="submit" id="submit" value="Authenticate">
+    </form>
+    <script>
+        var form = document.getElementById("authentication-form");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var request = getParam("request");
+            var credentials = {request: request, email: form.email.value, password: form.password.value};
+
+            fetch("api/services/authenticate-user", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(credentials)
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    console.log(data);
+                })
+        });
+
+        function getParam(name) {
+            if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search))
+                return decodeURIComponent(name[1]);
+        }
+
+    </script>
+</div>
+</body>
+</html>

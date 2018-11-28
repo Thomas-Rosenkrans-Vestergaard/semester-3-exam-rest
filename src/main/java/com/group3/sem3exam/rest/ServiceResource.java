@@ -9,17 +9,20 @@ import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.SpecializedGson;
-import com.group3.sem3exam.logic.services.ServiceFacade;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authentication.jwt.JwtGenerationException;
 import com.group3.sem3exam.logic.authorization.AuthorizationException;
+import com.group3.sem3exam.logic.services.PermissionTemplateTransfer;
+import com.group3.sem3exam.logic.services.ServiceFacade;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static javax.ws.rs.core.Response.Status.CREATED;
 
 @Path("services")
 public class ServiceResource
@@ -40,6 +43,7 @@ public class ServiceResource
     private static AuthenticationFacade authenticationFacade = Facades.authentication;
 
     @POST
+    @Path("register")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response register(String json) throws ResourceConflictException
@@ -50,7 +54,7 @@ public class ServiceResource
         response.id = service.getId();
         response.name = service.getName();
         response.status = service.getStatus();
-        return Response.status(Response.Status.CREATED).entity(gson.toJson(response)).build();
+        return Response.status(CREATED).entity(gson.toJson(response)).build();
     }
 
     private class RegisterRequest
@@ -67,10 +71,10 @@ public class ServiceResource
     }
 
     @POST
-    @Path("authentication-service")
+    @Path("authenticate-service")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response authenticate(String json) throws Exception
+    public Response authenticateService(String json) throws Exception
     {
         AuthenticationRequest  authenticationRequest = gson.fromJson(json, AuthenticationRequest.class);
         AuthenticationContext  authenticationContext = facade.authenticateService(authenticationRequest.name, authenticationRequest.password);
@@ -78,6 +82,7 @@ public class ServiceResource
         AuthenticationResponse response              = new AuthenticationResponse();
         response.token = token;
         response.service = authenticationContext.getService();
+
         return Response.ok(gson.toJson(response)).build();
     }
 
@@ -94,37 +99,62 @@ public class ServiceResource
     }
 
     @POST
-    @Path("template")
+    @Path("templates")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response createTemplate(@HeaderParam("Authorization") String auth, String json) throws AuthenticationException
+    public Response createTemplate(@HeaderParam("Authorization") String auth, String json)
+    throws AuthenticationException, ResourceConflictException, AuthorizationException
     {
         TemplateRequest       request               = gson.fromJson(json, TemplateRequest.class);
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
         PermissionTemplate template = facade.createTemplate(authenticationContext,
+                                                            request.name,
                                                             request.message,
                                                             request.permissions);
-        return Response.status(Response.Status.CREATED).entity(gson.toJson(template)).build();
+        return Response.status(CREATED).entity(gson.toJson(template)).build();
     }
 
     private class TemplateRequest
     {
+        public String       name;
         public String       message;
         public List<String> permissions;
     }
 
-    @POST
-    @Path("template/{id}")
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("templates")
+    public Response getTemplates(@HeaderParam("Authorization") String authToken)
+    throws AuthorizationException, AuthenticationException
+    {
+        AuthenticationContext    auth                = authenticationFacade.authenticateBearerHeader(authToken);
+        List<PermissionTemplate> permissionTemplates = facade.getTemplates(auth);
+        List<PermissionTemplateTransfer> transfers = permissionTemplates.stream()
+                                                                        .map(p -> new PermissionTemplateTransfer(p, false))
+                                                                        .collect(Collectors.toList());
+        return Response.ok(gson.toJson(transfers)).build();
+    }
+
+    @GET
+    @Path("templates/{id}")
     @Produces(APPLICATION_JSON)
     public Response getTemplate(@HeaderParam("Authorization") String authToken, @PathParam("id") String id)
     throws ResourceNotFoundException, AuthorizationException, AuthenticationException
     {
         AuthenticationContext auth               = authenticationFacade.authenticateBearerHeader(authToken);
         PermissionTemplate    permissionTemplate = facade.getTemplate(auth, id);
-        if (permissionTemplate == null)
-            throw new ResourceNotFoundException(PermissionTemplate.class, id);
+        return Response.ok(gson.toJson(permissionTemplate)).build();
+    }
 
-        return Response.status(Response.Status.CREATED).entity(gson.toJson(permissionTemplate)).build();
+    @GET
+    @Path("templates/name/{name}")
+    @Produces(APPLICATION_JSON)
+    public Response getTemplateByName(@HeaderParam("Authorization") String authToken, @PathParam("name") String name)
+    throws ResourceNotFoundException, AuthorizationException, AuthenticationException
+    {
+        AuthenticationContext auth               = authenticationFacade.authenticateBearerHeader(authToken);
+        PermissionTemplate    permissionTemplate = facade.getTemplateByName(auth, name);
+        return Response.ok(gson.toJson(permissionTemplate)).build();
     }
 
     @POST
@@ -136,8 +166,8 @@ public class ServiceResource
     {
         AuthRequestRequest    posted                = gson.fromJson(json, AuthRequestRequest.class);
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
-        AuthRequest           template              = facade.requestAuth(authenticationContext, posted.callback, posted.template);
-        return Response.status(Response.Status.CREATED).entity(gson.toJson(template)).build();
+        AuthRequest           created               = facade.requestAuth(authenticationContext, posted.callback, posted.template);
+        return Response.status(CREATED).entity(gson.toJson(created)).build();
     }
 
     public class AuthRequestRequest
@@ -150,7 +180,7 @@ public class ServiceResource
     @Path("authenticate-user")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response authenticateUser(String json) throws ResourceNotFoundException, AuthenticationException
+    public Response authenticateUser(String json) throws ResourceNotFoundException, AuthenticationException, JwtGenerationException
     {
         AuthenticateUserRequest request = gson.fromJson(json, AuthenticateUserRequest.class);
         AuthenticationContext authenticationContext = facade.authenticateServiceUser(
@@ -177,13 +207,5 @@ public class ServiceResource
         public String request;
         public String email;
         public String password;
-    }
-
-    @POST
-    @Path("callback")
-    @Consumes(APPLICATION_JSON)
-    public void callback(String json)
-    {
-        System.out.println(json);
     }
 }
