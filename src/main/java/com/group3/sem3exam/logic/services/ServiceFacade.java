@@ -1,4 +1,4 @@
-package com.group3.sem3exam.logic;
+package com.group3.sem3exam.logic.services;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,6 +6,8 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.data.services.*;
+import com.group3.sem3exam.logic.ResourceConflictException;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.authentication.*;
 import com.group3.sem3exam.logic.authorization.*;
 import org.apache.http.client.HttpClient;
