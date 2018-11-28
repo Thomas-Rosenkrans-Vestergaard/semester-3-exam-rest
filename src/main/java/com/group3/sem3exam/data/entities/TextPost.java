@@ -1,13 +1,11 @@
 package com.group3.sem3exam.data.entities;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import java.time.LocalDateTime;
 
-import static javax.persistence.GenerationType.AUTO;
-
-@Entity(name = "TextPost")
+@Entity
+@DiscriminatorValue(value = "t")
 public class TextPost extends Post
 {
 
