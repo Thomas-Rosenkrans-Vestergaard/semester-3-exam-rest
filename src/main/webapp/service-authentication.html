@@ -82,11 +82,22 @@
             background-color: #FFD2D2;
         }
 
+        #permissions {
+            margin-left: 40px;
+        }
+
+        #permissions li {
+            margin-top: 10px;
+        }
+
     </style>
 </head>
 <body>
 <div id="container">
     <h1>Service Authentication</h1>
+    <div id="request-details">
+
+    </div>
     <form id="authentication-form">
         <label>Email</label>
         <input type="email" name="email" required>
@@ -100,6 +111,7 @@
     <script>
         var form = document.getElementById("authentication-form");
         var messages = document.getElementById("messages");
+        var detailsBox = document.getElementById("request-details");
 
         getRequest(getParam("request")).then(function (response) {
             if (response.code === 200) {
@@ -113,12 +125,26 @@
         });
 
         function showRequestDetails(details) {
+
             if (details.status !== "READY") {
                 showError("The authentication request has already been used.");
                 return;
             }
 
+            detailsBox.innerHTML = "";
 
+            var p = document.createElement("p");
+            p.innerHTML = "<p>The service <strong>" + details.service.name + "</strong> is requesting the following permissions.</p>";
+            var ul = document.createElement("ul");
+            ul.id = "permissions";
+            for (var i = 0; i < details.template.permissions.length; i++) {
+                var li = document.createElement("li");
+                li.innerText = details.template.permissions[i];
+                ul.appendChild(li);
+            }
+
+            detailsBox.appendChild(p);
+            detailsBox.appendChild(ul);
         }
 
         form.addEventListener("submit", function (e) {
