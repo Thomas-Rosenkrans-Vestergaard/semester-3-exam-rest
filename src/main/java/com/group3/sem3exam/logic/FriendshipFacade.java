@@ -107,4 +107,15 @@ public class FriendshipFacade<T extends Transaction>
             return friendship;
         }
     }
+
+    public FriendRequest createFriendRequest(User requester, User reciever ) throws ResourceNotFoundException
+    {
+        try(FriendshipRepository friendshipRepository = friendshipRepositoryFactory.apply(transactionFactory.get())) {
+            if(requester == null || reciever == null)
+                throw new ResourceNotFoundException(FriendRequest.class, requester);
+
+            FriendRequest friendRequest = friendshipRepository.createFriendRequest(requester, reciever);
+            return friendRequest;
+        }
+    }
 }
