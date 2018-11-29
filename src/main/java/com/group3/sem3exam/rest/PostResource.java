@@ -50,7 +50,7 @@ public class PostResource
     {
         AuthenticationContext  ac          = authenticationFacade.authenticateBearerHeader(auth);
         ReceivedCreateTextPost post        = gson.fromJson(content, ReceivedCreateTextPost.class);
-        Post                   createdPost = postFacade.createPost(ac, post.contents, post.images);
+        Post                   createdPost = postFacade.createPost(ac, post.contents, post.images == null ? new ArrayList<>() : post.images);
         return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
     }
 
@@ -88,12 +88,6 @@ public class PostResource
     private class ReceivedCreateTextPost
     {
         private String                            contents;
-        private List<PostFacade.ImageDeclaration> images;
-    }
-
-    private class ReceivedCreateImagePost
-    {
-        private String       contents;
-        private List<String> images;
+        private List<PostFacade.ImageDeclaration> images = new ArrayList<>();
     }
 }
