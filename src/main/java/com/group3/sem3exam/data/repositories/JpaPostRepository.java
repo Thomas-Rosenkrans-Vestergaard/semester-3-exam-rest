@@ -1,6 +1,8 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.*;
+import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.Post;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -18,7 +20,6 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
         super(entityManager, Post.class);
     }
 
-
     public JpaPostRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, Post.class);
@@ -30,30 +31,12 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     }
 
     @Override
-    public TextPost createTextPost(User user, String body, LocalDateTime createdAt)
+    public Post create(User user, String body, List<Image> images, LocalDateTime time)
     {
-        TextPost post = new TextPost(body, user, createdAt);
+        Post post = new Post(body, images, user, time);
         getEntityManager().persist(post);
         return post;
     }
-
-    @Override
-    public ImagePost createImagePost(User user, String body, LocalDateTime time, List<ImagePostImage> images)
-    {
-        ImagePost post = new ImagePost(body, user, time, images);
-        getEntityManager().persist(post);
-        return post;
-    }
-
-    /*
-        @Override
-        public Post createPost(User user, String title, String body, LocalDateTime createdAt)
-        {
-            Post post = new Post(body, title, user, createdAt);
-            getEntityManager().persist(post);
-            return post;
-        }
-        */
 
     @Override
     public List<Post> getByUser(User author)

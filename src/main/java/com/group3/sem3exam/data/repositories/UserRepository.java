@@ -38,9 +38,10 @@ public interface UserRepository extends CrudRepository<User, Integer>, Transacti
     /**
      * Updates the profile picture of the provided user to the provided profile picture.
      *
-     * @param user The user to update the profile picture of.
-     * @param src  The src of the new profile picture.
+     * @param user      The user to update the profile picture of.
+     * @param full      The src of the new profile picture.
+     * @param thumbnail The thumbnail of the new profile picture.
      * @return The updated user entity.
      */
-    User updateProfilePicture(User user, String src);
+    User updateProfilePicture(User user, String full, String thumbnail);
 }

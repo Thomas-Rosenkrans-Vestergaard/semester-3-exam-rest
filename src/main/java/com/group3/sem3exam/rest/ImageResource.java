@@ -2,7 +2,7 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.group3.sem3exam.data.entities.GalleryImage;
+import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
@@ -38,7 +38,7 @@ public class ImageResource
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
         if (authenticationContext.getType() == USER) {
             ReceivedCreateImage receivedCreateImage = gson.fromJson(content, ReceivedCreateImage.class);
-            GalleryImage image = imageFacade.create(
+            Image image = imageFacade.create(
                     authenticationContext.getUser(),
                     receivedCreateImage.description,
                     receivedCreateImage.data);
@@ -53,8 +53,8 @@ public class ImageResource
     public Response getByUser(@PathParam("user") int user)
     throws ResourceNotFoundException
     {
-        List<GalleryImage> images = imageFacade.getByUser(user);
-        String             json   = gson.toJson(ImageDTO.list(images, ImageDTO::basic));
+        List<Image> images = imageFacade.getByUser(user);
+        String      json   = gson.toJson(ImageDTO.list(images, ImageDTO::basic));
         return Response.ok(json).build();
     }
 
@@ -82,8 +82,8 @@ public class ImageResource
             @PathParam("pageNumber") int pageNumber)
     throws ResourceNotFoundException
     {
-        List<GalleryImage> images        = imageFacade.getByUserPaginated(user, pageSize, pageNumber);
-        PaginatedView      paginatedView = new PaginatedView();
+        List<Image>   images        = imageFacade.getByUserPaginated(user, pageSize, pageNumber);
+        PaginatedView paginatedView = new PaginatedView();
         paginatedView.count = imageFacade.countByUser(user);
         paginatedView.results = ImageDTO.list(images, ImageDTO::basic);
 

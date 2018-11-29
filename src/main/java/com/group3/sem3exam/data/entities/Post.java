@@ -11,8 +11,7 @@ import java.util.List;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public abstract class Post implements RepositoryEntity<Integer>
+public class Post implements RepositoryEntity<Integer>
 {
 
     @Id
@@ -32,14 +31,18 @@ public abstract class Post implements RepositoryEntity<Integer>
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "post", orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Image> images = new ArrayList<>();
+
     public Post()
     {
 
     }
 
-    public Post(String contents, User author, LocalDateTime createdAt)
+    public Post(String contents, List<Image> images, User author, LocalDateTime createdAt)
     {
         this.contents = contents;
+        this.images = images;
         this.author = author;
         this.createdAt = createdAt;
     }
@@ -100,5 +103,16 @@ public abstract class Post implements RepositoryEntity<Integer>
     public void setId(Integer id)
     {
         this.id = id;
+    }
+
+    public List<Image> getImages()
+    {
+        return this.images;
+    }
+
+    public Post setImages(List<Image> images)
+    {
+        this.images = images;
+        return this;
     }
 }

@@ -45,29 +45,12 @@ public class PostResource
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("text")
-    public Response createTextPost(@HeaderParam("Authorization") String auth, String content)
-    throws ResourceNotFoundException, AuthenticationException
+    public Response createPost(@HeaderParam("Authorization") String auth, String content)
+    throws AuthenticationException, ImageThumbnailerException, UnsupportedImageFormatException
     {
         AuthenticationContext  ac          = authenticationFacade.authenticateBearerHeader(auth);
         ReceivedCreateTextPost post        = gson.fromJson(content, ReceivedCreateTextPost.class);
-        Post                   createdPost = postFacade.createTextPost(ac, post.contents);
-        return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
-    }
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("image")
-    public Response createImagePost(@HeaderParam("Authorization") String auth, String content)
-    throws ResourceNotFoundException, ImageThumbnailerException, UnsupportedImageFormatException, AuthenticationException
-    {
-        AuthenticationContext   ac   = authenticationFacade.authenticateBearerHeader(auth);
-        ReceivedCreateImagePost post = gson.fromJson(content, ReceivedCreateImagePost.class);
-        Post createdPost = postFacade.createImagePost(ac,
-                                                      post.contents,
-                                                      post.images);
-
+        Post                   createdPost = postFacade.createPost(ac, post.contents, post.images == null ? new ArrayList<>() : post.images);
         return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
     }
 
@@ -90,7 +73,6 @@ public class PostResource
         return Response.ok(gson.toJson(postDTOs)).build();
     }
 
-
     @Path("user/{userId}/{pageSize}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -105,12 +87,7 @@ public class PostResource
 
     private class ReceivedCreateTextPost
     {
-        private String contents;
-    }
-
-    private class ReceivedCreateImagePost
-    {
-        private String       contents;
-        private List<String> images;
+        private String                            contents;
+        private List<PostFacade.ImageDeclaration> images = new ArrayList<>();
     }
 }

@@ -30,15 +30,7 @@ public class ServiceResource
 
 
     private static Gson                          gson   = SpecializedGson.create();
-    private static ServiceFacade<JpaTransaction> facade = new ServiceFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaServiceRepository(transaction),
-            transaction -> new JpaAuthRequestRepository(transaction),
-            transaction -> new JpaPermissionRequestRepository(transaction),
-            transaction -> new JpaPermissionTemplateRepository(transaction),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaPermissionRepository(transaction)
-    );
+    private static ServiceFacade<JpaTransaction> facade = Facades.services;
 
     private static AuthenticationFacade authenticationFacade = Facades.authentication;
 

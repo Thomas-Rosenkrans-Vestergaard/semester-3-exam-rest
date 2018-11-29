@@ -1,16 +1,12 @@
 package com.group3.sem3exam.logic.images;
 
-import com.group3.sem3exam.data.entities.GalleryImage;
+import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.function.Function;
@@ -61,12 +57,12 @@ public class ImageFacade<T extends Transaction>
      * @return The image with the provided id.
      * @throws ResourceNotFoundException When an image with the provided id does not exist.
      */
-    public GalleryImage get(Integer id) throws ResourceNotFoundException
+    public Image get(Integer id) throws ResourceNotFoundException
     {
         try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
-            GalleryImage image = ir.get(id);
+            Image image = ir.get(id);
             if (image == null)
-                throw new ResourceNotFoundException(GalleryImage.class, id);
+                throw new ResourceNotFoundException(Image.class, id);
 
             return image;
         }
@@ -79,7 +75,7 @@ public class ImageFacade<T extends Transaction>
      * @return The images by the user with the provided id.
      * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public List<GalleryImage> getByUser(Integer user) throws ResourceNotFoundException
+    public List<Image> getByUser(Integer user) throws ResourceNotFoundException
     {
         try (T transaction = transactionFactory.get()) {
             UserRepository  ur = userRepositoryFactory.apply(transaction);
@@ -120,7 +116,7 @@ public class ImageFacade<T extends Transaction>
      * @return The images by the user with the provided id.
      * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public List<GalleryImage> getByUserPaginated(Integer user, int pageSize, int pageNumber)
+    public List<Image> getByUserPaginated(Integer user, int pageSize, int pageNumber)
     throws ResourceNotFoundException
     {
         pageSize = Math.max(pageSize, 0);
@@ -146,7 +142,7 @@ public class ImageFacade<T extends Transaction>
      * @throws UnsupportedImageFormatException When the provided image is of an unsupported type.
      * @throws ImageThumbnailerException       When a thumbnail of the image cannot be created.
      */
-    public GalleryImage create(User user, String description, String base64)
+    public Image create(User user, String description, String base64)
     throws UnsupportedImageFormatException, ImageThumbnailerException
     {
         DataUriEncoder   uriEncoder       = new DataUriEncoder();
@@ -158,7 +154,7 @@ public class ImageFacade<T extends Transaction>
 
         try (ImageRepository ir = imageRepositoryFactory.apply(transactionFactory.get())) {
             ir.begin();
-            GalleryImage image = ir.create(description, full, uriEncoder.encode(thumbnail, type), user);
+            Image image = ir.create(description, full, uriEncoder.encode(thumbnail, type), user);
             ir.commit();
             return image;
         }

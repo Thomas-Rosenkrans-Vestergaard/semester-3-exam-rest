@@ -12,8 +12,8 @@ import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authentication.IncorrectCredentialsException;
 import com.group3.sem3exam.logic.authentication.UserAuthenticator;
-import com.group3.sem3exam.logic.authentication.jwt.BasicJwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtGenerationException;
+import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenGenerator;
 import com.group3.sem3exam.logic.authorization.*;
 import org.apache.http.client.HttpClient;
@@ -42,6 +42,7 @@ public class ServiceFacade<T extends Transaction>
     private final Function<T, PermissionTemplateRepository> templateRepositoryFactory;
     private final Function<T, UserRepository>               userRepositoryFactory;
     private final Function<T, PermissionRepository>         permissionRepositoryFactory;
+    private final JwtSecret                                 jwtSecret;
 
     public ServiceFacade(
             Supplier<T> transactionFactory,
@@ -50,7 +51,8 @@ public class ServiceFacade<T extends Transaction>
             Function<T, PermissionRequestRepository> permissionRequestRepositoryFactory,
             Function<T, PermissionTemplateRepository> templateRepositoryFactory,
             Function<T, UserRepository> userRepositoryFactory,
-            Function<T, PermissionRepository> permissionRepositoryFactory)
+            Function<T, PermissionRepository> permissionRepositoryFactory,
+            JwtSecret jwtSecret)
     {
         this.transactionFactory = transactionFactory;
         this.serviceRepositoryFactory = serviceRepositoryFactory;
@@ -59,6 +61,7 @@ public class ServiceFacade<T extends Transaction>
         this.templateRepositoryFactory = templateRepositoryFactory;
         this.userRepositoryFactory = userRepositoryFactory;
         this.permissionRepositoryFactory = permissionRepositoryFactory;
+        this.jwtSecret = jwtSecret;
     }
 
     /**
@@ -547,7 +550,7 @@ public class ServiceFacade<T extends Transaction>
 
     private String generateToken(AuthenticationContext authenticationContext) throws JwtGenerationException
     {
-        JwtTokenGenerator tokenGenerator = new JwtTokenGenerator(new BasicJwtSecret(new byte[512 / 8]));
+        JwtTokenGenerator tokenGenerator = new JwtTokenGenerator(jwtSecret);
         return tokenGenerator.generate(authenticationContext);
     }
 }

@@ -10,8 +10,7 @@
         <class>com.group3.sem3exam.data.entities.City</class>
         <class>com.group3.sem3exam.data.entities.Region</class>
         <class>com.group3.sem3exam.data.entities.Country</class>
-        <class>com.group3.sem3exam.data.entities.GalleryImage</class>
-        <class>com.group3.sem3exam.data.entities.ProfilePicture</class>
+        <class>com.group3.sem3exam.data.entities.Image</class>
         <class>com.group3.sem3exam.logic.authentication.jwt.JwtEntity</class>
         <class>com.group3.sem3exam.data.services.Service</class>
         <class>com.group3.sem3exam.data.services.AuthRequest</class>
@@ -24,6 +23,8 @@
             <property name="hibernate.connection.url" value="jdbc:mysql://localhost:3306/semester-3-exam-rest"/>
             <property name="hibernate.connection.username" value=""/>
             <property name="hibernate.connection.password" value=""/>
+            <property name="hibernate.hbm2ddl.import_files_sql_extractor"
+                      value="org.hibernate.tool.hbm2ddl.MultipleLinesSqlCommandExtractor"/>
         </properties>
     </persistence-unit>
 </persistence>
