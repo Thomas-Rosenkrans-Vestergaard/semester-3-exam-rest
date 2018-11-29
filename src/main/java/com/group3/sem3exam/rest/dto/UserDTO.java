@@ -38,7 +38,7 @@ public class UserDTO
         if (showFriendships)
             this.friendships = user.getFriendships()
                                    .stream()
-                                   .map(friendship -> new FriendshipDTO(friendship))
+                                   .map(friendship -> FriendshipDTO.basicFriendshipDTO(friendship))
                                    .collect(Collectors.toList());
         if (showPosts)
             this.posts = user.getPosts()
