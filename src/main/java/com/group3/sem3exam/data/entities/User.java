@@ -54,10 +54,10 @@ public class User implements RepositoryEntity<Integer>
     private List<Friendship> friendships = new ArrayList<>();
 
     @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "user")
-    private List<GalleryImage> images = new ArrayList<>();
+    private List<Image> images = new ArrayList<>();
 
     @OneToOne(fetch = LAZY, cascade = ALL, mappedBy = "user")
-    private ProfilePicture profilePicture;
+    private Image profilePicture;
 
     public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
     {
@@ -188,27 +188,27 @@ public class User implements RepositoryEntity<Integer>
         this.dateOfBirth = dateOfBirth;
     }
 
-    public List<GalleryImage> getImages()
+    public List<Image> getImages()
     {
         return this.images;
     }
 
-    public void setImages(List<GalleryImage> images)
+    public void setImages(List<Image> images)
     {
         this.images = images;
     }
 
-    public void addImage(GalleryImage image)
+    public void addImage(Image image)
     {
         this.images.add(image);
     }
 
-    public ProfilePicture getProfilePicture()
+    public Image getProfilePicture()
     {
         return this.profilePicture;
     }
 
-    public void setProfilePicture(ProfilePicture profilePicture)
+    public void setProfilePicture(Image profilePicture)
     {
         this.profilePicture = profilePicture;
     }

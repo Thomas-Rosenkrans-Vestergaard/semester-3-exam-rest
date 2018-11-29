@@ -1,8 +1,10 @@
 package com.group3.sem3exam.logic;
 
 
-import com.group3.sem3exam.data.entities.*;
-import com.group3.sem3exam.data.repositories.ImagePostImageRepository;
+import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.Post;
+import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.PostRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
@@ -32,67 +34,65 @@ public class PostFacade<T extends Transaction>
     /**
      * A factory that creates a new {@link UserRepository} from a provided {@link T}.
      */
-    private final Function<T, UserRepository>           userRepositoryFactory;
-    private final Function<T, ImagePostImageRepository> imagePostImageRepositoryFactory;
+    private final Function<T, UserRepository> userRepositoryFactory;
+
+    /**
+     * A factory that creates a new {@link ImageRepository} from a provided {@link T}.
+     */
+    private final Function<T, ImageRepository> imageRepositoryFactory;
 
     /**
      * Creates a new {@link PostFacade}.
      *
-     * @param transactionFactory    A factory that returns {@link Transaction} instances of type {@code T}.
-     * @param postRepositoryFactory A factory that creates a new {@link PostRepository} from a provided {@link T}.
-     * @param userRepositoryFactory A factory that creates a new {@link UserRepository} from a provided {@link T}.
+     * @param transactionFactory     A factory that returns {@link Transaction} instances of type {@code T}.
+     * @param postRepositoryFactory  A factory that creates a new {@link PostRepository} from a provided {@link T}.
+     * @param userRepositoryFactory  A factory that creates a new {@link UserRepository} from a provided {@link T}.
+     * @param imageRepositoryFactory A factory that creates a new {@link ImageRepository} from a provided {@link T}.
      */
     public PostFacade(
             Supplier<T> transactionFactory,
             Function<T, PostRepository> postRepositoryFactory,
             Function<T, UserRepository> userRepositoryFactory,
-            Function<T, ImagePostImageRepository> imagePostImageRepositoryFactory)
+            Function<T, ImageRepository> imageRepositoryFactory)
     {
         this.transactionFactory = transactionFactory;
         this.postRepositoryFactory = postRepositoryFactory;
         this.userRepositoryFactory = userRepositoryFactory;
-        this.imagePostImageRepositoryFactory = imagePostImageRepositoryFactory;
+        this.imageRepositoryFactory = imageRepositoryFactory;
     }
 
-    /**
-     * Creates a new post using the provided information.
-     *
-     * @param user The user making the post.
-     * @param body The body of the post.
-     * @return The newly created post instance.
-     * @throws ResourceNotFoundException When a user with the provided id does not exist.
-     */
-    public TextPost createTextPost(AuthenticationContext user, String body) throws ResourceNotFoundException
+    public interface ImageDeclaration
+    {
+        String getData();
+
+        String getDescription();
+    }
+
+    public Post createPost(AuthenticationContext auth, String body, List<ImageDeclaration> images)
+    throws UnsupportedImageFormatException, ImageThumbnailerException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
-            PostRepository pr = postRepositoryFactory.apply(transaction);
+            PostRepository   pr               = postRepositoryFactory.apply(transaction);
+            ImageRepository  ir               = imageRepositoryFactory.apply(transaction);
+            List<Image>      postImages       = new ArrayList<>();
+            ImageThumbnailer imageThumbnailer = new ImageThumbnailer(250, 250);
+            DataUriEncoder   uriEncoder       = new DataUriEncoder();
+            User             user             = auth.getUser();
 
-            TextPost post = pr.createTextPost(user.getUser(), body, LocalDateTime.now());
-            transaction.commit();
-            return post;
-        }
-    }
-
-    public ImagePost createImagePost(AuthenticationContext auth, String body, List<String> images) throws ResourceNotFoundException, UnsupportedImageFormatException, ImageThumbnailerException
-    {
-        try (T transaction = transactionFactory.get()) {
-            transaction.begin();
-            PostRepository           pr               = postRepositoryFactory.apply(transaction);
-            ImagePostImageRepository ir               = imagePostImageRepositoryFactory.apply(transaction);
-            List<ImagePostImage>     postImages       = new ArrayList<>();
-            ImageThumbnailer         imageThumbnailer = new ImageThumbnailer(250, 250);
-            DataUriEncoder           uriEncoder       = new DataUriEncoder();
-            User                     user             = auth.getUser();
-
-            for (String image : images) {
-                byte[] data = Base64.getDecoder().decode(image);
-                data = imageThumbnailer.createThumbnail(data);
-                String uri = uriEncoder.encode(data, ImageType.fromData(data));
-                postImages.add(ir.create(image, user, uri));
+            for (ImageDeclaration image : images) {
+                byte[] full = Base64.getDecoder().decode(image.getData());
+                full = imageThumbnailer.createThumbnail(full);
+                String uri       = uriEncoder.encode(full, ImageType.fromData(full));
+                byte[] thumbnail = imageThumbnailer.createThumbnail(full, ImageType.fromData(full));
+                postImages.add(ir.create(
+                        image.getDescription(),
+                        uriEncoder.encode(full),
+                        uriEncoder.encode(thumbnail),
+                        user));
             }
 
-            ImagePost post = pr.createImagePost(user, body, LocalDateTime.now(), postImages);
+            Post post = pr.create(user, body, postImages, LocalDateTime.now());
             transaction.commit();
             return post;
         }

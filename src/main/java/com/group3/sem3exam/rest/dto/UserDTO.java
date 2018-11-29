@@ -46,7 +46,8 @@ public class UserDTO
                              .map(posts -> new PostDTO(posts))
                              .collect(Collectors.toList());
 
-        this.profilePicture = ImageDTO.basic(user.getProfilePicture());
+        if (user.getProfilePicture() != null)
+            this.profilePicture = ImageDTO.basic(user.getProfilePicture());
     }
 
     public static UserDTO basic(User user)

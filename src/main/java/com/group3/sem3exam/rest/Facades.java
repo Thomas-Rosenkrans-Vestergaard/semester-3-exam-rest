@@ -2,10 +2,12 @@ package com.group3.sem3exam.rest;
 
 import com.group3.sem3exam.data.repositories.*;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.data.services.JpaServiceRepository;
+import com.group3.sem3exam.data.services.*;
 import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
+import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.images.ImageFacade;
+import com.group3.sem3exam.logic.services.ServiceFacade;
 
 public class Facades
 {
@@ -36,18 +38,31 @@ public class Facades
             () -> new JpaTransaction(JpaConnection.create()),
             transaction -> new JpaPostRepository(transaction),
             transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaImagePostImageRepository(transaction)
+            transaction -> new JpaImageRepository(transaction)
     );
 
-    public static final RegionFacade region = new RegionFacade(() -> new JpaRegionRepository(JpaConnection.create()));
+    private static      JwtSecret                     jwtSecret;
+    public static final RegionFacade                  region = new RegionFacade(() -> new JpaRegionRepository(JpaConnection.create()));
+    public static final ServiceFacade<JpaTransaction> services;
 
     static {
         try {
+            jwtSecret = new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8);
             authentication = new AuthenticationFacade(
-                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
+                    jwtSecret,
                     () -> new JpaUserRepository(JpaConnection.create()),
                     () -> new JpaServiceRepository(JpaConnection.create()));
 
+            services = new ServiceFacade<>(
+                    () -> new JpaTransaction(JpaConnection.create()),
+                    transaction -> new JpaServiceRepository(transaction),
+                    transaction -> new JpaAuthRequestRepository(transaction),
+                    transaction -> new JpaPermissionRequestRepository(transaction),
+                    transaction -> new JpaPermissionTemplateRepository(transaction),
+                    transaction -> new JpaUserRepository(transaction),
+                    transaction -> new JpaPermissionRepository(transaction),
+                    jwtSecret
+            );
 
         } catch (Exception e) {
             throw new RuntimeException(e);

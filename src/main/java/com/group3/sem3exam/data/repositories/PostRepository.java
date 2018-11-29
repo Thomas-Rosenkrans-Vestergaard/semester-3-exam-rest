@@ -1,6 +1,8 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.*;
+import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.Post;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.CrudRepository;
 
 import java.time.LocalDateTime;
@@ -12,14 +14,13 @@ public interface PostRepository extends CrudRepository<Post, Integer>
     /**
      * Creates a new post entity using the provided information.
      *
-     * @param user The author of the new post.
-     * @param body The text body of the new post.
-     * @param time The time at which the post was made.
+     * @param user   The author of the new post.
+     * @param body   The text body of the new post.
+     * @param images The images to include in the post.
+     * @param time   The time at which the post was made.
      * @return The newly created post.
      */
-    TextPost createTextPost(User user, String body, LocalDateTime time);
-
-    ImagePost createImagePost(User user, String body, LocalDateTime time, List<ImagePostImage> imageData);
+    Post create(User user, String body, List<Image> images, LocalDateTime time);
 
     /**
      * Returns the posts made by the user with the provided id.

@@ -43,7 +43,13 @@ public class JpaConnection
         int     lineNumber = 1;
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            if (!line.trim().isEmpty()) {
+            line = line.trim();
+
+            if (!line.isEmpty()) {
+                if (line.startsWith("#")) {
+                    System.out.println("Ignoring line " + lineNumber);
+                    continue;
+                }
                 line += " ";
                 String[] parts = line.split("=");
                 if (parts.length != 2)

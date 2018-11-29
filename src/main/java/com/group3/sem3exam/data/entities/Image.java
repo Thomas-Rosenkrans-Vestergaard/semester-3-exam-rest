@@ -7,16 +7,22 @@ import javax.persistence.*;
 import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
+
 @Entity
-public class ImagePostImage implements RepositoryEntity<Integer>
+@Table(name = "image")
+public class Image implements RepositoryEntity<Integer>
 {
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
+    private String description;
+
     @Lob
     @Column(nullable = false)
-    private String data;
+    private String full;
 
     @Lob
     @Column
@@ -25,15 +31,17 @@ public class ImagePostImage implements RepositoryEntity<Integer>
     @ManyToOne(fetch = EAGER, optional = false)
     private User user;
 
-    public ImagePostImage(String data, String thumbnail, User user)
+    public Image()
     {
-        this.data = data;
-        this.thumbnail = thumbnail;
-        this.user = user;
+
     }
 
-    public ImagePostImage()
+    public Image(String description, String full, String thumbnail, User user)
     {
+        this.description = description;
+        this.full = full;
+        this.thumbnail = thumbnail;
+        this.user = user;
     }
 
     public Integer getId()
@@ -46,19 +54,29 @@ public class ImagePostImage implements RepositoryEntity<Integer>
         this.id = id;
     }
 
-    public String getData()
+    public String getDescription()
     {
-        return data;
+        return this.description;
     }
 
-    public void setData(String data)
+    public void setDescription(String description)
     {
-        this.data = data;
+        this.description = description;
+    }
+
+    public String getFull()
+    {
+        return this.full;
+    }
+
+    public void setFull(String full)
+    {
+        this.full = full;
     }
 
     public String getThumbnail()
     {
-        return thumbnail;
+        return this.thumbnail;
     }
 
     public void setThumbnail(String thumbnail)
