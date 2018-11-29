@@ -44,4 +44,14 @@ public interface CommentRepository extends ReadRepository<Comment, Integer>
      * @return The newly created comment.
      */
     Comment create(User user, String contents, CommentParent parent);
+
+    /**
+     * Returns a paginated view of the comments on the comment parent with the provided id.
+     *
+     * @param parent     The comment parent to return the comments of.
+     * @param pageSize   The number of results on a page. Where {@code pageSize >= 0}.
+     * @param pageNumber The position of the page to retrieve. Where {@code pageNumber >= 1}.
+     * @return The results on the retrieved page.
+     */
+    List<Comment> getPaginated(CommentParent parent, Integer pageSize, Integer pageNumber);
 }

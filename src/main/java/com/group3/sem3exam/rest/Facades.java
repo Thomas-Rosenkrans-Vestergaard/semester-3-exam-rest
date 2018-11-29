@@ -41,6 +41,10 @@ public class Facades
             transaction -> new JpaImageRepository(transaction)
     );
 
+    public static final CommentFacade comments = new CommentFacade(
+            () -> new JpaCommentRepository(JpaConnection.create())
+    );
+
     private static      JwtSecret                     jwtSecret;
     public static final RegionFacade                  region = new RegionFacade(() -> new JpaRegionRepository(JpaConnection.create()));
     public static final ServiceFacade<JpaTransaction> services;

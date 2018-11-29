@@ -30,9 +30,9 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
      * @param entityManagerFactory The entity manager factory used to create the entity manager to perform operations
      *                             upon.
      */
-    public JpaCommentRepository(EntityManagerFactory entityManagerFactory, Class<Comment> c)
+    public JpaCommentRepository(EntityManagerFactory entityManagerFactory)
     {
-        super(entityManagerFactory, c);
+        super(entityManagerFactory, Comment.class);
     }
 
     /**
@@ -71,7 +71,9 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
     @Override
     public List<Comment> getAll(CommentParent parent)
     {
-        return parent.getComments();
+        List<Comment> comments = parent.getComments();
+        comments.size();
+        return comments;
     }
 
     @Override
@@ -80,5 +82,19 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
         Comment comment = new Comment(contents, author, LocalDateTime.now(), parent);
         getEntityManager().persist(comment);
         return comment;
+    }
+
+    @Override
+    public List<Comment> getPaginated(CommentParent parent, Integer pageSize, Integer pageNumber)
+    {
+        pageSize = Math.max(pageSize, 0);
+        pageNumber = Math.max(pageNumber, 1);
+
+        return getEntityManager()
+                .createQuery("SELECT c FROM Comment c WHERE c.parent = :parent", Comment.class)
+                .setParameter("parent", parent)
+                .setFirstResult(pageSize * (pageNumber - 1))
+                .setMaxResults(pageSize)
+                .getResultList();
     }
 }

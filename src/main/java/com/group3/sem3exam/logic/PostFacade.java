@@ -83,7 +83,6 @@ public class PostFacade<T extends Transaction>
             for (ImageDeclaration image : images) {
                 byte[] full = Base64.getDecoder().decode(image.getData());
                 full = imageThumbnailer.createThumbnail(full);
-                String uri       = uriEncoder.encode(full, ImageType.fromData(full));
                 byte[] thumbnail = imageThumbnailer.createThumbnail(full, ImageType.fromData(full));
                 postImages.add(ir.create(
                         image.getDescription(),
