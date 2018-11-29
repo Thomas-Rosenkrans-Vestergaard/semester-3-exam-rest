@@ -23,24 +23,24 @@ public class Comment implements RepositoryEntity<Integer>
     @ManyToOne
     private User author;
 
-    @ManyToOne
-    private Post post;
-
     @Column
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    private CommentParent parent;
 
     public Comment()
     {
 
     }
 
-    public Comment(String contents, User author, Post post, LocalDateTime createdAt)
+    public Comment(String contents, User author, LocalDateTime createdAt, CommentParent parent)
     {
         this.contents = contents;
         this.author = author;
-        this.post = post;
         this.createdAt = createdAt;
+        this.parent = parent;
     }
 
     public Integer getId()
@@ -73,16 +73,6 @@ public class Comment implements RepositoryEntity<Integer>
         this.author = author;
     }
 
-    public Post getPost()
-    {
-        return this.post;
-    }
-
-    public void setPost(Post post)
-    {
-        this.post = post;
-    }
-
     public LocalDateTime getCreatedAt()
     {
         return this.createdAt;
@@ -91,5 +81,16 @@ public class Comment implements RepositoryEntity<Integer>
     public void setCreatedAt(LocalDateTime createdAt)
     {
         this.createdAt = createdAt;
+    }
+
+    public CommentParent getParent()
+    {
+        return this.parent;
+    }
+
+    public Comment setParent(CommentParent parent)
+    {
+        this.parent = parent;
+        return this;
     }
 }

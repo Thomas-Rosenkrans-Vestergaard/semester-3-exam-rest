@@ -98,13 +98,29 @@ public class FriendshipFacade<T extends Transaction>
 
     public Friendship createFriendship(int friendshipRequestId) throws ResourceNotFoundException
     {
+        //I can generate a random transaction here, because I only use one repository
         try (FriendshipRepository friendshipRepository = friendshipRepositoryFactory.apply(transactionFactory.get())) {
+            friendshipRepository.begin();
             FriendRequest friendRequest = friendshipRepository.getFriendRequest(friendshipRequestId);
             if (friendRequest == null)
                 throw new ResourceNotFoundException(FriendRequest.class, friendshipRequestId);
 
             Friendship friendship = friendshipRepository.createFriendship(friendRequest);
+            friendshipRepository.commit();
             return friendship;
+        }
+    }
+
+    public FriendRequest createFriendRequest(User requester, User reciever ) throws ResourceNotFoundException
+    {
+        try(FriendshipRepository friendshipRepository = friendshipRepositoryFactory.apply(transactionFactory.get())) {
+            if(requester == null || reciever == null)
+                throw new ResourceNotFoundException(FriendRequest.class, requester);
+            
+            friendshipRepository.begin();
+            FriendRequest friendRequest = friendshipRepository.createFriendRequest(requester, reciever);
+            friendshipRepository.commit();
+            return friendRequest;
         }
     }
 }

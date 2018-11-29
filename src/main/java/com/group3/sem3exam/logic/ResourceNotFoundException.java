@@ -16,7 +16,7 @@ public class ResourceNotFoundException extends FacadeException
     /**
      * Creates a new {@link ResourceNotFoundException}.
      *
-     * @param resource The class representing the resource that could not be found.
+     * @param resource The class serviceUser the resource that could not be found.
      * @param id       The id of the missing resource.
      */
     public ResourceNotFoundException(Class resource, Object id)
@@ -27,7 +27,7 @@ public class ResourceNotFoundException extends FacadeException
     /**
      * Creates a new {@link ResourceNotFoundException} with a status code and a throwable.
      *
-     * @param resource The class representing the resource that could not be found.
+     * @param resource The class serviceUser the resource that could not be found.
      * @param id       The id of the missing resource.
      * @param cause    The cause of this error.
      */

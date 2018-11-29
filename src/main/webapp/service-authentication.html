@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Service Authentication</title>
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI";
+        }
+
+        html, body {
+            height: 100%;
+            position: relative;
+        }
+
+        body {
+            background-image: url("http://www.psdgraphics.com/file/2017/abstract-geometric-background.png");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        #container {
+            background: #fff;
+            margin: auto;
+            max-width: 512px;
+            min-width: 512px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            height: auto;
+            padding: 20px;
+        }
+
+        label, input {
+            padding: 10px;
+            display: blocK;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input {
+            border: #ddd 1px solid;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        #submit {
+            margin-top: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        #messages {
+            margin-top: 15px;
+        }
+
+        #messages li {
+            list-style: none;
+            padding: 15px;
+            border: 1px solid #ddd;
+        }
+
+        #messages li.success {
+            color: #4F8A10;
+            background-color: #DFF2BF;
+        }
+
+        #messages li.error {
+            color: #D8000C;
+            background-color: #FFD2D2;
+        }
+
+        #permissions {
+            margin-left: 40px;
+        }
+
+        #permissions li {
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="container">
+    <h1>Service Authentication</h1>
+    <div id="request-details">
+
+    </div>
+    <form id="authentication-form">
+        <label>Email</label>
+        <input type="email" name="email" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
+        <input type="submit" name="submit" id="submit" value="Authenticate">
+    </form>
+    <ul id="messages">
+
+    </ul>
+    <script>
+        var form = document.getElementById("authentication-form");
+        var messages = document.getElementById("messages");
+        var detailsBox = document.getElementById("request-details");
+
+        getRequest(getParam("request")).then(function (response) {
+            if (response.code === 200) {
+                showRequestDetails(response.body);
+                return;
+            }
+            if (response.code === 404) {
+                showError("Unknown authentication request.")
+                return;
+            }
+        });
+
+        function showRequestDetails(details) {
+
+            if (details.status !== "READY") {
+                showError("The authentication request has already been used.");
+                return;
+            }
+
+            detailsBox.innerHTML = "";
+
+            var p = document.createElement("p");
+            p.innerHTML = "<p>The service <strong>" + details.service.name + "</strong> is requesting the following permissions.</p>";
+            var ul = document.createElement("ul");
+            ul.id = "permissions";
+            for (var i = 0; i < details.template.permissions.length; i++) {
+                var li = document.createElement("li");
+                li.innerText = details.template.permissions[i];
+                ul.appendChild(li);
+            }
+
+            detailsBox.appendChild(p);
+            detailsBox.appendChild(ul);
+        }
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            authenticate(getParam("request"), form.email.value, form.password.value).then(function (response) {
+
+                if (response.code === 200) {
+                    showSuccess("You were successfully authenticated.");
+                    return;
+                }
+
+                if (response.code === 404) {
+                    showError("The provided authentication request could not be found.");
+                    return;
+                }
+
+                if (response.code === 401) {
+                    showError("The provided credentials are incorrect.");
+                    return;
+                }
+
+                if (response.code === 409) {
+                    showError("The provided authentication request has already been used.")
+                    return;
+                }
+
+                if (response.code === 500) {
+                    showError("An internal error occurred.");
+                    return;
+                }
+            });
+        });
+
+        function showError(message) {
+            messages.innerHTML = "<li class='error'>" + message + "</li>";
+        }
+
+        function showSuccess(message) {
+            messages.innerHTML = "<li class='success'>" + message + "</li>";
+        }
+
+        function getParam(name) {
+            if (name = (new RegExp('[?&]' + encodeURIComponent(name) + '=([^&]*)')).exec(location.search))
+                return decodeURIComponent(name[1]);
+        }
+
+        function getRequest(id) {
+            var status = -1;
+
+            return fetch("api/services/request/" + id)
+                .then(function (response) {
+                    status = response.status;
+                    return response.json();
+                })
+                .then(function (data) {
+                    return {
+                        code: status,
+                        body: data
+                    }
+                })
+        }
+
+        function authenticate(request, email, password) {
+
+            var status = -1;
+
+            return fetch("api/services/authenticate-user", {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    request: request,
+                    email: email,
+                    password: password
+                })
+            })
+                .then(function (response) {
+                    status = response.status;
+                    return response.json();
+                })
+                .then(function (data) {
+                    return {
+                        code: status,
+                        body: data
+                    }
+                })
+        }
+
+    </script>
+</div>
+</body>
+</html>

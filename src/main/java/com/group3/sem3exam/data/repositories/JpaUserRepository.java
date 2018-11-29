@@ -2,7 +2,7 @@ package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
-import com.group3.sem3exam.data.entities.ProfilePicture;
+import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
@@ -90,13 +90,14 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
     }
 
     @Override
-    public User updateProfilePicture(User user, String src)
+    public User updateProfilePicture(User user, String full, String thumbnail)
     {
-        ProfilePicture existing = user.getProfilePicture();
-        if (existing != null)
-            existing.setSrc(src);
-        else {
-            ProfilePicture profilePicture = new ProfilePicture(src, user);
+        Image existing = user.getProfilePicture();
+        if (existing != null) {
+            existing.setFull(full);
+            existing.setThumbnail(thumbnail);
+        } else {
+            Image profilePicture = new Image("Profile picture.", full, thumbnail, user);
             getEntityManager().persist(profilePicture);
             user.setProfilePicture(profilePicture);
         }

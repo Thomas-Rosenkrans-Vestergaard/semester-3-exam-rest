@@ -37,7 +37,7 @@ public class UserDTO
         if (showFriendships)
             this.friendships = user.getFriendships()
                                    .stream()
-                                   .map(friendship -> new FriendshipDTO(friendship))
+                                   .map(friendship -> FriendshipDTO.basicFriendshipDTO(friendship))
                                    .collect(Collectors.toList());
         if (showPosts)
             this.posts = user.getPosts()
@@ -45,7 +45,8 @@ public class UserDTO
                              .map(posts -> new PostDTO(posts))
                              .collect(Collectors.toList());
 
-        this.profilePicture = ImageDTO.basic(user.getProfilePicture());
+        if (user.getProfilePicture() != null)
+            this.profilePicture = ImageDTO.basic(user.getProfilePicture());
     }
 
     public static UserDTO basic(User user)

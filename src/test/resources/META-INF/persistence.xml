@@ -4,14 +4,14 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.group3.sem3exam.data.entities.User</class>
         <class>com.group3.sem3exam.data.entities.Comment</class>
+        <class>com.group3.sem3exam.data.entities.CommentParent</class>
         <class>com.group3.sem3exam.data.entities.FriendRequest</class>
         <class>com.group3.sem3exam.data.entities.Friendship</class>
         <class>com.group3.sem3exam.data.entities.Post</class>
         <class>com.group3.sem3exam.data.entities.City</class>
         <class>com.group3.sem3exam.data.entities.Region</class>
         <class>com.group3.sem3exam.data.entities.Country</class>
-        <class>com.group3.sem3exam.data.entities.GalleryImage</class>
-        <class>com.group3.sem3exam.data.entities.ProfilePicture</class>
+        <class>com.group3.sem3exam.data.entities.Image</class>
         <class>com.group3.sem3exam.logic.authentication.jwt.JwtEntity</class>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:derby:memory:unit-testing;create=true"/>

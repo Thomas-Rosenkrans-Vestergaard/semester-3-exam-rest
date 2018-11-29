@@ -1,30 +1,33 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
+import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.Post;
-import com.group3.sem3exam.data.repositories.JpaImagePostImageRepository;
-import com.group3.sem3exam.data.repositories.JpaPostRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.PostFacade;
-import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.*;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
+import com.group3.sem3exam.rest.dto.CommentDTO;
 import com.group3.sem3exam.rest.dto.PostDTO;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.CREATED;
 
 @Path("posts")
 public class PostResource
 {
-    private static Gson                       gson       = SpecializedGson.create();
-    private static PostFacade<JpaTransaction> postFacade = Facades.post;
+    private static Gson                       gson                 = SpecializedGson.create();
+    private static PostFacade<JpaTransaction> postFacade           = Facades.post;
+    private static AuthenticationFacade       authenticationFacade = Facades.authentication;
+    private static CommentFacade              commentFacade        = Facades.comments;
+
 
     @GET
     @Path("user/{userId: [0-9]+}")
@@ -41,30 +44,14 @@ public class PostResource
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("text")
-    public Response createTextPost(String content) throws ResourceNotFoundException
+    @Produces(APPLICATION_JSON)
+    @Consumes(APPLICATION_JSON)
+    public Response createPost(@HeaderParam("Authorization") String auth, String content)
+    throws AuthenticationException, ImageThumbnailerException, UnsupportedImageFormatException
     {
-        ReceivedCreateTextPost post = gson.fromJson(content, ReceivedCreateTextPost.class);
-        Post createdPost = postFacade.createTextPost(post.title,
-                                                     post.contents,
-                                                     post.author);
-        return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
-    }
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("image")
-    public Response createImagePost(String content) throws ResourceNotFoundException, ImageThumbnailerException, UnsupportedImageFormatException
-    {
-        ReceivedCreateImagePost post = gson.fromJson(content, ReceivedCreateImagePost.class);
-        Post createdPost = postFacade.createImagePost(post.title,
-                                                      post.contents,
-                                                      post.author,
-                                                      post.images);
-
+        AuthenticationContext  ac          = authenticationFacade.authenticateBearerHeader(auth);
+        ReceivedCreateTextPost post        = gson.fromJson(content, ReceivedCreateTextPost.class);
+        Post                   createdPost = postFacade.createPost(ac, post.contents, post.images == null ? new ArrayList<>() : post.images);
         return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
     }
 
@@ -79,7 +66,7 @@ public class PostResource
 
     @Path("timeline/{userId}/{pageSize}")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
     public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff) throws ResourceNotFoundException
     {
         List<Post>    posts    = postFacade.getTimelinePosts(userId, pageSize, cutoff);
@@ -87,10 +74,9 @@ public class PostResource
         return Response.ok(gson.toJson(postDTOs)).build();
     }
 
-
     @Path("user/{userId}/{pageSize}")
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
     public Response getRollingUserPosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff)
     throws ResourceNotFoundException
     {
@@ -102,18 +88,51 @@ public class PostResource
 
     private class ReceivedCreateTextPost
     {
-        private String  contents;
-        private String  title;
-        private Integer author;
+        private String                            contents;
+        private List<PostFacade.ImageDeclaration> images = new ArrayList<>();
     }
 
-    private class ReceivedCreateImagePost
+    @POST
+    @Produces(APPLICATION_JSON)
+    @Consumes(APPLICATION_JSON)
+    @Path("{post: [0-9]+}/comments")
+    public Response createComment(@HeaderParam("Authorization") String auth, @PathParam("post") Integer post, String json)
+    throws ResourceNotFoundException, AuthenticationException
     {
-        private String       contents;
-        private String       title;
-        private Integer      author;
-        private List<String> images;
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
+        ReceivedComment       receivedComment       = gson.fromJson(json, ReceivedComment.class);
+        Comment               comment               = commentFacade.create(authenticationContext, receivedComment.contents, post);
+        return Response.status(CREATED).entity(gson.toJson(CommentDTO.basic(comment))).build();
     }
 
+    private class ReceivedComment
+    {
+        public String contents;
+    }
 
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("{post: [0-9]+}/comments")
+    public Response getComments(@HeaderParam("Authorization") String auth, @PathParam("post") Integer post)
+    throws ResourceNotFoundException, AuthenticationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
+        List<Comment>         comments              = commentFacade.getComments(authenticationContext, post);
+        return Response.ok(gson.toJson(CommentDTO.list(comments, CommentDTO::basic))).build();
+    }
+
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("{post: [0-9]+}/comments/page/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
+    public Response getCommentsPage(
+            @HeaderParam("Authorization") String auth,
+            @PathParam("post") Integer post,
+            @PathParam("pageSize") Integer pageSize,
+            @PathParam("pageNumber") Integer pageNumber)
+    throws ResourceNotFoundException, AuthenticationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
+        List<Comment>         comments              = commentFacade.getCommentsPage(authenticationContext, post, pageSize, pageNumber);
+        return Response.ok(gson.toJson(CommentDTO.list(comments, CommentDTO::basic))).build();
+    }
 }
