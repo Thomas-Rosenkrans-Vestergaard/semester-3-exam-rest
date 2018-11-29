@@ -13,9 +13,9 @@ public class ImagePost extends Post
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImagePostImage> images = new ArrayList<>();
 
-    public ImagePost(String title, String contents, User author, LocalDateTime createdAt, List<ImagePostImage> images)
+    public ImagePost(String contents, User author, LocalDateTime createdAt, List<ImagePostImage> images)
     {
-        super(title, contents, author, createdAt);
+        super(contents, author, createdAt);
         this.images = images;
     }
 

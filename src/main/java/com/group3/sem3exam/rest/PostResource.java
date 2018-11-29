@@ -3,9 +3,12 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.PostFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.SpecializedGson;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.rest.dto.PostDTO;
@@ -21,8 +24,9 @@ import static javax.ws.rs.core.Response.Status.CREATED;
 @Path("posts")
 public class PostResource
 {
-    private static Gson                       gson       = SpecializedGson.create();
-    private static PostFacade<JpaTransaction> postFacade = Facades.post;
+    private static Gson                       gson                 = SpecializedGson.create();
+    private static PostFacade<JpaTransaction> postFacade           = Facades.post;
+    private static AuthenticationFacade       authenticationFacade = Facades.authentication;
 
     @GET
     @Path("user/{userId: [0-9]+}")
@@ -42,12 +46,12 @@ public class PostResource
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("text")
-    public Response createTextPost(String content) throws ResourceNotFoundException
+    public Response createTextPost(@HeaderParam("Authorization") String auth, String content)
+    throws ResourceNotFoundException, AuthenticationException
     {
-        ReceivedCreateTextPost post = gson.fromJson(content, ReceivedCreateTextPost.class);
-        Post createdPost = postFacade.createTextPost(post.title,
-                                                     post.contents,
-                                                     post.author);
+        AuthenticationContext  ac          = authenticationFacade.authenticateBearerHeader(auth);
+        ReceivedCreateTextPost post        = gson.fromJson(content, ReceivedCreateTextPost.class);
+        Post                   createdPost = postFacade.createTextPost(ac, post.contents);
         return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
     }
 
@@ -55,12 +59,13 @@ public class PostResource
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("image")
-    public Response createImagePost(String content) throws ResourceNotFoundException, ImageThumbnailerException, UnsupportedImageFormatException
+    public Response createImagePost(@HeaderParam("Authorization") String auth, String content)
+    throws ResourceNotFoundException, ImageThumbnailerException, UnsupportedImageFormatException, AuthenticationException
     {
+        AuthenticationContext   ac   = authenticationFacade.authenticateBearerHeader(auth);
         ReceivedCreateImagePost post = gson.fromJson(content, ReceivedCreateImagePost.class);
-        Post createdPost = postFacade.createImagePost(post.title,
+        Post createdPost = postFacade.createImagePost(ac,
                                                       post.contents,
-                                                      post.author,
                                                       post.images);
 
         return Response.status(CREATED).entity(gson.toJson(PostDTO.withAuthor(createdPost))).build();
@@ -100,18 +105,12 @@ public class PostResource
 
     private class ReceivedCreateTextPost
     {
-        private String  contents;
-        private String  title;
-        private Integer author;
+        private String contents;
     }
 
     private class ReceivedCreateImagePost
     {
         private String       contents;
-        private String       title;
-        private Integer      author;
         private List<String> images;
     }
-
-
 }

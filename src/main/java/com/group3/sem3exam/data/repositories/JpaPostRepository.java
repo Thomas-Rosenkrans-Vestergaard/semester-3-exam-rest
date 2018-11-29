@@ -30,17 +30,17 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     }
 
     @Override
-    public TextPost createTextPost(User user, String title, String body, LocalDateTime createdAt)
+    public TextPost createTextPost(User user, String body, LocalDateTime createdAt)
     {
-        TextPost post = new TextPost(body, title, user, createdAt);
+        TextPost post = new TextPost(body, user, createdAt);
         getEntityManager().persist(post);
         return post;
     }
 
     @Override
-    public ImagePost createImagePost(User user, String title, String body, LocalDateTime time, List<ImagePostImage> images)
+    public ImagePost createImagePost(User user, String body, LocalDateTime time, List<ImagePostImage> images)
     {
-        ImagePost post = new ImagePost(title, body, user, time, images);
+        ImagePost post = new ImagePost(body, user, time, images);
         getEntityManager().persist(post);
         return post;
     }

@@ -3,13 +3,12 @@ package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.entities.*;
 import com.group3.sem3exam.data.repositories.ImagePostImageRepository;
-import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.PostRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.images.*;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -52,61 +51,52 @@ public class PostFacade<T extends Transaction>
         this.transactionFactory = transactionFactory;
         this.postRepositoryFactory = postRepositoryFactory;
         this.userRepositoryFactory = userRepositoryFactory;
-         this.imagePostImageRepositoryFactory = imagePostImageRepositoryFactory;
+        this.imagePostImageRepositoryFactory = imagePostImageRepositoryFactory;
     }
 
     /**
      * Creates a new post using the provided information.
      *
-     * @param title  The description of the post.
-     * @param body   the body of the post.
-     * @param author The id of the user who wrote the post (author).
+     * @param user The user making the post.
+     * @param body The body of the post.
      * @return The newly created post instance.
      * @throws ResourceNotFoundException When a user with the provided id does not exist.
      */
-    public TextPost createTextPost(String title, String body, Integer author) throws ResourceNotFoundException
+    public TextPost createTextPost(AuthenticationContext user, String body) throws ResourceNotFoundException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
-            PostRepository pr   = postRepositoryFactory.apply(transaction);
-            UserRepository ur   = userRepositoryFactory.apply(transaction);
-            User           user = ur.get(author);
-            if (user == null)
-                throw new ResourceNotFoundException(User.class, author);
+            PostRepository pr = postRepositoryFactory.apply(transaction);
 
-            TextPost post = pr.createTextPost(user, title, body, LocalDateTime.now());
+            TextPost post = pr.createTextPost(user.getUser(), body, LocalDateTime.now());
             transaction.commit();
             return post;
         }
     }
 
-    public ImagePost createImagePost(String title, String body, Integer author, List<String> images) throws ResourceNotFoundException, UnsupportedImageFormatException, ImageThumbnailerException
+    public ImagePost createImagePost(AuthenticationContext auth, String body, List<String> images) throws ResourceNotFoundException, UnsupportedImageFormatException, ImageThumbnailerException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
             PostRepository           pr               = postRepositoryFactory.apply(transaction);
-            UserRepository           ur               = userRepositoryFactory.apply(transaction);
             ImagePostImageRepository ir               = imagePostImageRepositoryFactory.apply(transaction);
-            User                     user             = ur.get(author);
             List<ImagePostImage>     postImages       = new ArrayList<>();
             ImageThumbnailer         imageThumbnailer = new ImageThumbnailer(250, 250);
-            DataUriEncoder               uriEncoder       = new DataUriEncoder();
-            if (user == null)
-                throw new ResourceNotFoundException(User.class, author);
+            DataUriEncoder           uriEncoder       = new DataUriEncoder();
+            User                     user             = auth.getUser();
 
-            for(String image: images){
+            for (String image : images) {
                 byte[] data = Base64.getDecoder().decode(image);
                 data = imageThumbnailer.createThumbnail(data);
                 String uri = uriEncoder.encode(data, ImageType.fromData(data));
                 postImages.add(ir.create(image, user, uri));
             }
 
-            ImagePost post = pr.createImagePost(user, title, body, LocalDateTime.now(), postImages);
+            ImagePost post = pr.createImagePost(user, body, LocalDateTime.now(), postImages);
             transaction.commit();
             return post;
         }
     }
-
 
     /**
      * Returns the post with the provided id.

@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 public class TextPost extends Post
 {
 
-    public TextPost(String title, String contents, User author, LocalDateTime createdAt)
+    public TextPost(String contents, User author, LocalDateTime createdAt)
     {
-        super(title, contents, author, createdAt);
+        super(contents, author, createdAt);
     }
 
     public TextPost()

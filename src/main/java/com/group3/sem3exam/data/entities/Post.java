@@ -19,9 +19,6 @@ public abstract class Post implements RepositoryEntity<Integer>
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
-    private String title;
-
     @Column(length = 65535, columnDefinition = "TEXT")
     private String contents;
 
@@ -40,22 +37,11 @@ public abstract class Post implements RepositoryEntity<Integer>
 
     }
 
-    public Post(String title, String contents, User author, LocalDateTime createdAt)
+    public Post(String contents, User author, LocalDateTime createdAt)
     {
-        this.title = title;
         this.contents = contents;
         this.author = author;
         this.createdAt = createdAt;
-    }
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public void setTitle(String title)
-    {
-        this.title = title;
     }
 
     public String getContents()

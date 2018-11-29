@@ -12,9 +12,8 @@ import java.util.function.Function;
 public class PostDTO
 {
 
-    public final Integer id;
+    public final Integer       id;
     public final String        contents;
-    public final String        title;
     public final LocalDateTime timeCreated;
     public final UserDTO       author;
 
@@ -28,7 +27,6 @@ public class PostDTO
         this.id = post.getId();
         this.contents = post.getContents();
         this.timeCreated = post.getCreatedAt();
-        this.title = post.getTitle();
         this.author = showAuthor ? UserDTO.basic(post.getAuthor()) : null;
     }
 
@@ -42,7 +40,8 @@ public class PostDTO
         return new PostDTO(post, true);
     }
 
-    public static List<PostDTO> list(List<Post> posts, Function<Post, PostDTO> f){
+    public static List<PostDTO> list(List<Post> posts, Function<Post, PostDTO> f)
+    {
         List<PostDTO> result = new ArrayList<>(posts.size());
         for (Post post : posts) {
             result.add(f.apply(post));
