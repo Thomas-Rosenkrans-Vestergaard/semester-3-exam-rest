@@ -31,7 +31,6 @@ public class JpaConnection
         System.out.println(String.format("Found %d options.", options.size()));
         return Persistence.createEntityManagerFactory("rest-api-pu", options);
     }
-
     private static Map<String, String> loadOptions(String file)
     {
         HashMap<String, String> options     = new HashMap<>();

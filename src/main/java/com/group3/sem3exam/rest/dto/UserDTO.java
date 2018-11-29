@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 public class UserDTO
 {
-
     private Integer             id;
     private String              name;
     private String              email;
@@ -65,7 +64,6 @@ public class UserDTO
         for (User user : users) {
             userDTOs.add(f.apply(user));
         }
-
         return userDTOs;
     }
 }

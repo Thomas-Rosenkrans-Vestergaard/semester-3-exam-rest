@@ -19,6 +19,7 @@ import com.group3.sem3exam.rest.dto.UserDTO;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -130,5 +131,15 @@ public class UserResource
     {
         List<User> friends = friendshipFacade.searchFriends(userId, pageSize, pageNumber, search);
         return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
+    }
+
+    @GET
+    @Path("search")
+    @Produces(APPLICATION_JSON)
+    public Response searchUsers(@QueryParam("name") String input) {
+        if(input == null || input.isEmpty())
+            return Response.ok(gson.toJson(new ArrayList())).build();
+        List<User> users = userFacade.searchUsers(input);
+        return Response.ok(gson.toJson(UserDTO.list(users, UserDTO::basic))).build();
     }
 }

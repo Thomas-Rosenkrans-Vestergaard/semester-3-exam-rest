@@ -6,10 +6,12 @@ import com.group3.sem3exam.data.entities.ProfilePicture;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
+import javax.persistence.Query;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * An implementation of the {@code UserRepository} interface, backed by a JPA data source.
@@ -100,5 +102,15 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
         }
 
         return user;
+    }
+
+    @Override
+    public List<User> searchUsers(String input)
+    {
+        EntityManager em    = getEntityManager();
+        Query         query = em.createQuery("SELECT u FROM User u WHERE u.name LIKE :input", User.class);
+        query.setMaxResults(5);
+        query.setParameter("input", input + "%");
+        return query.getResultList();
     }
 }

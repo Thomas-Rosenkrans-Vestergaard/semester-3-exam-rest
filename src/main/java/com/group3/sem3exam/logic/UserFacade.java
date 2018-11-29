@@ -6,6 +6,7 @@ import com.group3.sem3exam.data.entities.ProfilePicture;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.ImageRepository;
+import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.Temporal;
 import java.util.Base64;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -242,5 +244,12 @@ public class UserFacade<T extends Transaction>
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<User> searchUsers(String input){
+            try (UserRepository userRepo = userRepositoryFactory.apply(transactionFactory.get())){
+                List<User> userList = userRepo.searchUsers(input);
+                return userList;
+            }
     }
 }
