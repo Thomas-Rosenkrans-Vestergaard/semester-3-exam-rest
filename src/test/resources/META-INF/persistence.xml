@@ -4,6 +4,7 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>com.group3.sem3exam.data.entities.User</class>
         <class>com.group3.sem3exam.data.entities.Comment</class>
+        <class>com.group3.sem3exam.data.entities.CommentParent</class>
         <class>com.group3.sem3exam.data.entities.FriendRequest</class>
         <class>com.group3.sem3exam.data.entities.Friendship</class>
         <class>com.group3.sem3exam.data.entities.Post</class>

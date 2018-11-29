@@ -346,7 +346,6 @@ public class ServiceFacade<T extends Transaction>
      * @param serviceUser The user to request permissions from.
      * @param callback    The endpoint notified when the user updates the permissions of this request.
      * @param template    The permissions to request.
-     * @param
      * @return The newly created permission request.
      * @throws ResourceNotFoundException When the provided template does not exist.
      * @throws ResourceAccessException   When the provided template does not belong to the service.
