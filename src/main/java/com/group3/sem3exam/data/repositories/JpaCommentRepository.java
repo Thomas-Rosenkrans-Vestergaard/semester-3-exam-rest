@@ -97,4 +97,19 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
                 .setMaxResults(pageSize)
                 .getResultList();
     }
+
+    /**
+     * Returns the number of comments on the provided parent.
+     *
+     * @param commentParent The comment
+     * @return The number of comments on the provided parent.
+     */
+    @Override
+    public int count(CommentParent commentParent)
+    {
+        return getEntityManager()
+                .createQuery("SELECT count(c) FROM Comment c WHERE c.parent = :parent")
+                .setParameter("parent", commentParent)
+                .getFirstResult();
+    }
 }

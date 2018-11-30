@@ -6,7 +6,8 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.util.Arrays;
+import javax.persistence.NoResultException;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,31 +33,53 @@ public class JpaPermissionRepository extends AbstractJpaRepository implements Pe
     @Override
     public Set<Permission> getPermissionsFor(Service service, User user)
     {
-//        List<List> lists = getEntityManager()
-//                .createQuery("SELECT pr.template.permissions FROM PermissionRequest pr " +
-//                             "WHERE pr.template.service = :service AND pr.user = :user", List.class)
-//                .setParameter("service", service)
-//                .setParameter("user", user)
-//                .getResultList();
+        List<Permission> permissions = getEntityManager()
+                .createQuery("SELECT pm.permission FROM PermissionMapping pm " +
+                             "WHERE pm.template IN (" +
+                             "  SELECT pr.template FROM PermissionRequest pr " +
+                             "  WHERE pr.user = :user AND pr.template.service = :service AND pr.status = :status" +
+                             ")", Permission.class)
+                .setParameter("user", user)
+                .setParameter("service", service)
+                .setParameter("status", PermissionRequest.Status.ACCEPTED)
+                .getResultList();
 
+        return new HashSet<>(permissions);
+    }
 
-//        List collect = new ArrayList();
-//        for (List list : lists)
-//            collect.addAll(list);
-//
-//        return (List<Permission>) collect; // TODO: fix this
+    @Override
+    public void setLastUpdated(Service service, User user, LocalDateTime time)
+    {
+        if (internalGet(service, user) == null)
+            insert(service, user, time);
+        else
+            setLastUpdated(service, user, time);
+    }
 
-        /**
-         * entity PermissionMapping {
-         *
-         *      Template parent;
-         *      Permission permission;
-         *
-         *      SELECT pm.permission FROM PermissionMapping pm WHERE pm.parent IN
-         *      (SELECT perm_request.template FROM PermRequest user = :user )
-         * }
-         */
+    @Override
+    public LocalDateTime getLastUpdated(Service service, User user)
+    {
+        LocalDateTime fetched = internalGet(service, user);
 
-        return new HashSet<>(Arrays.asList(Permission.values()));
+        return fetched == null ? LocalDateTime.now() : fetched;
+    }
+
+    private LocalDateTime internalGet(Service service, User user)
+    {
+        try {
+            return getEntityManager()
+                    .createQuery("SELECT pu.time FROM PermissionUpdated pu " +
+                                 "WHERE pu.user = :user AND pu.service = :service", LocalDateTime.class)
+                    .setParameter("user", user)
+                    .setParameter("service", service)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    private void insert(Service service, User user, LocalDateTime time)
+    {
+
     }
 }

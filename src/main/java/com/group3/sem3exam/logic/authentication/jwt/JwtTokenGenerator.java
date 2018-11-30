@@ -5,10 +5,12 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.services.Permission;
 import com.group3.sem3exam.data.services.Service;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Generates JWT authentication tokens for users.
@@ -69,5 +71,15 @@ public class JwtTokenGenerator
         Service service = authenticationContext.getService();
         if (service != null)
             builder.withClaim("service", service.getId());
+
+        Set<Permission> serviceUserPermissions = authenticationContext.getServicePermissions();
+        if (serviceUserPermissions != null) {
+            builder.withArrayClaim("permissions", permissionsToArray(serviceUserPermissions));
+        }
+    }
+
+    private String[] permissionsToArray(Set<Permission> permissions)
+    {
+        return permissions.stream().map(Permission::name).toArray(String[]::new);
     }
 }

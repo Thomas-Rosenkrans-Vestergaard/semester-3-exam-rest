@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "permission_template")
@@ -22,9 +23,8 @@ public class PermissionTemplate implements RepositoryEntity<String>
     @Column(nullable = false)
     private String message;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @JoinTable(name = "auth_request_perms", joinColumns = @JoinColumn(name = "template_id"))
-    private List<Permission> permissions;
+    @OneToMany(mappedBy = "template", fetch = FetchType.EAGER)
+    private List<PermissionMapping> permissions;
 
     @ManyToOne
     private Service service;
@@ -34,7 +34,7 @@ public class PermissionTemplate implements RepositoryEntity<String>
 
     }
 
-    public PermissionTemplate(String name, String message, List<Permission> permissions, Service service)
+    public PermissionTemplate(String name, String message, List<PermissionMapping> permissions, Service service)
     {
         this.name = name;
         this.message = message;
@@ -76,12 +76,13 @@ public class PermissionTemplate implements RepositoryEntity<String>
 
     public List<Permission> getPermissions()
     {
-        return this.permissions;
+        return this.permissions.stream().map(PermissionMapping::getPermission).collect(Collectors.toList());
     }
 
-    public void setPermissions(List<Permission> permissions)
+    public PermissionTemplate setPermissions(List<PermissionMapping> permissions)
     {
         this.permissions = permissions;
+        return this;
     }
 
     public Service getService()

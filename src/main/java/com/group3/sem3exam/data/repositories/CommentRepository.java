@@ -54,4 +54,12 @@ public interface CommentRepository extends ReadRepository<Comment, Integer>
      * @return The results on the retrieved page.
      */
     List<Comment> getPaginated(CommentParent parent, Integer pageSize, Integer pageNumber);
+
+    /**
+     * Returns the number of comments on the provided parent.
+     *
+     * @param commentParent The comment
+     * @return The number of comments on the provided parent.
+     */
+    int count(CommentParent commentParent);
 }

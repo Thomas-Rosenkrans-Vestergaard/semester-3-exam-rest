@@ -76,4 +76,21 @@ public class CommentFacade
             return created;
         }
     }
+
+    /**
+     * Returns the number of comments on the parent.
+     *
+     * @param parent The parent to count the number of comments on.
+     * @return The number of comments on the parent.
+     * @throws ResourceNotFoundException When a comment parent with the provided id does not exist.
+     */
+    public int count(Integer parent) throws ResourceNotFoundException
+    {
+        try (CommentRepository commentRepository = commentRepositoryFactory.get()) {
+            CommentParent fetchedParent = commentRepository.getParent(parent);
+            if (fetchedParent == null)
+                throw new ResourceNotFoundException(CommentParent.class, parent);
+            return commentRepository.count(fetchedParent);
+        }
+    }
 }
