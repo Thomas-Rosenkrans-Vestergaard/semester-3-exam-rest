@@ -2,6 +2,8 @@ package com.group3.sem3exam.logic.authorization;
 
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
+import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
+
 public class IsUser implements AuthorizationCheck
 {
 
@@ -16,7 +18,7 @@ public class IsUser implements AuthorizationCheck
     @Override
     public void check(AuthenticationContext authenticationContext) throws AuthorizationException
     {
-        if (authenticationContext.getService() == null || authenticationContext.getService() != null)
+        if (authenticationContext.getType() != USER)
             throw new AuthorizationException("You must be a user to access this endpoint.");
     }
 }

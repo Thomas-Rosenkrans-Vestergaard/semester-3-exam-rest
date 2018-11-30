@@ -6,6 +6,7 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JpaPermissionTemplateRepository extends JpaCrudRepository<PermissionTemplate, String>
@@ -30,7 +31,12 @@ public class JpaPermissionTemplateRepository extends JpaCrudRepository<Permissio
     @Override
     public PermissionTemplate create(String name, String message, List<Permission> permissions, Service service)
     {
-        PermissionTemplate template = new PermissionTemplate(name, message, permissions, service);
+        PermissionTemplate      template = new PermissionTemplate(name, message, null, service);
+        List<PermissionMapping> mappings = new ArrayList<>();
+        for (Permission permission : permissions)
+            mappings.add(new PermissionMapping(template, permission));
+
+        template.setPermissions(mappings);
         getEntityManager().persist(template);
         return template;
     }

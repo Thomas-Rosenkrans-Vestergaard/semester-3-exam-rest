@@ -16,6 +16,12 @@ import com.group3.sem3exam.logic.authentication.jwt.JwtGenerationException;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenGenerator;
 import com.group3.sem3exam.logic.authorization.*;
+import com.group3.sem3exam.logic.validation.ResourceValidationException;
+import com.group3.sem3exam.logic.validation.ResourceValidator;
+import net.sf.oval.constraint.AssertURL;
+import net.sf.oval.constraint.Length;
+import net.sf.oval.constraint.NotNull;
+import net.sf.oval.constraint.Size;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -24,7 +30,6 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -92,12 +97,21 @@ public class ServiceFacade<T extends Transaction>
      * @param name     The name of the service account.
      * @param password The password of the service account
      * @return The newly created service.
-     * @throws ResourceConflictException When a service account with the provided name already exists.
+     * @throws ResourceValidationException When the provided information is invalid.
+     * @throws ResourceConflictException   When a service account with the provided name already exists.
      */
-    public Service register(String name, String password) throws ResourceConflictException
+    public Service register(String name, String password) throws ResourceValidationException,
+                                                                 ResourceConflictException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
+
+            ServiceValidator                    validatorObject = new ServiceValidator(name, password);
+            ResourceValidator<ServiceValidator> validator       = new ResourceValidator<>(validatorObject);
+            validator.oval();
+            if (validator.hasErrors())
+                validator.throwResourceValidationException();
+
             ServiceRepository serviceRepository = serviceRepositoryFactory.apply(transaction);
             if (serviceRepository.getByName(name) != null)
                 throw new ResourceConflictException(Service.class, "A service account with the provided name exists.");
@@ -105,6 +119,24 @@ public class ServiceFacade<T extends Transaction>
             Service service = serviceRepository.create(name, hash(password));
             transaction.commit();
             return service;
+        }
+    }
+
+    private class ServiceValidator
+    {
+
+        @NotNull
+        @Length(min = 6, max = 255)
+        private String name;
+
+        @NotNull
+        @Length(min = 4)
+        private String password;
+
+        public ServiceValidator(String name, String password)
+        {
+            this.name = name;
+            this.password = password;
         }
     }
 
@@ -141,13 +173,21 @@ public class ServiceFacade<T extends Transaction>
      * @param message     The message to display to the user when they are
      * @param permissions The permissions required by the service.
      * @return The newly created template.
-     * @throws AuthorizationException    When the provided auth context is not a service.
-     * @throws ResourceConflictException When a template with the same name already exists for the provided service.
+     * @throws AuthorizationException      When the provided auth context is not a service.
+     * @throws ResourceConflictException   When a template with the same name already exists for the provided service.
+     * @throws ResourceValidationException When
      */
     public PermissionTemplate createTemplate(AuthenticationContext service, String name, String message, List<String> permissions)
-    throws AuthorizationException, ResourceConflictException
+    throws AuthorizationException, ResourceConflictException, ResourceValidationException
     {
         new Authorizator(service).check(new IsService());
+
+        ResourceValidator<PermissionTemplateValidator> validator =
+                new ResourceValidator<>(new PermissionTemplateValidator(name, message, permissions));
+
+        validator.oval();
+        if (validator.hasErrors())
+            validator.throwResourceValidationException();
 
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
@@ -157,6 +197,28 @@ public class ServiceFacade<T extends Transaction>
             PermissionTemplate template = tr.create(name, message, toEnum(permissions), service.getService());
             transaction.commit();
             return template;
+        }
+    }
+
+    private class PermissionTemplateValidator
+    {
+
+        @Length(min = 1, max = 255)
+        @NotNull
+        private String name;
+
+        @Length(min = 1, max = 255)
+        @NotNull
+        private String message;
+
+        @Size(min = 1, max = 255)
+        private List<String> permissions;
+
+        public PermissionTemplateValidator(String name, String message, List<String> permissions)
+        {
+            this.name = name;
+            this.message = message;
+            this.permissions = permissions;
         }
     }
 
@@ -187,13 +249,21 @@ public class ServiceFacade<T extends Transaction>
      * @param callback The callback to call when the user authenticates.
      * @param template An optional template that should also be accepted when the user authenticate. Can be {@code null}.
      * @return The service auth request that was created.
-     * @throws AuthorizationException    When the provided auth context is not a service.
-     * @throws ResourceNotFoundException When the provided template cannot be found.
+     * @throws AuthorizationException      When the provided auth context is not a service.
+     * @throws ResourceNotFoundException   When the provided template cannot be found.
+     * @throws ResourceValidationException When the provided information is invalid.
      */
     public AuthRequest requestAuth(AuthenticationContext service, String callback, String template)
-    throws AuthorizationException, ResourceNotFoundException
+    throws AuthorizationException, ResourceNotFoundException, ResourceValidationException
     {
         new Authorizator(service).check(new IsService());
+
+        AuthRequestValidator                    validatorObject   = new AuthRequestValidator(callback, template);
+        ResourceValidator<AuthRequestValidator> resourceValidator = new ResourceValidator(validatorObject);
+        resourceValidator.oval();
+        if (resourceValidator.hasErrors())
+            resourceValidator.throwResourceValidationException();
+
 
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
@@ -206,8 +276,26 @@ public class ServiceFacade<T extends Transaction>
                 throw new ResourceAccessException(PermissionTemplate.class, template);
 
             AuthRequest authRequest = requestRepository.create(service.getService(), callback, fetchedTemplate);
+            authRequest.getTemplate().getPermissions().size();
             transaction.commit();
             return authRequest;
+        }
+    }
+
+    private class AuthRequestValidator
+    {
+        @NotNull
+        @Length(min = 1, max = 255)
+        @AssertURL
+        private String callback;
+
+        @Length(max = 255)
+        private String template;
+
+        public AuthRequestValidator(String callback, String template)
+        {
+            this.callback = callback;
+            this.template = template;
         }
     }
 
@@ -273,7 +361,9 @@ public class ServiceFacade<T extends Transaction>
 
             // We should also allow the template.
             if (authRequest.getTemplate() != null) {
-                PermissionRequestRepository permissionRequestRepository = permissionRequestRepositoryFactory.apply(transaction);
+                PermissionRequestRepository permissionRequestRepository =
+                        permissionRequestRepositoryFactory.apply(transaction);
+
                 PermissionRequest permissionRequest = permissionRequestRepository.create(
                         userContext.getUser(),
                         "",
@@ -281,10 +371,9 @@ public class ServiceFacade<T extends Transaction>
                 permissionRequestRepository.updateStatus(permissionRequest, ACCEPTED);
             }
 
-
             PermissionRepository permissionRepository = permissionRepositoryFactory.apply(transaction);
-            Service service = authRequest.getService();
-            User user = userContext.getUser();
+            Service              service              = authRequest.getService();
+            User                 user                 = userContext.getUser();
             AuthenticationContext authenticationContext =
                     serviceUser(service, user, permissionRepository.getPermissionsFor(service, user));
 

@@ -1,10 +1,11 @@
-package com.group3.sem3exam.rest;
+package com.group3.sem3exam.rest.services;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.data.services.*;
+import com.group3.sem3exam.data.services.AuthRequest;
+import com.group3.sem3exam.data.services.PermissionTemplate;
+import com.group3.sem3exam.data.services.Service;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
@@ -15,6 +16,8 @@ import com.group3.sem3exam.logic.authentication.jwt.JwtGenerationException;
 import com.group3.sem3exam.logic.authorization.AuthorizationException;
 import com.group3.sem3exam.logic.services.PermissionTemplateTransfer;
 import com.group3.sem3exam.logic.services.ServiceFacade;
+import com.group3.sem3exam.logic.validation.ResourceValidationException;
+import com.group3.sem3exam.rest.Facades;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -38,7 +41,7 @@ public class ServiceResource
     @Path("register")
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response register(String json) throws ResourceConflictException
+    public Response register(String json) throws ResourceConflictException, ResourceValidationException
     {
         RegisterRequest  registerRequest = gson.fromJson(json, RegisterRequest.class);
         Service          service         = facade.register(registerRequest.name, registerRequest.password);
@@ -103,7 +106,7 @@ public class ServiceResource
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response createTemplate(@HeaderParam("Authorization") String auth, String json)
-    throws AuthenticationException, ResourceConflictException, AuthorizationException
+    throws AuthenticationException, ResourceConflictException, AuthorizationException, ResourceValidationException
     {
         TemplateRequest       request               = gson.fromJson(json, TemplateRequest.class);
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
@@ -111,7 +114,7 @@ public class ServiceResource
                                                             request.name,
                                                             request.message,
                                                             request.permissions);
-        return Response.status(CREATED).entity(gson.toJson(template)).build();
+        return Response.status(CREATED).entity(gson.toJson(PermissionTemplateDTO.basic(template))).build();
     }
 
     private class TemplateRequest
@@ -162,7 +165,7 @@ public class ServiceResource
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     public Response requestAuth(@HeaderParam("Authorization") String auth, String json)
-    throws AuthenticationException, AuthorizationException, ResourceNotFoundException
+    throws AuthenticationException, AuthorizationException, ResourceNotFoundException, ResourceValidationException
     {
         AuthRequestRequest    posted                = gson.fromJson(json, AuthRequestRequest.class);
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);

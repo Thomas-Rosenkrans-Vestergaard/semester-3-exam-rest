@@ -99,6 +99,9 @@ public class AuthenticationFacade
      */
     public AuthenticationContext authenticateBearerHeader(String header) throws AuthenticationException
     {
+        if (header == null)
+            throw new AuthenticationException("Requires Authorization: Bearer <token>");
+
         header = header.trim();
         if (header.startsWith("Bearer ")) {
             header = header.substring(7);
