@@ -24,6 +24,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -280,7 +281,12 @@ public class ServiceFacade<T extends Transaction>
                 permissionRequestRepository.updateStatus(permissionRequest, ACCEPTED);
             }
 
-            AuthenticationContext authenticationContext = serviceUser(authRequest.getService(), userContext.getUser());
+
+            PermissionRepository permissionRepository = permissionRepositoryFactory.apply(transaction);
+            Service service = authRequest.getService();
+            User user = userContext.getUser();
+            AuthenticationContext authenticationContext =
+                    serviceUser(service, user, permissionRepository.getPermissionsFor(service, user));
 
             try {
                 requestRepository.completed(authRequest);

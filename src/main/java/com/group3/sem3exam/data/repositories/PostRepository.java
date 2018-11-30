@@ -51,4 +51,5 @@ public interface PostRepository extends CrudRepository<Post, Integer>
      * @return The rolling view.
      */
     List<Post> getRollingPosts(User user, Integer pageSize, Integer last);
+
 }

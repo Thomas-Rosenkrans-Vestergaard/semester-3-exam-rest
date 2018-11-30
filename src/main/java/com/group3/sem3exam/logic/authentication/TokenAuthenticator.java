@@ -3,11 +3,13 @@ package com.group3.sem3exam.logic.authentication;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
+import com.group3.sem3exam.data.services.Permission;
 import com.group3.sem3exam.data.services.Service;
 import com.group3.sem3exam.data.services.ServiceRepository;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenUnpacker;
 
+import java.util.HashSet;
 import java.util.function.Supplier;
 
 public class TokenAuthenticator
@@ -74,7 +76,9 @@ public class TokenAuthenticator
             Integer serviceId = jwt.getClaim("service").asInt();
             return LazyAuthenticationContext.serviceUser(
                     serviceId, createServiceRetriever(serviceId),
-                    userId, createUserRetriever(userId));
+                    userId, createUserRetriever(userId),
+                    new HashSet<>(jwt.getClaim("permissions").asList(Permission.class))
+            );
         }
 
         throw new AuthenticationException("Unsupported authentication type.");

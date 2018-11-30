@@ -7,7 +7,9 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class JpaPermissionRepository extends AbstractJpaRepository implements PermissionRepository
 {
@@ -28,7 +30,7 @@ public class JpaPermissionRepository extends AbstractJpaRepository implements Pe
     }
 
     @Override
-    public List<Permission> getPermissionsFor(Service service, User user)
+    public Set<Permission> getPermissionsFor(Service service, User user)
     {
 //        List<List> lists = getEntityManager()
 //                .createQuery("SELECT pr.template.permissions FROM PermissionRequest pr " +
@@ -55,6 +57,6 @@ public class JpaPermissionRepository extends AbstractJpaRepository implements Pe
          * }
          */
 
-        return Arrays.asList(Permission.values());
+        return new HashSet<>(Arrays.asList(Permission.values()));
     }
 }

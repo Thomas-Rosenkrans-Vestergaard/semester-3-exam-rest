@@ -111,7 +111,7 @@ public class UserResource
     }
 
     @GET
-    @Path("{user: [0-9]+}/friends")
+        @Path("{user: [0-9]+}/friends")
     @Produces(APPLICATION_JSON)
     public Response getFriends(@PathParam("user") Integer userId) throws ResourceNotFoundException
     {

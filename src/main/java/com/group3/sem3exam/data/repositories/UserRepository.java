@@ -45,9 +45,7 @@ public interface UserRepository extends CrudRepository<User, Integer>, Transacti
      * @return The updated user entity.
      */
 
-    User updateProfilePicture(User user, String src);
-
     List<User> searchUsers(String input);
-    
+
     User updateProfilePicture(User user, String full, String thumbnail);
 }

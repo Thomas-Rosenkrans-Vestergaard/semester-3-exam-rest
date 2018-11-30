@@ -89,6 +89,7 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
         }
     }
 
+
     @Override
     public User updateProfilePicture(User user, String full, String thumbnail)
     {

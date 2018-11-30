@@ -1,7 +1,10 @@
 package com.group3.sem3exam.logic.authentication;
 
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.services.Permission;
 import com.group3.sem3exam.data.services.Service;
+
+import java.util.Set;
 
 public interface AuthenticationContext
 {
@@ -48,4 +51,11 @@ public interface AuthenticationContext
      * {@code null} to indicate that this authentication context does not contain service information.
      */
     Service getService();
+
+    /**
+     * Returns the permissions granted by a user to a service.
+     * @return The permissions granted by a user to a service. Only non-null when the type of the authentication
+     * context is {@code SERVICE_REPRESENTING_USER}.
+     */
+    Set<Permission> getServicePermissions();
 }

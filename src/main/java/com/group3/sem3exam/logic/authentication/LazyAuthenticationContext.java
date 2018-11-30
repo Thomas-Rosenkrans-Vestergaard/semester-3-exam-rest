@@ -1,8 +1,10 @@
 package com.group3.sem3exam.logic.authentication;
 
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.services.Permission;
 import com.group3.sem3exam.data.services.Service;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -41,6 +43,7 @@ public class LazyAuthenticationContext implements AuthenticationContext
      */
     private Supplier<Service> serviceSupplier;
     private Service           lazyServiceCache;
+    private Set<Permission>   permissions;
 
     /**
      * Creates a new {@link LazyAuthenticationContext}.
@@ -61,7 +64,8 @@ public class LazyAuthenticationContext implements AuthenticationContext
             Integer userId,
             Supplier<User> userSupplier,
             Integer serviceId,
-            Supplier<Service> serviceSupplier)
+            Supplier<Service> serviceSupplier,
+            Set<Permission> permissions)
     {
         this.authenticationType = authenticationType;
 
@@ -70,6 +74,7 @@ public class LazyAuthenticationContext implements AuthenticationContext
 
         this.serviceId = serviceId;
         this.serviceSupplier = serviceSupplier;
+        this.permissions = permissions;
     }
 
     /**
@@ -84,7 +89,7 @@ public class LazyAuthenticationContext implements AuthenticationContext
      */
     public static LazyAuthenticationContext user(Integer userId, Supplier<User> userSupplier)
     {
-        return new LazyAuthenticationContext(AuthenticationType.USER, userId, userSupplier, null, () -> null);
+        return new LazyAuthenticationContext(AuthenticationType.USER, userId, userSupplier, null, () -> null, null);
     }
 
     /**
@@ -100,7 +105,7 @@ public class LazyAuthenticationContext implements AuthenticationContext
 
     public static LazyAuthenticationContext service(Integer serviceId, Supplier<Service> serviceSupplier)
     {
-        return new LazyAuthenticationContext(AuthenticationType.SERVICE, null, () -> null, serviceId, serviceSupplier);
+        return new LazyAuthenticationContext(AuthenticationType.SERVICE, null, () -> null, serviceId, serviceSupplier, null);
     }
 
     /**
@@ -108,26 +113,29 @@ public class LazyAuthenticationContext implements AuthenticationContext
      * <p>
      * This context allows services to act on behalf of a user.
      *
-     * @param service The service serviceUser the user.
-     * @param user    The user being represented by the user.
+     * @param service     The service serviceUser the user.
+     * @param user        The user being represented by the user.
+     * @param permissions The permissions granted by the user to the service.
      * @return The newly created authentication context.
      */
-    public static AuthenticationContext serviceUser(Service service, User user)
+    public static AuthenticationContext serviceUser(Service service, User user, Set<Permission> permissions)
     {
-        return serviceUser(service.getId(), () -> service, user.getId(), () -> user);
+        return serviceUser(service.getId(), () -> service, user.getId(), () -> user, permissions);
     }
 
     public static AuthenticationContext serviceUser(
             Integer serviceId,
             Supplier<Service> serviceSupplier,
             Integer userId,
-            Supplier<User> userSupplier)
+            Supplier<User> userSupplier,
+    Set<Permission> permissions)
     {
         return new LazyAuthenticationContext(AuthenticationType.SERVICE_REPRESENTING_USER,
                                              userId,
                                              userSupplier,
                                              serviceId,
-                                             serviceSupplier);
+                                             serviceSupplier,
+                                             permissions);
     }
 
     /**
@@ -209,5 +217,11 @@ public class LazyAuthenticationContext implements AuthenticationContext
             lazyServiceCache = serviceSupplier.get();
 
         return lazyServiceCache;
+    }
+
+    @Override
+    public Set<Permission> getServicePermissions()
+    {
+        return permissions;
     }
 }

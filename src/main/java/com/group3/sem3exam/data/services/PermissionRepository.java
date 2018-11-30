@@ -4,6 +4,7 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 public interface PermissionRepository extends Repository
 {
@@ -15,5 +16,5 @@ public interface PermissionRepository extends Repository
      * @param service The service.
      * @return The permissions provided to the provided service by the provided user.
      */
-    List<Permission> getPermissionsFor(Service service, User user);
+    Set<Permission> getPermissionsFor(Service service, User user);
 }

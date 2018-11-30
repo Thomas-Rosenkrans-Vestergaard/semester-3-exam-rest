@@ -1,9 +1,11 @@
 package com.group3.sem3exam.logic.authentication;
 
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.services.Permission;
 import com.group3.sem3exam.data.services.Service;
 
 import java.util.Objects;
+import java.util.Set;
 
 import static com.group3.sem3exam.logic.authentication.AuthenticationType.*;
 
@@ -135,6 +137,12 @@ public class EagerAuthenticationContext implements AuthenticationContext
 
     @Override
     public Service getService()
+    {
+        return null;
+    }
+
+    @Override
+    public Set<Permission> getServicePermissions()
     {
         return null;
     }
