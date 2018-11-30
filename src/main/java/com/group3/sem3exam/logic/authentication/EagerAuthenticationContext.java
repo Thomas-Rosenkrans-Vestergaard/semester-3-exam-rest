@@ -4,7 +4,7 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.services.Permission;
 import com.group3.sem3exam.data.services.Service;
 
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.group3.sem3exam.logic.authentication.AuthenticationType.*;
@@ -30,15 +30,23 @@ public class EagerAuthenticationContext implements AuthenticationContext
     private Service service;
 
     /**
+     * The permissions granted by a user to a service. Only non-null when the type of the authentication
+     * context is {@code SERVICE_REPRESENTING_USER}.
+     */
+    private Set<Permission> permissions;
+
+    /**
      * Creates a new {@link AuthenticationContext}.
      *
-     * @param type    The type of the authenticated entity.
-     * @param user    The authenticated user, must not be null when the {@code type} of the {@link AuthenticationContext} is
-     *                {@code USER} or {@code SERVICE_REPRESENTING_USER}.
-     * @param service The authenticated service, must not be null when the {@code type} of the {@link AuthenticationContext} is
-     *                {@code SERVICE} or {@code SERVICE_REPRESENTING_USER}.
+     * @param type        The type of the authenticated entity.
+     * @param user        The authenticated user, must not be null when the {@code type} of the {@link AuthenticationContext} is
+     *                    {@code USER} or {@code SERVICE_REPRESENTING_USER}.
+     * @param service     The authenticated service, must not be null when the {@code type} of the {@link AuthenticationContext} is
+     *                    {@code SERVICE} or {@code SERVICE_REPRESENTING_USER}.
+     * @param permissions The permissions granted by a user to a service. Only non-null when the type of the authentication
+     *                    context is {@code SERVICE_REPRESENTING_USER}.
      */
-    private EagerAuthenticationContext(AuthenticationType type, User user, Service service)
+    private EagerAuthenticationContext(AuthenticationType type, User user, Service service, Set<Permission> permissions)
     {
         if (type == null)
             throw new IllegalArgumentException("AuthenticationType must not be null.");
@@ -47,10 +55,13 @@ public class EagerAuthenticationContext implements AuthenticationContext
             throw new IllegalArgumentException("User must not be null.");
         if ((type == SERVICE || type == SERVICE_REPRESENTING_USER) && service == null)
             throw new IllegalArgumentException("Service must not be null.");
+        if (type == SERVICE_REPRESENTING_USER && permissions == null)
+            throw new IllegalArgumentException("Permissions must not be null.");
 
         this.type = type;
         this.user = user;
         this.service = service;
+        this.permissions = permissions;
     }
 
     /**
@@ -61,7 +72,7 @@ public class EagerAuthenticationContext implements AuthenticationContext
      */
     public static EagerAuthenticationContext user(User user)
     {
-        return new EagerAuthenticationContext(USER, user, null);
+        return new EagerAuthenticationContext(USER, user, null, new HashSet<>());
     }
 
     /**
@@ -72,7 +83,7 @@ public class EagerAuthenticationContext implements AuthenticationContext
      */
     public static EagerAuthenticationContext service(Service service)
     {
-        return new EagerAuthenticationContext(SERVICE, null, service);
+        return new EagerAuthenticationContext(SERVICE, null, service, new HashSet<>());
     }
 
     /**
@@ -96,6 +107,9 @@ public class EagerAuthenticationContext implements AuthenticationContext
     @Override
     public Integer getUserId()
     {
+        if (user == null)
+            return null;
+
         return user.getId();
     }
 
@@ -114,36 +128,23 @@ public class EagerAuthenticationContext implements AuthenticationContext
     }
 
     @Override
-    public boolean equals(Object o)
-    {
-        if (this == o) return true;
-        if (!(o instanceof AuthenticationContext)) return false;
-        AuthenticationContext that = (AuthenticationContext) o;
-        return getType() == that.getType() &&
-               Objects.equals(getUser(), that.getUser());
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(getType(), getUser());
-    }
-
-    @Override
     public Integer getServiceId()
     {
-        return null;
+        if (service == null)
+            return null;
+
+        return service.getId();
     }
 
     @Override
     public Service getService()
     {
-        return null;
+        return service;
     }
 
     @Override
     public Set<Permission> getServicePermissions()
     {
-        return null;
+        return permissions;
     }
 }
