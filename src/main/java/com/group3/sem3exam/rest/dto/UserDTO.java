@@ -5,66 +5,55 @@ import com.group3.sem3exam.data.entities.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class UserDTO
 {
-    private Integer             id;
-    private String              name;
-    private String              email;
-    private CityDTO             city;
-    private Gender              gender;
-    private LocalDate           dateOfBirth;
-    private LocalDateTime       createdAt;
-    private List<PostDTO>       posts;
-    private List<FriendshipDTO> friendships;
-    private ImageDTO            profilePicture;
+    private final Integer       id;
+    private final String        name;
+    private final String        email;
+    private final CityDTO       city;
+    private final Gender        gender;
+    private final LocalDate     dateOfBirth;
+    private final LocalDateTime createdAt;
+    private final ImageDTO      profilePicture;
 
-    public UserDTO(User user, boolean showFriendships, boolean showPosts, boolean showSensitive)
+    private UserDTO(Integer id, String name, String email, CityDTO city, Gender gender, LocalDate dateOfBirth, LocalDateTime createdAt, ImageDTO profilePicture)
     {
-        this.id = user.getId();
-        this.name = user.getName();
-        if (showSensitive) {
-            this.email = user.getEmail();
-            this.dateOfBirth = user.getDateOfBirth();
-        }
-        this.createdAt = user.getCreatedAt();
-        this.city = CityDTO.basic(user.getCity());
-        this.gender = user.getGender();
-        if (showFriendships)
-            this.friendships = user.getFriendships()
-                                   .stream()
-                                   .map(friendship -> FriendshipDTO.basicFriendshipDTO(friendship))
-                                   .collect(Collectors.toList());
-        if (showPosts)
-            this.posts = user.getPosts()
-                             .stream()
-                             .map(posts -> new PostDTO(posts))
-                             .collect(Collectors.toList());
-
-        if (user.getProfilePicture() != null)
-            this.profilePicture = ImageDTO.basic(user.getProfilePicture());
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.city = city;
+        this.gender = gender;
+        this.dateOfBirth = dateOfBirth;
+        this.createdAt = createdAt;
+        this.profilePicture = profilePicture;
     }
 
-    public static UserDTO basic(User user)
+    public static UserDTO complete(User user)
     {
-        return new UserDTO(user, false, false, true);
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                CityDTO.basic(user.getCity()),
+                user.getGender(),
+                user.getDateOfBirth(),
+                user.getCreatedAt(),
+                ImageDTO.basic(user.getProfilePicture())
+        );
     }
 
-    public static UserDTO hideSensitive(User user)
+    public static UserDTO publicView(User user)
     {
-        return new UserDTO(user, false, false, false);
-    }
-
-    public static List<UserDTO> list(List<User> users, Function<User, UserDTO> f)
-    {
-        List<UserDTO> userDTOs = new ArrayList<>(users.size());
-        for (User user : users) {
-            userDTOs.add(f.apply(user));
-        }
-        return userDTOs;
+        return new UserDTO(
+                user.getId(),
+                user.getName(),
+                null,
+                null,
+                user.getGender(),
+                null,
+                user.getCreatedAt(),
+                ImageDTO.basic(user.getProfilePicture())
+        );
     }
 }

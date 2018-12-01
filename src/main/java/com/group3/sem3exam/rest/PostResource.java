@@ -35,13 +35,8 @@ public class PostResource
     public Response getPostByUser(@PathParam("userId") Integer id) throws ResourceNotFoundException
     {
         List<Post>    posts    = postFacade.getPostByUser(id);
-        List<PostDTO> postDTOS = new ArrayList<>();
-        for (Post post : posts) {
-            postDTOS.add(new PostDTO(post));
-        }
-        postDTOS = PostDTO.list(posts, PostDTO::withAuthor);
-
-        return Response.ok(postDTOS).build();
+        List<PostDTO> postDTOS = PostDTO.list(posts, PostDTO::withAuthor);
+        return Response.ok(gson.toJson(postDTOS)).build();
     }
 
     @POST
@@ -61,7 +56,7 @@ public class PostResource
     public Response getPostById(@PathParam("id") Integer id) throws ResourceNotFoundException
     {
         Post    post    = postFacade.get(id);
-        PostDTO postDTO = new PostDTO(post);
+        PostDTO postDTO = PostDTO.withAuthor(post);
         return Response.ok(postDTO).build();
     }
 

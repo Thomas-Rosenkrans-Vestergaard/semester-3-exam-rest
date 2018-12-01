@@ -11,8 +11,16 @@ import java.util.function.Supplier;
 public class CommentFacade
 {
 
+    /**
+     * The supplier that creates comment repositories used by this facade.
+     */
     private final Supplier<CommentRepository> commentRepositoryFactory;
 
+    /**
+     * Creates a new comment facade.
+     *
+     * @param commentRepositoryFactory The supplier that creates comment repositories used by this facade.
+     */
     public CommentFacade(Supplier<CommentRepository> commentRepositoryFactory)
     {
         this.commentRepositoryFactory = commentRepositoryFactory;
@@ -62,6 +70,15 @@ public class CommentFacade
         }
     }
 
+    /**
+     * Creates a new comment, attaching it to the provided comment parent.
+     *
+     * @param auth     The authentication context of the actor creating the comment.
+     * @param contents The contents of the comment.
+     * @param parent   The comment parent to attach the comment to.
+     * @return The newly created comment.
+     * @throws ResourceNotFoundException
+     */
     public Comment create(AuthenticationContext auth, String contents, Integer parent)
     throws ResourceNotFoundException
     {

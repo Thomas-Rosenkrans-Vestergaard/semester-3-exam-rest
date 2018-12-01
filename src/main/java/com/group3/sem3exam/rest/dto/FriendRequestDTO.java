@@ -7,16 +7,17 @@ public class FriendRequestDTO
     private UserDTO requester, reciever;
     private FriendRequest.FRIENDSHIP_STATUS status;
 
-    private FriendRequestDTO(FriendRequest friendRequest, FriendRequest.FRIENDSHIP_STATUS status) {
+    private FriendRequestDTO(FriendRequest friendRequest, FriendRequest.FRIENDSHIP_STATUS status)
+    {
 
-        this.requester = UserDTO.basic( friendRequest.getRequester() );
-        this.reciever = UserDTO.basic( friendRequest.getReceiver() );
+        this.requester = UserDTO.publicView(friendRequest.getRequester());
+        this.reciever = UserDTO.publicView(friendRequest.getReceiver());
         this.status = status;
     }
 
     public static FriendRequestDTO basicFriendRequest(FriendRequest friendRequest, FriendRequest.FRIENDSHIP_STATUS status)
     {
-        return new FriendRequestDTO( friendRequest, status );
+        return new FriendRequestDTO(friendRequest, status);
     }
 
     public UserDTO getRequester()

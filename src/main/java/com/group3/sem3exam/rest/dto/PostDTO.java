@@ -1,43 +1,54 @@
 package com.group3.sem3exam.rest.dto;
 
 import com.group3.sem3exam.data.entities.Post;
+import com.group3.sem3exam.data.entities.User;
 
-import javax.ejb.Stateless;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-@Stateless
 public class PostDTO
 {
 
     public final Integer       id;
     public final String        contents;
     public final LocalDateTime timeCreated;
-    public final UserDTO       author;
+    public final PostAuthorDTO author;
 
-    public PostDTO(Post post)
-    {
-        this(post, false);
-    }
 
-    public PostDTO(Post post, boolean showAuthor)
+    private PostDTO(Integer id, String contents, LocalDateTime timeCreated, PostAuthorDTO author)
     {
-        this.id = post.getId();
-        this.contents = post.getContents();
-        this.timeCreated = post.getCreatedAt();
-        this.author = showAuthor ? UserDTO.basic(post.getAuthor()) : null;
+        this.id = id;
+        this.contents = contents;
+        this.timeCreated = timeCreated;
+        this.author = author;
     }
 
     public static PostDTO basic(Post post)
     {
-        return new PostDTO(post, false);
+        return new PostDTO(
+                post.getId(),
+                post.getContents(),
+                post.getCreatedAt(),
+                null
+        );
     }
 
     public static PostDTO withAuthor(Post post)
     {
-        return new PostDTO(post, true);
+        User author = post.getAuthor();
+
+        return new PostDTO(
+                post.getId(),
+                post.getContents(),
+                post.getCreatedAt(),
+                new PostAuthorDTO(
+                        author.getId(),
+                        author.getName(),
+                        author.getProfilePicture().getThumbnail()
+                )
+        );
     }
 
     public static List<PostDTO> list(List<Post> posts, Function<Post, PostDTO> f)
@@ -47,5 +58,19 @@ public class PostDTO
             result.add(f.apply(post));
         }
         return result;
+    }
+
+    private static class PostAuthorDTO
+    {
+        public final Integer id;
+        public final String  name;
+        public final String  profilePicture;
+
+        public PostAuthorDTO(Integer id, String name, String profilePicture)
+        {
+            this.id = id;
+            this.name = name;
+            this.profilePicture = profilePicture;
+        }
     }
 }

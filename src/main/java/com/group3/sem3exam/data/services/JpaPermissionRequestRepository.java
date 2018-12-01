@@ -11,16 +11,33 @@ public class JpaPermissionRequestRepository extends JpaCrudRepository<Permission
         implements PermissionRequestRepository
 {
 
+    /**
+     * Creates a new {@link JpaPermissionRequestRepository}.
+     *
+     * @param entityManager The entity manager that operations are performed upon.
+     */
     public JpaPermissionRequestRepository(EntityManager entityManager)
     {
         super(entityManager, PermissionRequest.class);
     }
 
+    /**
+     * Creates a new {@link JpaPermissionRequestRepository}.
+     *
+     * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
+     *                             performed upon - is created.
+     */
     public JpaPermissionRequestRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, PermissionRequest.class);
     }
 
+    /**
+     * Creates a new {@link JpaPermissionRequestRepository}.
+     *
+     * @param transaction The transaction from which the entity manager - that operations are performed upon - is
+     *                    created.
+     */
     public JpaPermissionRequestRepository(JpaTransaction transaction)
     {
         super(transaction, PermissionRequest.class);

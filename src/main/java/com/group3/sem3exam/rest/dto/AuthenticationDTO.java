@@ -16,6 +16,6 @@ public class AuthenticationDTO
 
     public static AuthenticationDTO basic(String token, User user)
     {
-        return new AuthenticationDTO(token, UserDTO.basic(user));
+        return new AuthenticationDTO(token, UserDTO.complete(user));
     }
 }

@@ -15,16 +15,33 @@ import java.util.Set;
 public class JpaPermissionRepository extends AbstractJpaRepository implements PermissionRepository
 {
 
+    /**
+     * Creates a new {@link JpaPermissionRepository}.
+     *
+     * @param entityManager The entity manager that operations are performed upon.
+     */
     public JpaPermissionRepository(EntityManager entityManager)
     {
         super(entityManager);
     }
 
+    /**
+     * Creates a new {@link JpaPermissionRepository}.
+     *
+     * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
+     *                             performed upon - is created.
+     */
     public JpaPermissionRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory);
     }
 
+    /**
+     * Creates a new {@link JpaPermissionRepository}.
+     *
+     * @param transaction The transaction from which the entity manager - that operations are performed upon - is
+     *                    created.
+     */
     public JpaPermissionRepository(JpaTransaction transaction)
     {
         super(transaction);
@@ -68,7 +85,7 @@ public class JpaPermissionRepository extends AbstractJpaRepository implements Pe
     {
         try {
             return getEntityManager()
-                    .createQuery("SELECT pu.time FROM PermissionUpdated pu " +
+                    .createQuery("SELECT pu.time FROM PermissionUpdate pu " +
                                  "WHERE pu.user = :user AND pu.service = :service", LocalDateTime.class)
                     .setParameter("user", user)
                     .setParameter("service", service)
@@ -78,8 +95,10 @@ public class JpaPermissionRepository extends AbstractJpaRepository implements Pe
         }
     }
 
-    private void insert(Service service, User user, LocalDateTime time)
+    private PermissionUpdate insert(Service service, User user, LocalDateTime time)
     {
-
+        PermissionUpdate update = new PermissionUpdate(user, service, time);
+        getEntityManager().persist(update);
+        return update;
     }
 }

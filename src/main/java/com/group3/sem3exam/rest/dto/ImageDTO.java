@@ -25,7 +25,7 @@ public class ImageDTO
         this.full = image.getFull();
         this.thumbnail = image.getThumbnail();
         if (withUser)
-            this.user = UserDTO.basic(image.getUser());
+            this.user = UserDTO.publicView(image.getUser());
     }
 
     public static ImageDTO basic(Image image)

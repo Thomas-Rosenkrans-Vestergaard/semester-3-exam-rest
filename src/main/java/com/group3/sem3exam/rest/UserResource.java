@@ -13,6 +13,7 @@ import com.group3.sem3exam.logic.images.ImageCropperException;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
+import com.group3.sem3exam.rest.dto.DTO;
 import com.group3.sem3exam.rest.dto.ImageDTO;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
@@ -50,7 +51,7 @@ public class UserResource
                                                  receivedUser.gender,
                                                  receivedUser.dateOfBirth);
 
-        return Response.status(CREATED).entity(gson.toJson(UserDTO.basic(createdUser))).build();
+        return Response.status(CREATED).entity(gson.toJson(UserDTO.complete(createdUser))).build();
     }
 
     private class ReceivedCreateUser
@@ -69,7 +70,7 @@ public class UserResource
     public Response getUserById(@PathParam("id") int id) throws ResourceNotFoundException
     {
         User   user    = userFacade.get(id);
-        String jsonDTO = gson.toJson(UserDTO.basic(user));
+        String jsonDTO = gson.toJson(UserDTO.complete(user));
         return Response.ok(jsonDTO).build();
     }
 
@@ -111,12 +112,12 @@ public class UserResource
     }
 
     @GET
-        @Path("{user: [0-9]+}/friends")
+    @Path("{user: [0-9]+}/friends")
     @Produces(APPLICATION_JSON)
     public Response getFriends(@PathParam("user") Integer userId) throws ResourceNotFoundException
     {
         List<User> friends = friendshipFacade.getFriends(userId);
-        return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
+        return Response.ok(gson.toJson(DTO.map(friends, UserDTO::publicView))).build();
     }
 
     @GET
@@ -130,16 +131,17 @@ public class UserResource
     throws ResourceNotFoundException
     {
         List<User> friends = friendshipFacade.searchFriends(userId, pageSize, pageNumber, search);
-        return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
+        return Response.ok(gson.toJson(DTO.map(friends, UserDTO::publicView))).build();
     }
 
     @GET
     @Path("search")
     @Produces(APPLICATION_JSON)
-    public Response searchUsers(@QueryParam("name") String input) {
-        if(input == null || input.isEmpty())
+    public Response searchUsers(@QueryParam("name") String input)
+    {
+        if (input == null || input.isEmpty())
             return Response.ok(gson.toJson(new ArrayList())).build();
         List<User> users = userFacade.searchUsers(input);
-        return Response.ok(gson.toJson(UserDTO.list(users, UserDTO::basic))).build();
+        return Response.ok(gson.toJson(DTO.map(users, UserDTO::publicView))).build();
     }
 }

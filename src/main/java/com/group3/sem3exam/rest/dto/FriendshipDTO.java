@@ -21,7 +21,7 @@ public class FriendshipDTO
 
     public static FriendshipDTO basicFriendshipDTO(Friendship friendship)
     {
-        return new FriendshipDTO(UserDTO.basic(friendship.getOwner()), UserDTO.basic(friendship.getFriend()), friendship.getSince());
+        return new FriendshipDTO(UserDTO.publicView(friendship.getOwner()), UserDTO.publicView(friendship.getFriend()), friendship.getSince());
     }
 
     public LocalDateTime getSince()

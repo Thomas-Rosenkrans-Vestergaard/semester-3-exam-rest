@@ -1,9 +1,9 @@
 package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.base.ReadRepository;
+import com.group3.sem3exam.data.repositories.base.CrudRepository;
 
-public interface PermissionRequestRepository extends ReadRepository<PermissionRequest, String>
+public interface PermissionRequestRepository extends CrudRepository<PermissionRequest, String>
 {
 
     /**

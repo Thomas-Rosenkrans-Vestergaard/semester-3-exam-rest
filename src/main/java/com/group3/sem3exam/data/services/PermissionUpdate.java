@@ -6,7 +6,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class PermissionUpdated
+public class PermissionUpdate
 {
 
     @Id
@@ -21,12 +21,12 @@ public class PermissionUpdated
 
     private LocalDateTime time;
 
-    public PermissionUpdated()
+    public PermissionUpdate()
     {
 
     }
 
-    public PermissionUpdated(User user, Service service, LocalDateTime time)
+    public PermissionUpdate(User user, Service service, LocalDateTime time)
     {
         this.user = user;
         this.service = service;
@@ -38,7 +38,7 @@ public class PermissionUpdated
         return this.id;
     }
 
-    public PermissionUpdated setId(Integer id)
+    public PermissionUpdate setId(Integer id)
     {
         this.id = id;
         return this;
@@ -49,7 +49,7 @@ public class PermissionUpdated
         return this.user;
     }
 
-    public PermissionUpdated setUser(User user)
+    public PermissionUpdate setUser(User user)
     {
         this.user = user;
         return this;
@@ -60,7 +60,7 @@ public class PermissionUpdated
         return this.service;
     }
 
-    public PermissionUpdated setService(Service service)
+    public PermissionUpdate setService(Service service)
     {
         this.service = service;
         return this;
@@ -71,7 +71,7 @@ public class PermissionUpdated
         return this.time;
     }
 
-    public PermissionUpdated setTime(LocalDateTime time)
+    public PermissionUpdate setTime(LocalDateTime time)
     {
         this.time = time;
         return this;
