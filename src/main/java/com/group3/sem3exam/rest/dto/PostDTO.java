@@ -46,7 +46,7 @@ public class PostDTO
                 new PostAuthorDTO(
                         author.getId(),
                         author.getName(),
-                        author.getProfilePicture().getThumbnail()
+                        author.getProfilePicture() == null ? null : author.getProfilePicture().getThumbnail()
                 )
         );
     }

@@ -3,6 +3,7 @@ package com.group3.sem3exam.rest.dto;
 import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.User;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -12,12 +13,14 @@ public class CommentDTO
 
     public final Integer id;
     public final String  contents;
+    public final LocalDateTime createdAt;
     public final UserDTO author;
 
     private CommentDTO(Comment comment)
     {
         this.id = comment.getId();
         this.contents = comment.getContents();
+        this.createdAt = comment.getCreatedAt();
         this.author = new UserDTO(comment.getAuthor());
     }
 

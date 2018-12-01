@@ -107,9 +107,9 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
     @Override
     public int count(CommentParent commentParent)
     {
-        return getEntityManager()
-                .createQuery("SELECT count(c) FROM Comment c WHERE c.parent = :parent")
+        return (int) (long) getEntityManager()
+                .createQuery("SELECT count(c) FROM Comment c WHERE c.parent = :parent", Long.class)
                 .setParameter("parent", commentParent)
-                .getFirstResult();
+                .getSingleResult();
     }
 }

@@ -102,7 +102,7 @@ public class UserResource
                 post.data,
                 post.crop);
 
-        return Response.ok(gson.toJson(ImageDTO.basic(profileImage))).build();
+        return Response.ok(gson.toJson(ImageDTO.complete(profileImage))).build();
     }
 
     private class UpdateProfileImagePost

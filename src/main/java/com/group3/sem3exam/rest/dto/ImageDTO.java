@@ -18,19 +18,41 @@ public class ImageDTO
     public String  thumbnail;
     public UserDTO user;
 
-    public ImageDTO(Image image, boolean withUser)
+    public ImageDTO(Integer id, String description, String full, String thumbnail, UserDTO user)
     {
-        this.id = image.getId();
-        this.description = image.getDescription();
-        this.full = image.getFull();
-        this.thumbnail = image.getThumbnail();
-        if (withUser)
-            this.user = UserDTO.publicView(image.getUser());
+        this.id = id;
+        this.description = description;
+        this.full = full;
+        this.thumbnail = thumbnail;
+        this.user = user;
     }
 
-    public static ImageDTO basic(Image image)
+    public static ImageDTO complete(Image image)
     {
-        return new ImageDTO(image, false);
+        if (image == null)
+            return null;
+
+        return new ImageDTO(
+                image.getId(),
+                image.getDescription(),
+                image.getFull(),
+                image.getThumbnail(),
+                UserDTO.publicView(image.getUser())
+        );
+    }
+
+    public static ImageDTO thumbnail(Image image)
+    {
+        if (image == null)
+            return null;
+
+        return new ImageDTO(
+                image.getId(),
+                image.getDescription(),
+                null,
+                image.getThumbnail(),
+                UserDTO.publicView(image.getUser())
+        );
     }
 
     public static List<ImageDTO> list(List<Image> images, Function<Image, ImageDTO> f)

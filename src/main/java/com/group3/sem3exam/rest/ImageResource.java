@@ -42,7 +42,7 @@ public class ImageResource
                     authenticationContext.getUser(),
                     receivedCreateImage.description,
                     receivedCreateImage.data);
-            return Response.status(CREATED).entity(gson.toJson(ImageDTO.basic(image))).build();
+            return Response.status(CREATED).entity(gson.toJson(ImageDTO.complete(image))).build();
         }
 
         throw new AuthenticationException("Unsupported user type");
@@ -54,7 +54,7 @@ public class ImageResource
     throws ResourceNotFoundException
     {
         List<Image> images = imageFacade.getByUser(user);
-        String      json   = gson.toJson(ImageDTO.list(images, ImageDTO::basic));
+        String      json   = gson.toJson(ImageDTO.list(images, ImageDTO::complete));
         return Response.ok(json).build();
     }
 
@@ -85,7 +85,7 @@ public class ImageResource
         List<Image>   images        = imageFacade.getByUserPaginated(user, pageSize, pageNumber);
         PaginatedView paginatedView = new PaginatedView();
         paginatedView.count = imageFacade.countByUser(user);
-        paginatedView.results = ImageDTO.list(images, ImageDTO::basic);
+        paginatedView.results = ImageDTO.list(images, ImageDTO::complete);
 
         return Response.ok(gson.toJson(paginatedView)).build();
     }

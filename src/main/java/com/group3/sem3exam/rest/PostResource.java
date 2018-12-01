@@ -63,7 +63,7 @@ public class PostResource
     @Path("timeline/{userId}/{pageSize}")
     @GET
     @Produces(APPLICATION_JSON)
-    public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff) throws ResourceNotFoundException
+    public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff)
     {
         List<Post>    posts    = postFacade.getTimelinePosts(userId, pageSize, cutoff);
         List<PostDTO> postDTOs = PostDTO.list(posts, PostDTO::withAuthor);
@@ -110,7 +110,7 @@ public class PostResource
         int        count    = commentFacade.count(id);
         JsonObject response = new JsonObject();
         response.addProperty("count", count);
-        return Response.ok().entity(gson.toJson(count)).build();
+        return Response.ok().entity(gson.toJson(response)).build();
     }
 
     private class ReceivedComment
