@@ -1,25 +1,24 @@
 package com.group3.sem3exam.rest.dto;
 
-import com.group3.sem3exam.data.entities.FriendRequest;
 import com.group3.sem3exam.data.entities.Friendship;
 
-import javax.ejb.Local;
 import java.time.LocalDateTime;
 
 public class FriendshipDTO
 {
 
     private LocalDateTime since;
-    private UserDTO requester, reciever;
+    private UserDTO       requester;
+    private UserDTO       receiver;
 
-    private  FriendshipDTO(UserDTO requester, UserDTO reciever, LocalDateTime since)
+    private FriendshipDTO(UserDTO requester, UserDTO receiver, LocalDateTime since)
     {
         this.since = since;
         this.requester = requester;
-        this.reciever = reciever;
+        this.receiver = receiver;
     }
 
-    public static FriendshipDTO basicFriendshipDTO(Friendship friendship)
+    public static FriendshipDTO complete(Friendship friendship)
     {
         return new FriendshipDTO(UserDTO.publicView(friendship.getOwner()), UserDTO.publicView(friendship.getFriend()), friendship.getSince());
     }
@@ -44,13 +43,13 @@ public class FriendshipDTO
         this.requester = requester;
     }
 
-    public UserDTO getReciever()
+    public UserDTO getReceiver()
     {
-        return this.reciever;
+        return this.receiver;
     }
 
-    public void setReciever(UserDTO reciever)
+    public void setReceiver(UserDTO receiver)
     {
-        this.reciever = reciever;
+        this.receiver = receiver;
     }
 }

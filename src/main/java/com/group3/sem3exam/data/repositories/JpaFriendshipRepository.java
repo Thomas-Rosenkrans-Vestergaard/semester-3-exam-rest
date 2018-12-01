@@ -8,10 +8,12 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import java.util.List;
 
 public class JpaFriendshipRepository extends AbstractJpaRepository implements FriendshipRepository
 {
+
     public JpaFriendshipRepository(EntityManager entityManager)
     {
         super(entityManager);
@@ -51,24 +53,77 @@ public class JpaFriendshipRepository extends AbstractJpaRepository implements Fr
 
 
     @Override
-    public Friendship createFriendship(FriendRequest friendRequest)
+    public Friendship createFriendship(FriendRequest request)
     {
-        Friendship friendship = new Friendship(friendRequest.getRequester(), friendRequest.getReceiver());
-        getEntityManager().persist(friendship);
+        EntityManager entityManager = getEntityManager();
+        request.setStatus(FriendRequest.Status.ACCEPTED);
+        entityManager.merge(entityManager.contains(request) ? request : entityManager.merge(request));
+        Friendship friendship = new Friendship(request.getRequester(), request.getReceiver());
+        entityManager.persist(friendship);
+        entityManager.persist(new Friendship(request.getReceiver(), request.getRequester()));
         return friendship;
     }
 
     @Override
-    public FriendRequest createFriendRequest(User requester, User reciever)
+    public FriendRequest createRequest(User requester, User receiver)
     {
-        FriendRequest friendRequest = new FriendRequest(requester, reciever);
+        FriendRequest friendRequest = new FriendRequest(requester, receiver);
         getEntityManager().persist(friendRequest);
         return friendRequest;
     }
 
     @Override
-    public FriendRequest getFriendRequest(int id)
+    public FriendRequest reject(FriendRequest request)
+    {
+        EntityManager entityManager = this.getEntityManager();
+        request.setStatus(FriendRequest.Status.REJECTED);
+        return entityManager.merge(entityManager.contains(request) ? request : entityManager.merge(request));
+    }
+
+    @Override
+    public Friendship getFriendship(User self, User other)
+    {
+        try {
+            return getEntityManager()
+                    .createQuery("SELECT f FROM Friendship f WHERE f.pk.owner = :self AND f.pk.friend = :other", Friendship.class)
+                    .setParameter("self", self)
+                    .setParameter("other", other)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public FriendRequest getRequest(Integer id)
     {
         return getEntityManager().find(FriendRequest.class, id);
+    }
+
+    @Override
+    public FriendRequest getRequest(User requester, User receiver)
+    {
+        try {
+            return getEntityManager()
+                    .createQuery("SELECT fr FROM FriendRequest fr " +
+                                 "WHERE fr.requester = :requester AND fr.receiver = :receiver AND fr.status = :status", FriendRequest.class)
+                    .setParameter("requester", requester)
+                    .setParameter("receiver", receiver)
+                    .setParameter("status", FriendRequest.Status.PENDING)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public List<FriendRequest> getReceivedPendingRequests(User user)
+    {
+        return getEntityManager()
+                .createQuery("SELECT fr FROM FriendRequest fr " +
+                             "WHERE fr.receiver = :user AND fr.status = :status", FriendRequest.class)
+                .setParameter("user", user)
+                .setParameter("status", FriendRequest.Status.PENDING)
+                .getResultList();
     }
 }

@@ -2,11 +2,13 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.*;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.images.CropArea;
 import com.group3.sem3exam.logic.images.ImageCropperException;
@@ -14,6 +16,7 @@ import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
 import com.group3.sem3exam.rest.dto.DTO;
+import com.group3.sem3exam.rest.dto.FriendshipDTO;
 import com.group3.sem3exam.rest.dto.ImageDTO;
 import com.group3.sem3exam.rest.dto.UserDTO;
 

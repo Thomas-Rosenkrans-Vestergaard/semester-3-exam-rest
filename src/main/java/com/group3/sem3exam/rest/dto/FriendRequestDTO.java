@@ -4,34 +4,27 @@ import com.group3.sem3exam.data.entities.FriendRequest;
 
 public class FriendRequestDTO
 {
-    private UserDTO requester, reciever;
-    private FriendRequest.FRIENDSHIP_STATUS status;
 
-    private FriendRequestDTO(FriendRequest friendRequest, FriendRequest.FRIENDSHIP_STATUS status)
+    public final Integer              id;
+    public final UserDTO              requester;
+    public final UserDTO              receiver;
+    public final FriendRequest.Status status;
+
+    private FriendRequestDTO(Integer id, UserDTO requester, UserDTO receiver, FriendRequest.Status status)
     {
-
-        this.requester = UserDTO.publicView(friendRequest.getRequester());
-        this.reciever = UserDTO.publicView(friendRequest.getReceiver());
+        this.id = id;
+        this.requester = requester;
+        this.receiver = receiver;
         this.status = status;
     }
 
-    public static FriendRequestDTO basicFriendRequest(FriendRequest friendRequest, FriendRequest.FRIENDSHIP_STATUS status)
+    public static FriendRequestDTO complete(FriendRequest request)
     {
-        return new FriendRequestDTO(friendRequest, status);
-    }
-
-    public UserDTO getRequester()
-    {
-        return this.requester;
-    }
-
-    public UserDTO getReciever()
-    {
-        return this.reciever;
-    }
-
-    public FriendRequest.FRIENDSHIP_STATUS getStatus()
-    {
-        return this.status;
+        return new FriendRequestDTO(
+                request.getId(),
+                UserDTO.publicView(request.getRequester()),
+                UserDTO.publicView(request.getReceiver()),
+                request.getStatus()
+        );
     }
 }

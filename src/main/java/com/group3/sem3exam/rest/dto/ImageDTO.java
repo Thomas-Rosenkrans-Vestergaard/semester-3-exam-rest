@@ -41,6 +41,20 @@ public class ImageDTO
         );
     }
 
+    public static ImageDTO withoutUser(Image image)
+    {
+        if (image == null)
+            return null;
+
+        return new ImageDTO(
+                image.getId(),
+                image.getDescription(),
+                image.getFull(),
+                image.getThumbnail(),
+                null
+        );
+    }
+
     public static ImageDTO thumbnail(Image image)
     {
         if (image == null)
