@@ -38,7 +38,7 @@ public interface ChatMessageRepository extends ReadRepository<ChatMessage, Integ
      * @param one      The first user.
      * @param two      The second user.
      * @param last     The id of the last message retrieved. Only chat messages with {@code chatMessage.id < last} are
-     *                 retrieved.
+     *                 retrieved. When {@code last == null} the last newest message is instead used.
      * @param pageSize The number of results to retrieve. Where {@code pageSize > 0}.
      * @return The chat history. The list is returned in an ascending order, with the oldest messages first.
      */

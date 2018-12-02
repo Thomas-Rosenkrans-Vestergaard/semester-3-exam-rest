@@ -63,7 +63,7 @@ public class ChatFacade<T extends Transaction>
      * @param authenticated The authenticated user.
      * @param receiver      The id of the receiver.
      * @param last          The id of the last message retrieved. Only chat messages with {@code chatMessage.id < last} are
-     *                      retrieved.
+     *                      retrieved. When {@code last == null} the last newest message is instead used.
      * @param pageSize      The number of results to retrieve. Where {@code pageSize > 0}.
      * @return The chat history. The list is returned in an ascending order, with the oldest messages first.
      * @throws ResourceNotFoundException When the provided receiver does not exist.
@@ -72,6 +72,8 @@ public class ChatFacade<T extends Transaction>
     throws ResourceNotFoundException
     {
         // TODO: Add authorization
+
+        last = last == null ? Integer.MAX_VALUE : last;
 
         try (T transaction = transactionFactory.get()) {
             ChatMessageRepository messageRepository = messageRepositoryFactory.apply(transaction);

@@ -51,15 +51,18 @@ public class JpaChatMessageRepository extends JpaReadRepository<ChatMessage, Int
     @Override
     public List<ChatMessage> getHistory(User one, User two, Integer last, Integer pageSize)
     {
+        last = last == null ? Integer.MAX_VALUE : last;
         pageSize = Math.max(pageSize, 1);
 
         return getEntityManager()
                 .createQuery("SELECT cm FROM ChatMessage cm " +
                              "WHERE (cm.sender = :one AND cm.receiver = :two) " +
                              "OR (cm.sender = :two AND cm.receiver = :one) " +
+                             "AND cm.id < :last " +
                              "ORDER BY cm.id DESC", ChatMessage.class)
                 .setParameter("one", one)
                 .setParameter("two", two)
+                .setParameter("last", last)
                 .setMaxResults(pageSize)
                 .getResultList();
     }
