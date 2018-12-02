@@ -85,7 +85,29 @@ public class PostResource
     private class ReceivedCreateTextPost
     {
         private String                            contents;
-        private List<PostFacade.ImageDeclaration> images = new ArrayList<>();
+        private List<ImageDeclarationImpl> images = new ArrayList<>();
+    }
+
+    private class ImageDeclarationImpl implements PostFacade.ImageDeclaration {
+
+        public String data;
+        public String description;
+
+        public ImageDeclarationImpl()
+        {
+        }
+
+        @Override
+        public String getData()
+        {
+            return data;
+        }
+
+        @Override
+        public String getDescription()
+        {
+            return description;
+        }
     }
 
     @POST

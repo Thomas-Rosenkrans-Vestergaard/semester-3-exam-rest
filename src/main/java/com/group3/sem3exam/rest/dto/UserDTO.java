@@ -39,7 +39,7 @@ public class UserDTO
                 user.getGender(),
                 user.getDateOfBirth(),
                 user.getCreatedAt(),
-                ImageDTO.withoutUser(user.getProfilePicture())
+                ImageDTO.withoutUser(user.getProfilePicture() == null ? null : user.getProfilePicture().getImage())
         );
     }
 
@@ -53,7 +53,7 @@ public class UserDTO
                 user.getGender(),
                 null,
                 user.getCreatedAt(),
-                ImageDTO.withoutUser(user.getProfilePicture())
+                ImageDTO.withoutUser(user.getProfilePicture() == null ? null : user.getProfilePicture().getImage())
         );
     }
 }

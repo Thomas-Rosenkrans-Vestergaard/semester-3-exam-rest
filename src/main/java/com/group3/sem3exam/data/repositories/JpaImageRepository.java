@@ -80,6 +80,9 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
     @Override
     public int countByUser(User user)
     {
-        return user.getImages().size();
+        return getEntityManager()
+                .createQuery("SELECT count(i) FROM Image i WHERE i.user = :user")
+                .setParameter("user", user)
+                .getFirstResult();
     }
 }

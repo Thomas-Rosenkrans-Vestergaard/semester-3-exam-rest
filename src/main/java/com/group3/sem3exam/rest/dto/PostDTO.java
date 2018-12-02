@@ -11,18 +11,20 @@ import java.util.function.Function;
 public class PostDTO
 {
 
-    public final Integer       id;
-    public final String        contents;
-    public final LocalDateTime timeCreated;
-    public final PostAuthorDTO author;
+    public final Integer        id;
+    public final String         contents;
+    public final LocalDateTime  timeCreated;
+    public final PostAuthorDTO  author;
+    public final List<ImageDTO> images;
 
 
-    private PostDTO(Integer id, String contents, LocalDateTime timeCreated, PostAuthorDTO author)
+    private PostDTO(Integer id, String contents, LocalDateTime timeCreated, PostAuthorDTO author, List<ImageDTO> images)
     {
         this.id = id;
         this.contents = contents;
         this.timeCreated = timeCreated;
         this.author = author;
+        this.images = images;
     }
 
     public static PostDTO basic(Post post)
@@ -31,7 +33,8 @@ public class PostDTO
                 post.getId(),
                 post.getContents(),
                 post.getCreatedAt(),
-                null
+                null,
+                ImageDTO.list(post.getImages(), ImageDTO::withoutUser)
         );
     }
 
@@ -47,7 +50,8 @@ public class PostDTO
                         author.getId(),
                         author.getName(),
                         author.getProfilePicture() == null ? null : author.getProfilePicture().getThumbnail()
-                )
+                ),
+                ImageDTO.list(post.getImages(), ImageDTO::withoutUser)
         );
     }
 
