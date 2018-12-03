@@ -21,7 +21,7 @@ public class Image extends CommentParent implements RepositoryEntity<Integer>
     private String description;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, name = "full_")
     private String full;
 
     @Lob

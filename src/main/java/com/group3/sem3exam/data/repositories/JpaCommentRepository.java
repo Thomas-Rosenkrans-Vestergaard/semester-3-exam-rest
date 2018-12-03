@@ -71,9 +71,10 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
     @Override
     public List<Comment> getAll(CommentParent parent)
     {
-        List<Comment> comments = parent.getComments();
-        comments.size();
-        return comments;
+        return getEntityManager()
+                .createQuery("SELECT c FROM Comment c WHERE c.parent = :parent")
+                .setParameter("parent", parent)
+                .getResultList();
     }
 
     @Override
