@@ -6,6 +6,8 @@ import com.group3.sem3exam.data.services.*;
 import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
+import com.group3.sem3exam.logic.chat.ChatFacade;
+import com.group3.sem3exam.logic.chat.ChatWebSocketServer;
 import com.group3.sem3exam.logic.images.ImageFacade;
 import com.group3.sem3exam.logic.services.ServiceFacade;
 
@@ -71,5 +73,27 @@ public class Facades
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public static final ChatWebSocketServer<JpaTransaction> chatWebSocketServer;
+
+    public static final ChatFacade<JpaTransaction> chat;
+
+    static {
+        chatWebSocketServer = new ChatWebSocketServer<>(
+                () -> new JpaTransaction(JpaConnection.create()),
+                transaction -> new JpaChatMessageRepository(transaction),
+                transaction -> new JpaUserRepository(transaction),
+                null
+        );
+
+        chat = new ChatFacade<>(chatWebSocketServer,
+                                () -> new JpaTransaction(JpaConnection.create()),
+                                transaction -> new JpaChatMessageRepository(transaction),
+                                transaction -> new JpaUserRepository(transaction)
+        );
+
+        chatWebSocketServer.start();
     }
 }
