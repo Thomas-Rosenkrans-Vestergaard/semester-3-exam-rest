@@ -124,36 +124,4 @@ public class PostResource
             return description;
         }
     }
-
-    @POST
-    @Produces(APPLICATION_JSON)
-    @Consumes(APPLICATION_JSON)
-    @Path("{post: [0-9]+}/comments")
-    public Response createComment(@HeaderParam("Authorization") String auth, @PathParam("post") Integer post, String json)
-    throws ResourceNotFoundException, AuthenticationException
-    {
-        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
-        ReceivedComment       receivedComment       = gson.fromJson(json, ReceivedComment.class);
-        Comment               comment               = commentFacade.create(authenticationContext, receivedComment.contents, post);
-        return Response.status(CREATED).entity(gson.toJson(CommentDTO.basic(comment))).build();
-    }
-
-    @GET
-    @Produces(APPLICATION_JSON)
-    @Path("{post: [0-9]+}/comments/count")
-    public Response createComment(@HeaderParam("Authorization") String auth, @PathParam("post") Integer id)
-    throws ResourceNotFoundException
-    {
-        int        count    = commentFacade.count(id);
-        JsonObject response = new JsonObject();
-        response.addProperty("count", count);
-        return Response.ok().entity(gson.toJson(response)).build();
-    }
-
-    private class ReceivedComment
-    {
-        public String contents;
-    }
-
-
 }
