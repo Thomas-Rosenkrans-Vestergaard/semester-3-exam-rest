@@ -5,17 +5,16 @@ import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.EAGER;
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "image")
 public class Image extends CommentParent implements RepositoryEntity<Integer>
 {
-<<<<<<< Updated upstream:src/main/java/com/group3/sem3exam/data/entities/Image.java
-=======
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
->>>>>>> Stashed changes:src/main/java/com/group3/sem3exam/data/entities/GalleryImage.java
 
     @Column(nullable = false)
     private String description;

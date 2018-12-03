@@ -82,4 +82,7 @@ public interface FriendshipRepository extends TransactionalRepository
      * @return The friend requests received from the provided {@code user}.
      */
     List<FriendRequest> getReceivedPendingRequests(User user);
+
+    Friendship deleteFriendship(User user, User other);
+
 }

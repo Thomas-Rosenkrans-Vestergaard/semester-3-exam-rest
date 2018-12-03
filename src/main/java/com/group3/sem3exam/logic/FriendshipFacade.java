@@ -148,6 +148,22 @@ public class FriendshipFacade<T extends Transaction>
         }
     }
 
+
+    public Friendship unfriend(AuthenticationContext auth, User other) throws AuthorizationException, ResourceNotFoundException, ResourceConflictException
+    {
+
+        new Authorizator(auth).check(new IsUser());
+
+        try(FriendshipRepository friendshipRepository = friendshipRepositoryFactory.apply(transactionFactory.get())){
+            friendshipRepository.begin();
+            Friendship friendship = friendshipRepository.deleteFriendship(auth.getUser(), other);
+            if(friendship == null){
+                throw new ResourceNotFoundException(Friendship.class, auth.getUserId() + "+" + other.getId());
+            }
+        }
+        return null;
+    }
+
     /**
      * Creates a new friend-request from the authenticated user to the user with the provided id.
      *

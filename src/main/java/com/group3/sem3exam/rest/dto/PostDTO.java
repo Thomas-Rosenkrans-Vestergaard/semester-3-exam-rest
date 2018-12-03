@@ -2,6 +2,8 @@ package com.group3.sem3exam.rest.dto;
 
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

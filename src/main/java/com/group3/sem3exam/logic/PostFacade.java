@@ -10,7 +10,6 @@ import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.images.*;
-
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -86,6 +85,21 @@ public class PostFacade<T extends Transaction>
             transaction.commit();
             return post;
         }
+    }
+
+
+    public Post delete(AuthenticationContext auth, Integer id) throws ResourceNotFoundException
+    {
+        try (PostRepository pr =  postRepositoryFactory.apply(transactionFactory.get())) {
+            pr.begin();
+            User           user = auth.getUser();
+            if (pr.get(id) != null && user.getId() == pr.get(id).getAuthor().getId()){
+                Post post = pr.delete(id);
+                pr.commit();
+                return post;
+            }
+        }
+        return null;
     }
 
     private Image createPostImage(ImageRepository ir, ImageDeclaration image, User user)
