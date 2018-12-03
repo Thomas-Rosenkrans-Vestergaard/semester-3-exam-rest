@@ -96,6 +96,8 @@ public class PostResource
     }
 
 
+
+
     private class ReceivedCreateTextPost
     {
         private String                     contents;

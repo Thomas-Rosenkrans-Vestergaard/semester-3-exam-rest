@@ -40,6 +40,18 @@ public class CommentResource
 
     @GET
     @Produces(APPLICATION_JSON)
+    @Path("{commentparent: [0-9]+}/count")
+    public Response getCommentCount(@HeaderParam("Authorization") String auth, @PathParam("commentparent") Integer id)
+    throws ResourceNotFoundException
+    {
+        int        count    = commentFacade.count(id);
+        JsonObject response = new JsonObject();
+        response.addProperty("count", count);
+        return Response.ok().entity(gson.toJson(response)).build();
+    }
+
+    @GET
+    @Produces(APPLICATION_JSON)
     @Path("{post: [0-9]+}/page/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
     public Response getCommentsPage(
             @HeaderParam("Authorization") String auth,
