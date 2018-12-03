@@ -1,6 +1,9 @@
 package com.group3.sem3exam.logic;
 
-import com.group3.sem3exam.data.entities.*;
+import com.group3.sem3exam.data.entities.City;
+import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.ImageRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
@@ -226,7 +229,7 @@ public class UserFacade<T extends Transaction>
             ImageType        type    = ImageType.fromData(data);
             ur.updateProfilePicture(user, encoder.encode(images.full, type), encoder.encode(images.thumbnail, type));
             ur.commit();
-            return user.getProfilePicture();
+            return user.getProfilePicture() == null ? null : user.getProfilePicture().getImage();
         }
     }
 

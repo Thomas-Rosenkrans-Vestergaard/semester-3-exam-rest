@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.AbstractJpaRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -125,5 +126,19 @@ public class JpaFriendshipRepository extends AbstractJpaRepository implements Fr
                 .setParameter("user", user)
                 .setParameter("status", FriendRequest.Status.PENDING)
                 .getResultList();
+    }
+
+    @Override
+    public Friendship deleteFriendship(User user, User other)
+    {
+       Friendship friendship1 = getFriendship(user, other);
+       Friendship friendship2 = getFriendship(other, user);
+
+       if(friendship2 != null && friendship1 != null){
+           getEntityManager().remove(friendship1);
+           getEntityManager().remove(friendship2);
+           return friendship1;
+       }
+      return null;
     }
 }

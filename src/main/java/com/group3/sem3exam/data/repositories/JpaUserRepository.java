@@ -1,15 +1,12 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.entities.Gender;
-import com.group3.sem3exam.data.entities.Image;
-import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.entities.*;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
-import javax.persistence.Query;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -93,12 +90,14 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
     @Override
     public User updateProfilePicture(User user, String full, String thumbnail)
     {
-        Image existing = user.getProfilePicture();
+        ProfilePicture existing = user.getProfilePicture();
         if (existing != null) {
             existing.setFull(full);
             existing.setThumbnail(thumbnail);
         } else {
-            Image profilePicture = new Image("Profile picture.", full, thumbnail, user);
+            Image          image          = new Image("Profile picture.", full, thumbnail, user);
+            ProfilePicture profilePicture = new ProfilePicture(user, image);
+            getEntityManager().persist(image);
             getEntityManager().persist(profilePicture);
             user.setProfilePicture(profilePicture);
         }

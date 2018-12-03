@@ -10,7 +10,7 @@ import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.images.*;
-
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -68,34 +68,68 @@ public class PostFacade<T extends Transaction>
         String getDescription();
     }
 
-    public Post createPost(AuthenticationContext auth, String body, List<ImageDeclaration> images)
+    public Post createPost(AuthenticationContext auth, String body, List<? extends ImageDeclaration> images)
     throws UnsupportedImageFormatException, ImageThumbnailerException
     {
         try (T transaction = transactionFactory.get()) {
             transaction.begin();
-            PostRepository   pr               = postRepositoryFactory.apply(transaction);
-            ImageRepository  ir               = imageRepositoryFactory.apply(transaction);
-            List<Image>      postImages       = new ArrayList<>();
-            ImageThumbnailer imageThumbnailer = new ImageThumbnailer(250, 250);
-            DataUriEncoder   uriEncoder       = new DataUriEncoder();
-            User             user             = auth.getUser();
+            PostRepository  pr         = postRepositoryFactory.apply(transaction);
+            ImageRepository ir         = imageRepositoryFactory.apply(transaction);
+            List<Image>     postImages = new ArrayList<>();
+            User            user       = auth.getUser();
 
-            for (ImageDeclaration image : images) {
-                byte[] full = Base64.getDecoder().decode(image.getData());
-                full = imageThumbnailer.createThumbnail(full);
-                byte[] thumbnail = imageThumbnailer.createThumbnail(full, ImageType.fromData(full));
-                postImages.add(ir.create(
-                        image.getDescription(),
-                        uriEncoder.encode(full),
-                        uriEncoder.encode(thumbnail),
-                        user));
-            }
+            for (ImageDeclaration image : images)
+                postImages.add(createPostImage(ir, image, user));
 
             Post post = pr.create(user, body, postImages, LocalDateTime.now());
             transaction.commit();
             return post;
         }
     }
+
+
+    public Post delete(AuthenticationContext auth, Integer id) throws ResourceNotFoundException
+    {
+        try (PostRepository pr =  postRepositoryFactory.apply(transactionFactory.get())) {
+            pr.begin();
+            User           user = auth.getUser();
+            if (pr.get(id) != null && user.getId() == pr.get(id).getAuthor().getId()){
+                Post post = pr.delete(id);
+                pr.commit();
+                return post;
+            }
+        }
+        return null;
+    }
+
+    private Image createPostImage(ImageRepository ir, ImageDeclaration image, User user)
+    throws ImageThumbnailerException, UnsupportedImageFormatException
+    {
+        ImageThumbnailer imageThumbnailer = new ImageThumbnailer(250, 250);
+        DataUriEncoder   uriEncoder       = new DataUriEncoder();
+
+        if (isURL(image.getData()))
+            return ir.create(image.getDescription(), image.getData(), image.getData(), user);
+
+        byte[] full      = Base64.getDecoder().decode(image.getData());
+        byte[] thumbnail = imageThumbnailer.createThumbnail(full, ImageType.fromData(full));
+        return ir.create(
+                image.getDescription(),
+                uriEncoder.encode(full),
+                uriEncoder.encode(thumbnail),
+                user);
+    }
+
+    public boolean isURL(String test)
+    {
+        try {
+            new URL(test).toURI();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 
     /**
      * Returns the post with the provided id.

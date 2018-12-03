@@ -15,7 +15,6 @@ public class JpaConnection
     {
         if (emf == null)
             emf = createConnection();
-
         return emf;
     }
 
@@ -37,7 +36,6 @@ public class JpaConnection
         InputStream             inputStream = JpaConnection.class.getResourceAsStream(file);
         if (inputStream == null)
             throw new IllegalStateException(String.format("No %s configuration file in resources.", file));
-
         Scanner scanner    = new Scanner(inputStream);
         int     lineNumber = 1;
         while (scanner.hasNextLine()) {
@@ -54,13 +52,10 @@ public class JpaConnection
                 if (parts.length != 2)
                     throw new IllegalStateException(
                             String.format("Bad configuration entry '%s' on line %d.", line, lineNumber));
-
                 options.put(parts[0].trim(), parts[1].trim());
             }
-
             lineNumber++;
         }
-
         return options;
     }
 }

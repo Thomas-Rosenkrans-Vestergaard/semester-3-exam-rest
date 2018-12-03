@@ -19,6 +19,7 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
      *
      * @param entityManager The entity manager that operations are performed upon.
      */
+
     public JpaImageRepository(EntityManager entityManager)
     {
         super(entityManager, Image.class);
@@ -80,6 +81,9 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
     @Override
     public int countByUser(User user)
     {
-        return user.getImages().size();
+        return getEntityManager()
+                .createQuery("SELECT count(i) FROM Image i WHERE i.user = :user")
+                .setParameter("user", user)
+                .getFirstResult();
     }
 }

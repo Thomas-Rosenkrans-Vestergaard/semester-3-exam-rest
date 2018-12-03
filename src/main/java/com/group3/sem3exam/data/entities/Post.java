@@ -8,8 +8,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 @Entity
 public class Post extends CommentParent implements RepositoryEntity<Integer>
 {
@@ -24,7 +22,7 @@ public class Post extends CommentParent implements RepositoryEntity<Integer>
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Image> images = new ArrayList<>();
 
     public Post()

@@ -3,6 +3,7 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.FriendRequest;
 import com.group3.sem3exam.data.entities.Friendship;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
@@ -99,4 +100,20 @@ public class FriendshipResource
         List<FriendRequest>   requests              = friendshipFacade.getReceivedRequests(authenticationContext);
         return Response.ok(gson.toJson(DTO.map(requests, FriendRequestDTO::complete))).build();
     }
+
+    @DELETE
+    @Path("target/{id}")
+    @Produces(APPLICATION_JSON)
+    @Consumes(APPLICATION_JSON)
+    public Response deletePost(@HeaderParam("Authorization") String token, @PathParam("id") Integer friendship) throws AuthenticationException, ResourceNotFoundException, ResourceConflictException, AuthorizationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
+        User                  other                 = authenticationContext.getUser();
+        Friendship            friendship1           = friendshipFacade.getFriendship(authenticationContext, friendship);
+        friendshipFacade.unfriend(authenticationContext, other);
+        return Response.status(404).entity(FriendshipDTO.complete(friendship1)).build();
+
+
+    }
+
 }

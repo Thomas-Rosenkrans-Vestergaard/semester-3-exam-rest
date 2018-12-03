@@ -5,18 +5,22 @@ import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import javax.persistence.*;
 
 import static javax.persistence.FetchType.EAGER;
-
+import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "image")
 public class Image extends CommentParent implements RepositoryEntity<Integer>
 {
 
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Integer id;
+
     @Column(nullable = false)
     private String description;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, name = "full_")
     private String full;
 
     @Lob

@@ -4,6 +4,7 @@ import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.CommentParent;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -71,9 +72,10 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
     @Override
     public List<Comment> getAll(CommentParent parent)
     {
-        List<Comment> comments = parent.getComments();
-        comments.size();
-        return comments;
+        return getEntityManager()
+                .createQuery("SELECT c FROM Comment c WHERE c.parent = :parent")
+                .setParameter("parent", parent)
+                .getResultList();
     }
 
     @Override
@@ -111,5 +113,13 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
                 .createQuery("SELECT count(c) FROM Comment c WHERE c.parent = :parent", Long.class)
                 .setParameter("parent", commentParent)
                 .getSingleResult();
+    }
+
+    @Override
+    public Comment delete(Comment comment)
+    {
+    return getEntityManager().createQuery("DELETE Comment c WHERE c.id = :id ", Comment.class)
+            .setParameter("id", comment.getId())
+            .getSingleResult();
     }
 }

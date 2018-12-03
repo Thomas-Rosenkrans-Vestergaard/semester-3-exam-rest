@@ -2,6 +2,7 @@ package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.CommentParent;
+import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CommentRepository;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
@@ -110,4 +111,19 @@ public class CommentFacade
             return commentRepository.count(fetchedParent);
         }
     }
+
+    public Comment delete(AuthenticationContext auth, Integer comment) throws ResourceNotFoundException
+    {
+        try(CommentRepository commentRepository = commentRepositoryFactory.get()){
+            commentRepository.begin();
+            Comment commentToDelete = commentRepository.get(comment);
+            if(commentToDelete == null){
+                throw new ResourceNotFoundException(Comment.class, comment);
+            }
+            commentRepository.delete(commentToDelete);
+            commentRepository.commit();
+            return commentToDelete;
+        }
+    }
+
 }
