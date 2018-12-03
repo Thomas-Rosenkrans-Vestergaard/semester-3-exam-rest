@@ -14,6 +14,11 @@
         <class>com.group3.sem3exam.data.entities.Image</class>
         <class>com.group3.sem3exam.data.entities.ProfilePicture</class>
         <class>com.group3.sem3exam.logic.authentication.jwt.JwtEntity</class>
+        <class>com.group3.sem3exam.data.services.Service</class>
+        <class>com.group3.sem3exam.data.services.AuthRequest</class>
+        <class>com.group3.sem3exam.data.services.PermissionRequest</class>
+        <class>com.group3.sem3exam.data.services.PermissionTemplate</class>
+        <class>com.group3.sem3exam.data.services.PermissionMapping</class>
         <properties>
             <property name="hibernate.connection.url" value="jdbc:derby:memory:unit-testing;create=true"/>
             <property name="hibernate.connection.driver_class" value="org.apache.derby.jdbc.EmbeddedDriver"/>
