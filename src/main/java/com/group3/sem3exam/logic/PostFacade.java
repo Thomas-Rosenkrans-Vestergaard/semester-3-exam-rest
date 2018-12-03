@@ -97,8 +97,7 @@ public class PostFacade<T extends Transaction>
         if (isURL(image.getData()))
             return ir.create(image.getDescription(), image.getData(), image.getData(), user);
 
-        byte[] full = Base64.getDecoder().decode(image.getData());
-        full = imageThumbnailer.createThumbnail(full);
+        byte[] full      = Base64.getDecoder().decode(image.getData());
         byte[] thumbnail = imageThumbnailer.createThumbnail(full, ImageType.fromData(full));
         return ir.create(
                 image.getDescription(),
