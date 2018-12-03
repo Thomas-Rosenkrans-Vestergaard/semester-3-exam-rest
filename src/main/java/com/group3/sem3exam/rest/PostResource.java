@@ -5,14 +5,18 @@ import com.google.gson.JsonObject;
 import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+<<<<<<< Updated upstream
 import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.rest.dto.CommentDTO;
+=======
+import com.group3.sem3exam.logic.PostFacade;
+import com.group3.sem3exam.logic.ResourceNotFoundException;
+>>>>>>> Stashed changes
 import com.group3.sem3exam.rest.dto.PostDTO;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;

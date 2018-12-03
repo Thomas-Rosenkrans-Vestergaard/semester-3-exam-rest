@@ -159,7 +159,6 @@ public class JpaReadRepository<E extends RepositoryEntity<K>, K extends Comparab
                 .createQuery("SELECT count(e.id) FROM " + c.getSimpleName() + " e WHERE e.id = :id", Long.class)
                 .setParameter("id", id)
                 .getSingleResult();
-
         return count > 0;
     }
 }

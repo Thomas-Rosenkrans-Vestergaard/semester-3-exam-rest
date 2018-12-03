@@ -19,6 +19,7 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
      *
      * @param entityManager The entity manager that operations are performed upon.
      */
+
     public JpaImageRepository(EntityManager entityManager)
     {
         super(entityManager, Image.class);
