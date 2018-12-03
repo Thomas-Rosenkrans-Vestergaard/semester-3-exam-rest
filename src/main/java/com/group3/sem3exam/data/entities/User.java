@@ -45,6 +45,7 @@ public class User implements RepositoryEntity<Integer>
     private LocalDateTime createdAt;
 
     @OneToOne(fetch = EAGER, cascade = ALL, mappedBy = "user")
+    @JoinColumn(name = "profile_picture")
     private ProfilePicture profilePicture;
 
     public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
@@ -147,9 +148,10 @@ public class User implements RepositoryEntity<Integer>
         return this.profilePicture;
     }
 
-    public void setProfilePicture(ProfilePicture profilePicture)
+    public User setProfilePicture(ProfilePicture profilePicture)
     {
         this.profilePicture = profilePicture;
+        return this;
     }
 
     @Override

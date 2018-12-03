@@ -3,6 +3,7 @@ package com.group3.sem3exam.data.entities;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "profile_picture")
 public class ProfilePicture
 {
 
@@ -10,10 +11,10 @@ public class ProfilePicture
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private User user;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Image image;
 
     public ProfilePicture()
