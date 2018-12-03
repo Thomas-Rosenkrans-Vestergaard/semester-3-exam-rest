@@ -116,7 +116,11 @@ public class CommentFacade
     {
         try(CommentRepository commentRepository = commentRepositoryFactory.get()){
             commentRepository.begin();
+            User user = auth.getUser();
             Comment commentToDelete = commentRepository.get(comment);
+            if(commentToDelete.getAuthor() != user){
+                throw new ResourceNotFoundException(Comment.class, user);
+            }
             if(commentToDelete == null){
                 throw new ResourceNotFoundException(Comment.class, comment);
             }

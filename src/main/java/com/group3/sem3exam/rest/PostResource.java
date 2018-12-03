@@ -155,42 +155,5 @@ public class PostResource
         public String contents;
     }
 
-    @GET
-    @Produces(APPLICATION_JSON)
-    @Path("{post: [0-9]+}/comments")
-    public Response getComments(@HeaderParam("Authorization") String auth, @PathParam("post") Integer post)
-    throws ResourceNotFoundException, AuthenticationException
-    {
-        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
-        List<Comment>         comments              = commentFacade.getComments(authenticationContext, post);
-        return Response.ok(gson.toJson(CommentDTO.list(comments, CommentDTO::basic))).build();
-    }
 
-    @GET
-    @Produces(APPLICATION_JSON)
-    @Path("{post: [0-9]+}/comments/page/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
-    public Response getCommentsPage(
-            @HeaderParam("Authorization") String auth,
-            @PathParam("post") Integer post,
-            @PathParam("pageSize") Integer pageSize,
-            @PathParam("pageNumber") Integer pageNumber)
-    throws ResourceNotFoundException, AuthenticationException
-    {
-        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
-        List<Comment>         comments              = commentFacade.getCommentsPage(authenticationContext, post, pageSize, pageNumber);
-        return Response.ok(gson.toJson(CommentDTO.list(comments, CommentDTO::basic))).build();
-    }
-
-
-    @DELETE
-    @Consumes(APPLICATION_JSON)
-    @Produces(APPLICATION_JSON)
-    @Path("{post: [0-9]+}/comments/{id: [0-9]+}")
-        public Response deleteComment (@HeaderParam("Authorization") String auth, @PathParam("post") Integer post, @PathParam("id")Integer id) throws AuthenticationException, ResourceNotFoundException
-    {
-            AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
-            Comment comment = commentFacade.delete(authenticationContext, post);
-            return Response.status(404).entity(CommentDTO.basic(comment)).build();
-
-    }
 }

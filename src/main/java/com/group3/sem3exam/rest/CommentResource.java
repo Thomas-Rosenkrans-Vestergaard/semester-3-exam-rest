@@ -1,0 +1,69 @@
+package com.group3.sem3exam.rest;
+
+
+import com.google.gson.Gson;
+import com.group3.sem3exam.data.entities.Comment;
+import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.logic.*;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.rest.dto.CommentDTO;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.util.List;
+
+import static com.group3.sem3exam.rest.Facades.post;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+
+@Path("/comments")
+public class CommentResource
+{
+
+    private static Gson                       gson                 = SpecializedGson.create();
+    private static PostFacade<JpaTransaction> postFacade           = post;
+    private static AuthenticationFacade       authenticationFacade = Facades.authentication;
+    private static CommentFacade              commentFacade        = Facades.comments;
+
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("{post: [0-9]+}/comments")
+    public Response getComments(@HeaderParam("Authorization") String auth, @PathParam("post") Integer post)
+    throws ResourceNotFoundException, AuthenticationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
+        List<Comment>         comments              = commentFacade.getComments(authenticationContext, post);
+        return Response.ok(gson.toJson(CommentDTO.list(comments, CommentDTO::basic))).build();
+    }
+
+    @GET
+    @Produces(APPLICATION_JSON)
+    @Path("{post: [0-9]+}/comments/page/{pageSize: [0-9]+}/{pageNumber: [0-9]+}")
+    public Response getCommentsPage(
+            @HeaderParam("Authorization") String auth,
+            @PathParam("post") Integer post,
+            @PathParam("pageSize") Integer pageSize,
+            @PathParam("pageNumber") Integer pageNumber)
+    throws ResourceNotFoundException, AuthenticationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
+        List<Comment>         comments              = commentFacade.getCommentsPage(authenticationContext, post, pageSize, pageNumber);
+        return Response.ok(gson.toJson(CommentDTO.list(comments, CommentDTO::basic))).build();
+    }
+
+
+    @DELETE
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    @Path("{post: [0-9]+}/comments/{id: [0-9]+}")
+    public Response deleteComment (@HeaderParam("Authorization") String auth, @PathParam("post") Integer post, @PathParam("id")Integer id) throws AuthenticationException, ResourceNotFoundException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
+        Comment comment = commentFacade.delete(authenticationContext, id);
+        return Response.status(204).entity(CommentDTO.basic(comment)).build();
+
+    }
+
+
+
+}
