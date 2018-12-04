@@ -4,11 +4,11 @@ import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.CommentParent;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -59,6 +59,7 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
             return null;
         }
     }
+
 
     @Override
     public boolean parentExists(Integer parent)
@@ -116,10 +117,10 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
     }
 
     @Override
-    public Comment delete(Comment comment)
+    public Integer delete(Comment comment)
     {
-    return getEntityManager().createQuery("DELETE Comment c WHERE c.id = :id ", Comment.class)
+    return  getEntityManager().createQuery("DELETE FROM Comment c WHERE c.id = :id ")
             .setParameter("id", comment.getId())
-            .getSingleResult();
+            .executeUpdate();
     }
 }

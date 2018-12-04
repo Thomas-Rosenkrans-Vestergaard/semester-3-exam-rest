@@ -4,7 +4,6 @@ import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.CommentParent;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.ReadRepository;
-import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 
 import java.util.List;
 
@@ -65,5 +64,5 @@ public interface CommentRepository extends ReadRepository<Comment, Integer>
     int count(CommentParent commentParent);
 
 
-    Comment delete(Comment comment);
+    Object delete(Comment comment);
 }
