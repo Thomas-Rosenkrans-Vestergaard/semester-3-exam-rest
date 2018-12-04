@@ -8,22 +8,22 @@ import java.util.Map;
 public class ChatMessageDelegator
 {
 
+    private final Map<String, Accept> routes = new HashMap<>();
+
     interface Accept<T>
     {
-        void accept(T message) throws Exception;
+        public void accept(T t) throws Exception;
     }
 
-    private final Map<Class<? extends InMessage>, Accept> routes = new HashMap<>();
-
-    public <T extends InMessage> void register(Class<T> c, Accept<T> consumer)
+    public <T extends InMessage> void register(String type, Class<T> t, Accept<T> consumer)
     {
-        routes.put(c, consumer);
+        routes.put(type, consumer);
     }
 
     public void handle(InMessage message) throws Exception
     {
-        Class<? extends InMessage> c = message.getClass();
-        if (routes.containsKey(c))
-            routes.get(c).accept(message);
+        Accept consumer = routes.get(message.getType());
+        if (consumer != null)
+            consumer.accept(message);
     }
 }

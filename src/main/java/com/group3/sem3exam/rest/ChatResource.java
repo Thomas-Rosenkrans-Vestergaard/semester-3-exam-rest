@@ -3,13 +3,18 @@ package com.group3.sem3exam.rest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.ChatMessage;
+import com.group3.sem3exam.data.repositories.JpaChatMessageRepository;
+import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
+import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.data.services.JpaServiceRepository;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.chat.ChatFacade;
 import com.group3.sem3exam.logic.chat.ChatMember;
+import com.group3.sem3exam.logic.chat.ChatWebSocketServer;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
 import javax.ws.rs.*;
@@ -24,7 +29,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class ChatResource
 {
 
-    private static ChatFacade<JpaTransaction> chatFacade           = Facades.chat;
+    private static ChatFacade<JpaTransaction> chatFacade = ServletContextClass.chatFacade;
     private static AuthenticationFacade       authenticationFacade = Facades.authentication;
     private static Gson                       gson                 = new GsonBuilder().setPrettyPrinting().create();
 

@@ -8,6 +8,7 @@ import com.group3.sem3exam.data.repositories.ChatMessageRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.authentication.TokenAuthenticator;
+import com.group3.sem3exam.logic.chat.messages.AuthenticationMessage;
 import com.group3.sem3exam.logic.chat.messages.InTextMessage;
 import com.group3.sem3exam.logic.chat.messages.OutMessage;
 import org.java_websocket.WebSocket;
@@ -15,20 +16,20 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
-import java.util.Base64;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer implements ChatTransportOutput
 {
 
-    private       ChatTransportInput                 input;
+    private       ChatTransportInput                 inputTransport;
     private final Supplier<T>                        transactionFactory;
     private final Function<T, ChatMessageRepository> messageRepositoryFactory;
     private final Function<T, UserRepository>        userRepositoryFactory;
     private final TokenAuthenticator                 tokenAuthenticator;
-    private final Gson                               gson = new GsonBuilder().create();
+    private final Gson                               gson    = new GsonBuilder().create();
+    private final Map<ChatConnection, WebSocket>     sockets = new HashMap<>();
 
     public ChatWebSocketServer(
             Supplier<T> transactionFactory,
@@ -43,19 +44,22 @@ public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer 
         this.tokenAuthenticator = tokenAuthenticator;
     }
 
-    public void setInput(ChatTransportInput input)
+    public void setInputTransport(ChatTransportInput inputTransport)
     {
-        this.input = input;
+        this.inputTransport = inputTransport;
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake)
     {
         ChatConnection chatConnection = conn.getAttachment();
-        if (chatConnection == null)
-            conn.setAttachment(ChatConnectionData.random());
+        if (chatConnection == null) {
+            chatConnection = ChatConnectionData.random();
+            conn.setAttachment(chatConnection);
+        }
 
-        input
+        this.sockets.put(chatConnection, conn);
+        this.inputTransport.onConnect(chatConnection);
     }
 
     private static class ChatConnectionData implements ChatConnection
@@ -83,12 +87,27 @@ public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer 
         {
             return uniqueId;
         }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (!(o instanceof ChatConnectionData)) return false;
+            ChatConnectionData that = (ChatConnectionData) o;
+            return Objects.equals(uniqueId, that.uniqueId);
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return Objects.hash(uniqueId);
+        }
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote)
     {
-
+        this.inputTransport.onClose(conn.getAttachment());
     }
 
     @Override
@@ -99,12 +118,20 @@ public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer 
         String     type   = root.get("type").getAsString();
 
         if ("text".equals(type)) {
-            input.onMessage(InTextMessage.of(
-                    root.get("token").getAsString(),
+            inputTransport.onMessage(InTextMessage.of(
                     conn.getAttachment(),
                     root.get("receiver").getAsInt(),
                     root.get("contents").getAsString()
             ));
+            return;
+        }
+
+        if ("authentication".equals(type)) {
+            inputTransport.onMessage(AuthenticationMessage.of(
+                    root.get("token").getAsString(),
+                    conn.getAttachment()
+            ));
+            return;
         }
 
         throw new UnsupportedOperationException(type);
@@ -130,6 +157,7 @@ public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer 
     @Override
     public void send(OutMessage message)
     {
-
+        WebSocket socket = this.sockets.get(message.getReceiver());
+        socket.send(gson.toJson(message));
     }
 }

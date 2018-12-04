@@ -11,11 +11,4 @@ public interface InMessage extends Message
      * @return The user id of the sender.
      */
     ChatConnection getSender();
-
-    /**
-     * Returns the authentication token sent by the sender.
-     *
-     * @return The authentication token sent by the sender.
-     */
-    String getAuthToken();
 }

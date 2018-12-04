@@ -15,7 +15,7 @@ public interface InTextMessage extends InMessage
 
     String getContents();
 
-    static InTextMessage of(String token, ChatConnection sender, Integer receiver, String contents)
+    static InTextMessage of(ChatConnection sender, Integer receiver, String contents)
     {
         return new InTextMessage()
         {
@@ -23,12 +23,6 @@ public interface InTextMessage extends InMessage
             public String getContents()
             {
                 return contents;
-            }
-
-            @Override
-            public String getAuthToken()
-            {
-                return token;
             }
 
             @Override

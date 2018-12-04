@@ -47,10 +47,9 @@ public class Facades
             () -> new JpaCommentRepository(JpaConnection.create())
     );
 
-    private static      JwtSecret                     jwtSecret;
+    public static       JwtSecret                     jwtSecret;
     public static final RegionFacade                  region = new RegionFacade(() -> new JpaRegionRepository(JpaConnection.create()));
     public static final ServiceFacade<JpaTransaction> services;
-
     static {
         try {
             jwtSecret = new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8);
@@ -73,30 +72,5 @@ public class Facades
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    public static final ChatWebSocketServer<JpaTransaction> chatWebSocketServer;
-
-    public static final ChatFacade<JpaTransaction> chat;
-
-    static {
-        chatWebSocketServer = new ChatWebSocketServer<>(
-                () -> new JpaTransaction(JpaConnection.create()),
-                transaction -> new JpaChatMessageRepository(transaction),
-                transaction -> new JpaUserRepository(transaction),
-                null
-        );
-
-        chat = new ChatFacade<>(chatWebSocketServer,
-                                () -> new JpaTransaction(JpaConnection.create()),
-                                transaction -> new JpaChatMessageRepository(transaction),
-                                transaction -> new JpaUserRepository(transaction),
-                                transaction -> new JpaFriendshipRepository(transaction),
-                                transaction -> new JpaServiceRepository(transaction),
-                                jwtSecret
-        );
-
-        chatWebSocketServer.start();
     }
 }

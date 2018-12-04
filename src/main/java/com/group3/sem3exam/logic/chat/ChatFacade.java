@@ -12,6 +12,7 @@ import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authentication.TokenAuthenticator;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
+import com.group3.sem3exam.logic.chat.messages.AuthenticationMessage;
 import com.group3.sem3exam.logic.chat.messages.InMessage;
 import com.group3.sem3exam.logic.chat.messages.InTextMessage;
 import com.group3.sem3exam.logic.chat.messages.OutTextMessage;
@@ -28,15 +29,15 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
 
     private final ChatTransportOutput chatOutput;
 
-    private final Supplier<T>                         transactionFactory;
-    private final Function<T, ChatMessageRepository>  messageRepositoryFactory;
-    private final Function<T, UserRepository>         userRepositoryFactory;
-    private final Function<T, FriendshipRepository>   friendshipRepositoryFactory;
-    private final Function<T, ServiceRepository>      serviceRepositoryFactory;
-    private final ChatMessageDelegator                delegator          = new ChatMessageDelegator();
-    private final Map<Integer, AuthenticationContext> authenticatedUsers = new HashMap<>();
-    private final Map<String, ChatConnection>         connections        = new HashMap<>();
-    private final JwtSecret                           jwtSecret;
+    private final Supplier<T>                                transactionFactory;
+    private final Function<T, ChatMessageRepository>         messageRepositoryFactory;
+    private final Function<T, UserRepository>                userRepositoryFactory;
+    private final Function<T, FriendshipRepository>          friendshipRepositoryFactory;
+    private final Function<T, ServiceRepository>             serviceRepositoryFactory;
+    private final ChatMessageDelegator                       delegator          = new ChatMessageDelegator();
+    private final Map<ChatConnection, AuthenticationContext> authenticatedUsers = new HashMap<>();
+    private final Map<Integer, ChatConnection>               userConnections    = new HashMap<>();
+    private final JwtSecret                                  jwtSecret;
 
     public ChatFacade(
             ChatTransportOutput chatOutput,
@@ -55,7 +56,8 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
         this.friendshipRepositoryFactory = friendshipRepositoryFactory;
         this.jwtSecret = jwtSecret;
 
-        delegator.register(InTextMessage.class, this::onTextMessage);
+        delegator.register("text", InTextMessage.class, this::onTextMessage);
+        delegator.register("authentication", AuthenticationMessage.class, this::onAuthentication);
     }
 
     /**
@@ -180,35 +182,39 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
     public void onMessage(InMessage message)
     {
         try {
-            authenticate(message);
             this.delegator.handle(message);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 
-    private AuthenticationContext authenticate(InMessage message) throws AuthenticationException
+    /**
+     * Called when the provided connection is opened.
+     *
+     * @param connection The connection that was opened.
+     */
+    @Override
+    public void onConnect(ChatConnection connection)
     {
-        String id = message.getSender().getId();
-        if (this.authenticatedUsers.containsKey(id))
-            return authenticatedUsers.get(id);
 
-        try (T transaction = transactionFactory.get()) {
-            UserRepository    userRepository    = userRepositoryFactory.apply(transaction);
-            ServiceRepository serviceRepository = serviceRepositoryFactory.apply(transaction);
-            TokenAuthenticator tokenAuthenticator = new TokenAuthenticator(jwtSecret,
-                                                                           () -> userRepository,
-                                                                           () -> serviceRepository);
+    }
 
-            AuthenticationContext authenticationContext = tokenAuthenticator.authenticate(message.getAuthToken());
-            this.authenticatedUsers.put(authenticationContext.getUserId(), authenticationContext);
-            return authenticationContext;
-        }
+    /**
+     * Called when the provided connection is closed.
+     *
+     * @param connection The connection that was closed.
+     */
+    @Override
+    public void onClose(ChatConnection connection)
+    {
+        AuthenticationContext authenticatedUser = authenticatedUsers.get(connection);
+        if (authenticatedUser != null)
+            this.userConnections.remove(authenticatedUser.getUserId());
     }
 
     private User getAuthenticatedUser(ChatConnection connection)
     {
-        return authenticatedUsers.get(connection.getId()).getUser();
+        return authenticatedUsers.get(connection).getUser();
     }
 
     private void onTextMessage(InTextMessage message)
@@ -217,19 +223,35 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
             ChatMessageRepository messageRepository = messageRepositoryFactory.apply(transaction);
             UserRepository        userRepository    = userRepositoryFactory.apply(transaction);
 
-            ChatConnection receiverConnection = connections.get(message.getSender().getId());
+            User           sender             = getAuthenticatedUser(message.getSender());
+            ChatConnection receiverConnection = userConnections.get(message.getReceiver());
             if (receiverConnection != null)
-                chatOutput.send(OutTextMessage.of(receiverConnection, message.getSender(), message.getContents()));
+                chatOutput.send(OutTextMessage.of(receiverConnection, sender, message.getContents()));
 
-            User sender   = getAuthenticatedUser(message.getSender());
             User receiver = userRepository.get(message.getReceiver());
             messageRepository.write(sender, receiver, message.getContents());
         }
     }
 
+    private void onAuthentication(AuthenticationMessage message) throws AuthenticationException
+    {
+        String id = message.getSender().getId();
+        if (this.authenticatedUsers.containsKey(id))
+            return;
+
+        TokenAuthenticator tokenAuthenticator = new TokenAuthenticator(
+                jwtSecret,
+                () -> userRepositoryFactory.apply(transactionFactory.get()),
+                () -> serviceRepositoryFactory.apply(transactionFactory.get()));
+
+        AuthenticationContext authenticationContext = tokenAuthenticator.authenticate(message.getAuthToken());
+        this.authenticatedUsers.put(message.getSender(), authenticationContext);
+        this.userConnections.put(authenticationContext.getUserId(), message.getSender());
+    }
+
     @Override
     public boolean isOnline(User user)
     {
-        return this.authenticatedUsers.containsKey(user.getId());
+        return this.userConnections.containsKey(user.getId());
     }
 }
