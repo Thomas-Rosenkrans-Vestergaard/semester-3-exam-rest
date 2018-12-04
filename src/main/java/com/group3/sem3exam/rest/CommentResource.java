@@ -87,7 +87,7 @@ public class CommentResource
     {
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
         Comment comment = commentFacade.delete(authenticationContext, id);
-        return Response.status(204).entity(CommentDTO.basic(comment)).build();
+        return Response.status(204).entity(gson.toJson(CommentDTO.basic(comment))).build();
 
     }
 
