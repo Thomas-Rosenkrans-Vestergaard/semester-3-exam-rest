@@ -91,7 +91,10 @@ public class Facades
         chat = new ChatFacade<>(chatWebSocketServer,
                                 () -> new JpaTransaction(JpaConnection.create()),
                                 transaction -> new JpaChatMessageRepository(transaction),
-                                transaction -> new JpaUserRepository(transaction)
+                                transaction -> new JpaUserRepository(transaction),
+                                transaction -> new JpaFriendshipRepository(transaction),
+                                transaction -> new JpaServiceRepository(transaction),
+                                jwtSecret
         );
 
         chatWebSocketServer.start();

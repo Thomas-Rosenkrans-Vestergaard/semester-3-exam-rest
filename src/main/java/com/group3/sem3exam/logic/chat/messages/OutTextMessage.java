@@ -1,6 +1,6 @@
 package com.group3.sem3exam.logic.chat.messages;
 
-import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.logic.chat.ChatConnection;
 
 public interface OutTextMessage extends OutMessage
 {
@@ -10,14 +10,20 @@ public interface OutTextMessage extends OutMessage
         return "text";
     }
 
-    User getSender();
+    ChatConnection getSender();
 
     String getContents();
 
-    static OutTextMessage of(User receiver, User sender, String contents)
+    static OutTextMessage of(ChatConnection receiver, ChatConnection sender, String contents)
     {
         return new OutTextMessage()
         {
+            @Override
+            public ChatConnection getSender()
+            {
+                return sender;
+            }
+
             @Override
             public String getContents()
             {
@@ -25,15 +31,9 @@ public interface OutTextMessage extends OutMessage
             }
 
             @Override
-            public User getReceiver()
+            public ChatConnection getReceiver()
             {
                 return receiver;
-            }
-
-            @Override
-            public User getSender()
-            {
-                return sender;
             }
         };
     }

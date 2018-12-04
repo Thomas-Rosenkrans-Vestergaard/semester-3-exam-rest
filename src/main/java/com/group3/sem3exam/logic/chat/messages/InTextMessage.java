@@ -1,6 +1,6 @@
 package com.group3.sem3exam.logic.chat.messages;
 
-import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.logic.chat.ChatConnection;
 
 public interface InTextMessage extends InMessage
 {
@@ -11,11 +11,11 @@ public interface InTextMessage extends InMessage
         return "text";
     }
 
-    User getReceiver();
+    Integer getReceiver();
 
     String getContents();
 
-    static InTextMessage of(User sender, User receiver, String contents)
+    static InTextMessage of(String token, ChatConnection sender, Integer receiver, String contents)
     {
         return new InTextMessage()
         {
@@ -26,13 +26,19 @@ public interface InTextMessage extends InMessage
             }
 
             @Override
-            public User getSender()
+            public String getAuthToken()
+            {
+                return token;
+            }
+
+            @Override
+            public ChatConnection getSender()
             {
                 return sender;
             }
 
             @Override
-            public User getReceiver()
+            public Integer getReceiver()
             {
                 return receiver;
             }

@@ -1,6 +1,5 @@
 package com.group3.sem3exam.logic.chat;
 
-import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.chat.messages.InMessage;
 
 import java.util.HashMap;
@@ -11,7 +10,7 @@ public class ChatMessageDelegator
 
     interface Accept<T>
     {
-        void accept(AuthenticationContext connection, T message) throws Exception;
+        void accept(T message) throws Exception;
     }
 
     private final Map<Class<? extends InMessage>, Accept> routes = new HashMap<>();
@@ -21,10 +20,10 @@ public class ChatMessageDelegator
         routes.put(c, consumer);
     }
 
-    public void handle(AuthenticationContext authenticationContext, InMessage message) throws Exception
+    public void handle(InMessage message) throws Exception
     {
         Class<? extends InMessage> c = message.getClass();
         if (routes.containsKey(c))
-            routes.get(c).accept(authenticationContext, message);
+            routes.get(c).accept(message);
     }
 }

@@ -13,6 +13,13 @@ public interface ChatMember
     User getUser();
 
     /**
+     * Returns true if the user is currently online.
+     *
+     * @return {@code true} if the user is currently online.
+     */
+    boolean isOnline();
+
+    /**
      * Returns the number of unread messages by the user.
      *
      * @return The number of unread messages by the user.

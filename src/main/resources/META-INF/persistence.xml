@@ -19,6 +19,7 @@
         <class>com.group3.sem3exam.data.services.PermissionRequest</class>
         <class>com.group3.sem3exam.data.services.PermissionTemplate</class>
         <class>com.group3.sem3exam.data.services.PermissionMapping</class>
+        <class>com.group3.sem3exam.data.entities.ChatMessage</class>
         <properties>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL57Dialect"/>

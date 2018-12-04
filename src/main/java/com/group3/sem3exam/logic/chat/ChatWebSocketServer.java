@@ -1,32 +1,34 @@
 package com.group3.sem3exam.logic.chat;
 
-import com.group3.sem3exam.data.entities.User;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.group3.sem3exam.data.repositories.ChatMessageRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
-import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.TokenAuthenticator;
-import com.group3.sem3exam.logic.chat.messages.InMessage;
+import com.group3.sem3exam.logic.chat.messages.InTextMessage;
 import com.group3.sem3exam.logic.chat.messages.OutMessage;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Base64;
+import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer implements ChatTransportOutput, ChatTransportInput
+public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer implements ChatTransportOutput
 {
 
     private       ChatTransportInput                 input;
-    private       Map<Integer, WebSocket>            connections      = new HashMap<>();
     private final Supplier<T>                        transactionFactory;
     private final Function<T, ChatMessageRepository> messageRepositoryFactory;
     private final Function<T, UserRepository>        userRepositoryFactory;
     private final TokenAuthenticator                 tokenAuthenticator;
+    private final Gson                               gson = new GsonBuilder().create();
 
     public ChatWebSocketServer(
             Supplier<T> transactionFactory,
@@ -49,7 +51,38 @@ public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake)
     {
+        ChatConnection chatConnection = conn.getAttachment();
+        if (chatConnection == null)
+            conn.setAttachment(ChatConnectionData.random());
 
+        input
+    }
+
+    private static class ChatConnectionData implements ChatConnection
+    {
+        private final String uniqueId;
+
+        public ChatConnectionData(String uniqueId)
+        {
+            this.uniqueId = uniqueId;
+        }
+
+        public static ChatConnectionData random()
+        {
+            Random random  = new Random();
+            byte   bytes[] = new byte[20];
+            random.nextBytes(bytes);
+            Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
+            String         token   = encoder.encodeToString(bytes);
+
+            return new ChatConnectionData(token);
+        }
+
+        @Override
+        public String getId()
+        {
+            return uniqueId;
+        }
     }
 
     @Override
@@ -61,7 +94,20 @@ public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer 
     @Override
     public void onMessage(WebSocket conn, String message)
     {
+        JsonParser parser = new JsonParser();
+        JsonObject root   = parser.parse(message).getAsJsonObject();
+        String     type   = root.get("type").getAsString();
 
+        if ("text".equals(type)) {
+            input.onMessage(InTextMessage.of(
+                    root.get("token").getAsString(),
+                    conn.getAttachment(),
+                    root.get("receiver").getAsInt(),
+                    root.get("contents").getAsString()
+            ));
+        }
+
+        throw new UnsupportedOperationException(type);
     }
 
     @Override
@@ -74,19 +120,6 @@ public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer 
     public void onStart()
     {
         System.out.println("ChatServer started.");
-    }
-
-    /**
-     * Called when a message is received by the chat server.
-     *
-     * @param authenticationContext The authentication context of the closed connection.
-     * @param receiver              The receiver of the message.
-     * @param message               The message sent by the client.
-     */
-    @Override
-    public void onMessage(AuthenticationContext authenticationContext, User receiver, InMessage message)
-    {
-
     }
 
     /**

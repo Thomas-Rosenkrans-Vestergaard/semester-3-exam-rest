@@ -43,6 +43,7 @@ public class PostDTO
         User author = post.getAuthor();
 
         return new PostDTO(
+
                 post.getId(),
                 post.getContents(),
                 post.getCreatedAt(),
