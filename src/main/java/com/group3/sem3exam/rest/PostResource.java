@@ -23,7 +23,7 @@ import static com.group3.sem3exam.rest.Facades.post;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.CREATED;
 
-@Path("posts")
+
 public class PostResource
 {
     private static Gson                       gson                 = SpecializedGson.create();
@@ -83,16 +83,17 @@ public class PostResource
         return Response.ok(gson.toJson(postDTOs)).build();
     }
 
-    @Path("user/{id}")
+
     @DELETE
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    public Response deletePost(@HeaderParam("authorization") String token, final @PathParam("id") Integer id) throws ResourceNotFoundException, AuthenticationException
+    @Path("/{id: [0-9]+}")
+    public Response deletePost(@HeaderParam("authorization") String token, @PathParam("id") Integer id) throws ResourceNotFoundException, AuthenticationException
     {
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
         Post                  post                  = postFacade.delete(authenticationContext, id);
-        PostDTO               postDTO               = PostDTO.basic(post);
-        return Response.status(204).entity(gson.toJson(postDTO)).build();
+
+        return Response.ok(gson.toJson(PostDTO.basic(post))).build();
     }
 
 
