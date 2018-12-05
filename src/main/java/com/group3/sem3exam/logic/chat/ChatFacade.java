@@ -12,10 +12,7 @@ import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authentication.TokenAuthenticator;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
-import com.group3.sem3exam.logic.chat.messages.AuthenticationMessage;
-import com.group3.sem3exam.logic.chat.messages.InMessage;
-import com.group3.sem3exam.logic.chat.messages.InTextMessage;
-import com.group3.sem3exam.logic.chat.messages.OutTextMessage;
+import com.group3.sem3exam.logic.chat.messages.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -208,8 +205,13 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
     public void onClose(ChatConnection connection)
     {
         AuthenticationContext authenticatedUser = authenticatedUsers.get(connection);
-        if (authenticatedUser != null)
+        if (authenticatedUser != null) {
             this.userConnections.remove(authenticatedUser.getUserId());
+            this.authenticatedUsers.remove(connection);
+            OnUserDisconnected disconnectedMessage = new OnUserDisconnected(authenticatedUser.getUserId());
+            for (ChatConnection chatConnection : this.userConnections.values())
+                chatOutput.send(chatConnection, disconnectedMessage);
+        }
     }
 
     private User getAuthenticatedUser(ChatConnection connection)
@@ -226,7 +228,7 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
             User           sender             = getAuthenticatedUser(message.getSender());
             ChatConnection receiverConnection = userConnections.get(message.getReceiver());
             if (receiverConnection != null)
-                chatOutput.send(OutTextMessage.of(receiverConnection, sender, message.getContents()));
+                chatOutput.send(receiverConnection, new OutTextMessage(sender.getId(), message.getContents()));
 
             User receiver = userRepository.get(message.getReceiver());
             messageRepository.write(sender, receiver, message.getContents());
@@ -245,8 +247,12 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
                 () -> serviceRepositoryFactory.apply(transactionFactory.get()));
 
         AuthenticationContext authenticationContext = tokenAuthenticator.authenticate(message.getAuthToken());
+        OnUserConnected       connectedMessage      = new OnUserConnected(authenticationContext.getUserId());
+        for (ChatConnection chatConnection : this.userConnections.values())
+            chatOutput.send(chatConnection, connectedMessage);
         this.authenticatedUsers.put(message.getSender(), authenticationContext);
         this.userConnections.put(authenticationContext.getUserId(), message.getSender());
+
     }
 
     @Override

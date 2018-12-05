@@ -1,15 +1,16 @@
 package com.group3.sem3exam.logic.chat.messages;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class OnUserConnected implements OutMessage
+public class OnUserDisconnected implements OutMessage
 {
 
-    private static final String  TYPE = "user-connected";
+    private static final String  TYPE = "user-disconnected";
     private final        Integer user;
 
-    public OnUserConnected(Integer user)
+    public OnUserDisconnected(Integer user)
     {
         this.user = user;
     }
@@ -38,3 +39,4 @@ public class OnUserConnected implements OutMessage
         return payload;
     }
 }
+

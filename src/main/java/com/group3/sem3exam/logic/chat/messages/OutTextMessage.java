@@ -1,43 +1,43 @@
 package com.group3.sem3exam.logic.chat.messages;
 
-import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.logic.chat.ChatConnection;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public interface OutTextMessage extends OutMessage
+public class OutTextMessage implements OutMessage
 {
-    @Override
-    default String getType()
+
+    private static final String  TYPE = "text";
+    private final        Integer sender;
+    private final        String  contents;
+
+    public OutTextMessage(Integer sender, String contents)
     {
-        return "text";
+        this.sender = sender;
+        this.contents = contents;
     }
 
-    static OutTextMessage of(ChatConnection receiver, User sender, String contents)
+    /**
+     * Returns the type of the message, should be unique across the messages in chat.
+     *
+     * @return The type of the message.
+     */
+    @Override
+    public String getType()
+    {
+        return TYPE;
+    }
+
+    /**
+     * Returns the payload of the message.
+     *
+     * @return The payload of the message.
+     */
+    @Override
+    public Map<String, ?> getPayload()
     {
         Map<String, Object> payload = new HashMap<>();
         payload.put("contents", contents);
-        payload.put("sender", sender.getId());
-
-        return new OutTextMessage()
-        {
-            /**
-             * Returns the payload of the message.
-             *
-             * @return The payload of the message.
-             */
-            @Override
-            public Map<String, ?> getPayload()
-            {
-                return payload;
-            }
-
-            @Override
-            public ChatConnection getReceiver()
-            {
-                return receiver;
-            }
-        };
+        payload.put("sender", sender);
+        return payload;
     }
 }

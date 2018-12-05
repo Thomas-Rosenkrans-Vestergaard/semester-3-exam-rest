@@ -152,12 +152,28 @@ public class ChatWebSocketServer<T extends Transaction> extends WebSocketServer 
     /**
      * Sends the provided message to the provided user.
      *
-     * @param message The message to send to the user.
+     * @param receiver The connection the message should be sent to.
+     * @param message  The message to send to the user.
      */
     @Override
-    public void send(OutMessage message)
+    public void send(ChatConnection receiver, OutMessage message)
     {
-        WebSocket socket = this.sockets.get(message.getReceiver());
-        socket.send(gson.toJson(message));
+        WebSocket socket = this.sockets.get(receiver);
+        socket.send(createJson(message));
+    }
+
+    private String createJson(OutMessage message)
+    {
+        Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+        Root root = new Root();
+        root.type = message.getType();
+        root.payload = message.getPayload();
+        return gson.toJson(root);
+    }
+
+    private class Root
+    {
+        public String         type;
+        public Map<String, ?> payload;
     }
 }

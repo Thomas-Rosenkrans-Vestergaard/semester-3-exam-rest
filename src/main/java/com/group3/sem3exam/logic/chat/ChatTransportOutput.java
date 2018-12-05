@@ -7,9 +7,9 @@ public interface ChatTransportOutput
 
     /**
      * Sends the provided message to the provided user.
-     * .
      *
-     * @param message The message to send to the user.
+     * @param receiver The connection the message should be sent to.
+     * @param message  The message to send to the user.
      */
-    void send(OutMessage message);
+    void send(ChatConnection receiver, OutMessage message);
 }
