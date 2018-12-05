@@ -1,8 +1,6 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.*;
@@ -10,9 +8,6 @@ import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
-import com.group3.sem3exam.rest.dto.CommentDTO;
-import com.group3.sem3exam.logic.PostFacade;
-import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.rest.dto.PostDTO;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -23,7 +18,7 @@ import static com.group3.sem3exam.rest.Facades.post;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.CREATED;
 
-
+@Path("posts")
 public class PostResource
 {
     private static Gson                       gson                 = SpecializedGson.create();
@@ -92,7 +87,6 @@ public class PostResource
     {
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
         Post                  post                  = postFacade.delete(authenticationContext, id);
-
         return Response.ok(gson.toJson(PostDTO.basic(post))).build();
     }
 
