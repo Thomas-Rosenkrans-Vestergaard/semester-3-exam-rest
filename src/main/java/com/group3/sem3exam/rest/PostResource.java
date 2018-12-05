@@ -87,7 +87,7 @@ public class PostResource
     @DELETE
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @Path("/{id: [0-9]+}")
+    @Path("{id: [0-9]+}")
     public Response deletePost(@HeaderParam("authorization") String token, @PathParam("id") Integer id) throws ResourceNotFoundException, AuthenticationException
     {
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
