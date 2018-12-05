@@ -1,25 +1,21 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.group3.sem3exam.data.entities.ChatMessage;
-import com.group3.sem3exam.data.repositories.JpaChatMessageRepository;
-import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.data.services.JpaServiceRepository;
 import com.group3.sem3exam.logic.AuthenticationFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.SpecializedGson;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.chat.ChatFacade;
 import com.group3.sem3exam.logic.chat.ChatMember;
-import com.group3.sem3exam.logic.chat.ChatWebSocketServer;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
 
@@ -29,9 +25,9 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class ChatResource
 {
 
-    private static ChatFacade<JpaTransaction> chatFacade = ServletContextClass.chatFacade;
+    private static ChatFacade<JpaTransaction> chatFacade           = ServletContextClass.chatFacade;
     private static AuthenticationFacade       authenticationFacade = Facades.authentication;
-    private static Gson                       gson                 = new GsonBuilder().setPrettyPrinting().create();
+    private static Gson                       gson                 = SpecializedGson.create();
 
     @GET
     @Path("history/{friend: [0-9]+}")
@@ -40,7 +36,6 @@ public class ChatResource
     {
         return Response.ok().build();
     }
-
 
     @GET
     @Path("history/{friend: [0-9]+}/{pageSize: [0-9]+}")
@@ -61,10 +56,10 @@ public class ChatResource
 
         private Integer id;
         private String  contents;
-        private UserDTO sender;
-        private UserDTO receiver;
+        private Integer sender;
+        private Integer receiver;
 
-        public ChatMessageDTO(Integer id, String contents, UserDTO sender, UserDTO receiver)
+        public ChatMessageDTO(Integer id, String contents, Integer sender, Integer receiver)
         {
             this.id = id;
             this.contents = contents;
@@ -77,8 +72,8 @@ public class ChatResource
             return new ChatMessageDTO(
                     message.getId(),
                     message.getContents(),
-                    null,
-                    null
+                    message.getSender().getId(),
+                    message.getReceiver().getId()
             );
         }
 
@@ -117,7 +112,7 @@ public class ChatResource
 
         public static ChatMemberDTO with(ChatMember chatMember)
         {
-            return new ChatMemberDTO(UserDTO.publicView(chatMember.getUser()), chatMember.unreadMessages(), chatMember.isOnline());
+            return new ChatMemberDTO(UserDTO.complete(chatMember.getUser()), chatMember.unreadMessages(), chatMember.isOnline());
         }
 
         public static List<ChatMemberDTO> map(List<ChatMember> members, Function<ChatMember, ChatMemberDTO> f)

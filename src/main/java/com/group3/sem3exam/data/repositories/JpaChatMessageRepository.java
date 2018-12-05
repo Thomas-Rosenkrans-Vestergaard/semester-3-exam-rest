@@ -7,6 +7,8 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class JpaChatMessageRepository extends JpaReadRepository<ChatMessage, Integer> implements ChatMessageRepository
@@ -42,7 +44,7 @@ public class JpaChatMessageRepository extends JpaReadRepository<ChatMessage, Int
                 .createQuery("SELECT cm FROM ChatMessage cm " +
                              "WHERE (cm.sender = :one AND cm.receiver = :two) " +
                              "OR (cm.sender = :two AND cm.receiver = :one) " +
-                             "ORDER BY cm.id DESC", ChatMessage.class)
+                             "ORDER BY cm.id ASC", ChatMessage.class)
                 .setParameter("one", one)
                 .setParameter("two", two)
                 .getResultList();
@@ -54,10 +56,10 @@ public class JpaChatMessageRepository extends JpaReadRepository<ChatMessage, Int
         last = last == null ? Integer.MAX_VALUE : last;
         pageSize = Math.max(pageSize, 1);
 
-        return getEntityManager()
+        List<ChatMessage> messages = getEntityManager()
                 .createQuery("SELECT cm FROM ChatMessage cm " +
-                             "WHERE (cm.sender = :one AND cm.receiver = :two) " +
-                             "OR (cm.sender = :two AND cm.receiver = :one) " +
+                             "WHERE ((cm.sender = :one AND cm.receiver = :two) " +
+                             "OR (cm.sender = :two AND cm.receiver = :one)) " +
                              "AND cm.id < :last " +
                              "ORDER BY cm.id DESC", ChatMessage.class)
                 .setParameter("one", one)
@@ -65,5 +67,8 @@ public class JpaChatMessageRepository extends JpaReadRepository<ChatMessage, Int
                 .setParameter("last", last)
                 .setMaxResults(pageSize)
                 .getResultList();
+
+        Collections.sort(messages, Comparator.comparingInt(ChatMessage::getId));
+        return messages;
     }
 }

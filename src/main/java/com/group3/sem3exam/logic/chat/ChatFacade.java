@@ -231,7 +231,9 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
                 chatOutput.send(receiverConnection, new OutTextMessage(sender.getId(), message.getContents()));
 
             User receiver = userRepository.get(message.getReceiver());
+            transaction.begin();
             messageRepository.write(sender, receiver, message.getContents());
+            transaction.commit();
         }
     }
 

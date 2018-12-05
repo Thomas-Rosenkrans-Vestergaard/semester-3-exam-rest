@@ -6,7 +6,7 @@ import java.util.Map;
 public class OutTextMessage implements OutMessage
 {
 
-    private static final String  TYPE = "text";
+    private static final String  TYPE = "message";
     private final        Integer sender;
     private final        String  contents;
 
