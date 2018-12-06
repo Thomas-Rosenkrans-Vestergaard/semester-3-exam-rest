@@ -6,6 +6,8 @@ import com.group3.sem3exam.data.services.*;
 import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
+import com.group3.sem3exam.logic.chat.ChatFacade;
+import com.group3.sem3exam.logic.chat.ChatWebSocketServer;
 import com.group3.sem3exam.logic.images.ImageFacade;
 import com.group3.sem3exam.logic.services.ServiceFacade;
 
@@ -45,10 +47,9 @@ public class Facades
             () -> new JpaCommentRepository(JpaConnection.create())
     );
 
-    private static      JwtSecret                     jwtSecret;
+    public static       JwtSecret                     jwtSecret;
     public static final RegionFacade                  region = new RegionFacade(() -> new JpaRegionRepository(JpaConnection.create()));
     public static final ServiceFacade<JpaTransaction> services;
-
     static {
         try {
             jwtSecret = new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8);
