@@ -10,6 +10,7 @@ import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.images.*;
+
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -90,10 +91,10 @@ public class PostFacade<T extends Transaction>
 
     public Post delete(AuthenticationContext auth, Integer id) throws ResourceNotFoundException
     {
-        try (PostRepository pr =  postRepositoryFactory.apply(transactionFactory.get())) {
+        try (PostRepository pr = postRepositoryFactory.apply(transactionFactory.get())) {
             pr.begin();
-            User           user = auth.getUser();
-            if (pr.get(id) != null && user.getId() == pr.get(id).getAuthor().getId()){
+            User user = auth.getUser();
+            if (pr.get(id) != null && user.getId() == pr.get(id).getAuthor().getId()) {
                 Post post = pr.delete(id);
                 pr.commit();
                 return post;
@@ -159,11 +160,19 @@ public class PostFacade<T extends Transaction>
      * @param pageSize The maximum number of results per request.
      * @param cutoff   The id of cutoff post. Meaning that the id of the first returned post is {@code cutoff + 1}.
      * @return The paginated view of the timeline of the user with the provided id.
+     * @throws ResourceNotFoundException When a user with the provided user id does not exist.
      */
-    public List<Post> getTimelinePosts(Integer user, Integer pageSize, Integer cutoff)
+    public List<Post> getTimelinePosts(Integer user, Integer pageSize, Integer cutoff) throws ResourceNotFoundException
     {
-        try (PostRepository pr = postRepositoryFactory.apply(transactionFactory.get())) {
-            return pr.getTimelinePosts(user, pageSize, cutoff);
+        try (T transaction = transactionFactory.get()) {
+            UserRepository userRepository = userRepositoryFactory.apply(transaction);
+            PostRepository postRepository = postRepositoryFactory.apply(transaction);
+
+            User fetchedUser = userRepository.get(user);
+            if (fetchedUser == null)
+                throw new ResourceNotFoundException(User.class, user);
+
+            return postRepository.getTimeline(fetchedUser, pageSize, cutoff);
         }
     }
 
@@ -183,7 +192,7 @@ public class PostFacade<T extends Transaction>
             if (user == null)
                 throw new ResourceNotFoundException(Post.class, user.getId());
 
-            return pr.getByUser(user);
+            return pr.getByAuthor(user);
         }
     }
 
@@ -207,7 +216,7 @@ public class PostFacade<T extends Transaction>
             if (user == null)
                 throw new ResourceNotFoundException(Post.class, user.getId());
 
-            return pr.getRollingPosts(user, pageSize, cutoff);
+            return pr.getByAuthorRolling(user, pageSize, cutoff);
         }
     }
 }

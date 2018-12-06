@@ -9,6 +9,7 @@ import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.rest.dto.PostDTO;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -60,7 +61,11 @@ public class PostResource
     @Path("timeline/{userId}/{pageSize}")
     @GET
     @Produces(APPLICATION_JSON)
-    public Response getTimelinePosts(@PathParam("userId") Integer userId, @PathParam("pageSize") Integer pageSize, @QueryParam("cutoff") Integer cutoff)
+    public Response getTimelinePosts(
+            @PathParam("userId") Integer userId,
+            @PathParam("pageSize") Integer pageSize,
+            @QueryParam("cutoff") Integer cutoff)
+    throws ResourceNotFoundException
     {
         List<Post>    posts    = postFacade.getTimelinePosts(userId, pageSize, cutoff);
         List<PostDTO> postDTOs = PostDTO.list(posts, PostDTO::withAuthor);
@@ -89,8 +94,6 @@ public class PostResource
         Post                  post                  = postFacade.delete(authenticationContext, id);
         return Response.ok(gson.toJson(PostDTO.basic(post))).build();
     }
-
-
 
 
     private class ReceivedCreateTextPost

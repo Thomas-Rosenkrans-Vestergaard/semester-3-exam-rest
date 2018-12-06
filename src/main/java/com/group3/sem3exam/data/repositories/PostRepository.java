@@ -28,19 +28,7 @@ public interface PostRepository extends CrudRepository<Post, Integer>
      * @param user The id of the user to return the posts of.
      * @return The posts made by the user with the provided id.
      */
-    List<Post> getByUser(User user);
-
-    /**
-     * Returns a specific set of posts from the friends of a user.
-     *
-     * @param userId   The id of the user to return the posts of.
-     * @param pageSize the amount of new posts to fetch
-     * @param last     the offset from where to start to fetch posts
-     *                 <<<<<<< HEAD
-     * @return The posts made by the friends of the user with the provided id.
-     * >>>>>>> master
-     */
-    List<Post> getTimelinePosts(Integer userId, Integer pageSize, Integer last);
+    List<Post> getByAuthor(User user);
 
     /**
      * Returns a rolling view of the posts created by the provided user.
@@ -50,6 +38,15 @@ public interface PostRepository extends CrudRepository<Post, Integer>
      * @param last     the offset from where to start to fetch posts.
      * @return The rolling view.
      */
-    List<Post> getRollingPosts(User user, Integer pageSize, Integer last);
+    List<Post> getByAuthorRolling(User user, Integer pageSize, Integer last);
 
+    /**
+     * Returns a specific set of posts from the friends of the provided user.
+     *
+     * @param user     The id of the user to return the posts of.
+     * @param pageSize the amount of new posts to fetch
+     * @param last     the offset from where to start to fetch posts
+     * @return The posts made by the friends of the user with the provided id.
+     */
+    List<Post> getTimeline(User user, Integer pageSize, Integer last);
 }
