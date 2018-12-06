@@ -5,7 +5,6 @@ import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.AbstractJpaRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.ResourceNotFoundException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -54,7 +53,7 @@ public class JpaFriendshipRepository extends AbstractJpaRepository implements Fr
 
 
     @Override
-    public Friendship createFriendship(FriendRequest request)
+    public Friendship accept(FriendRequest request)
     {
         EntityManager entityManager = getEntityManager();
         request.setStatus(FriendRequest.Status.ACCEPTED);
@@ -102,12 +101,13 @@ public class JpaFriendshipRepository extends AbstractJpaRepository implements Fr
     }
 
     @Override
-    public FriendRequest getRequest(User requester, User receiver)
+    public FriendRequest getPendingRequest(User requester, User receiver)
     {
         try {
             return getEntityManager()
                     .createQuery("SELECT fr FROM FriendRequest fr " +
-                                 "WHERE fr.requester = :requester AND fr.receiver = :receiver AND fr.status = :status", FriendRequest.class)
+                                 "WHERE fr.requester = :requester AND fr.receiver = :receiver AND fr.status = :status",
+                                 FriendRequest.class)
                     .setParameter("requester", requester)
                     .setParameter("receiver", receiver)
                     .setParameter("status", FriendRequest.Status.PENDING)
@@ -131,14 +131,14 @@ public class JpaFriendshipRepository extends AbstractJpaRepository implements Fr
     @Override
     public Friendship deleteFriendship(User user, User other)
     {
-       Friendship friendship1 = getFriendship(user, other);
-       Friendship friendship2 = getFriendship(other, user);
+        Friendship friendship1 = getFriendship(user, other);
+        Friendship friendship2 = getFriendship(other, user);
 
-       if(friendship2 != null && friendship1 != null){
-           getEntityManager().remove(friendship1);
-           getEntityManager().remove(friendship2);
-           return friendship1;
-       }
-      return null;
+        if (friendship2 != null && friendship1 != null) {
+            getEntityManager().remove(friendship1);
+            getEntityManager().remove(friendship2);
+            return friendship1;
+        }
+        return null;
     }
 }

@@ -142,7 +142,7 @@ public class FriendshipFacade<T extends Transaction>
         try (FriendshipRepository repository = friendshipRepositoryFactory.apply(transactionFactory.get())) {
             repository.begin();
             FriendRequest fetchedRequest = retrieveRequest(repository, auth, request);
-            Friendship created = repository.createFriendship(fetchedRequest);
+            Friendship created = repository.accept(fetchedRequest);
             repository.commit();
             return created;
         }
@@ -244,7 +244,7 @@ public class FriendshipFacade<T extends Transaction>
             if (fetchedOther == null)
                 throw new ResourceNotFoundException(User.class, other);
 
-            FriendRequest request = friendshipRepository.getRequest(self.getUser(), fetchedOther);
+            FriendRequest request = friendshipRepository.getPendingRequest(self.getUser(), fetchedOther);
             if (request == null)
                 throw new ResourceNotFoundException(FriendRequest.class, self.getUserId() + ", " + other);
 

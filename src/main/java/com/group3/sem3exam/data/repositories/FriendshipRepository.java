@@ -36,7 +36,7 @@ public interface FriendshipRepository extends TransactionalRepository
      * @param request The friend request from which to create the friendship, this entity is then marked accepted.
      * @return The friendship created from the request.
      */
-    Friendship createFriendship(FriendRequest request);
+    Friendship accept(FriendRequest request);
 
     /**
      * Creates a new friend request from the provided {@code requester} to the provided {@code receiver}.
@@ -73,7 +73,7 @@ public interface FriendshipRepository extends TransactionalRepository
      * @return the friend request between the provided {@code user} and {@code other}, {@code null} when
      * no such record exists.
      */
-    FriendRequest getRequest(User user, User other);
+    FriendRequest getPendingRequest(User user, User other);
 
     /**
      * Returns the pending friend requests received by the provided {@code user}.
