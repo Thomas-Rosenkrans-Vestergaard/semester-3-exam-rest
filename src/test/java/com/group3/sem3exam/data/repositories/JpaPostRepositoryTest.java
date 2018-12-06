@@ -5,6 +5,7 @@ import com.group3.sem3exam.TestingUtils;
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.base.JpaReadRepositoryTester;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;

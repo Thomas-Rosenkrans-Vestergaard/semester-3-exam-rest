@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.repositories.base;
 
 import com.group3.sem3exam.data.repositories.base.JpaReadRepository;
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
@@ -30,7 +30,7 @@ public class JpaReadRepositoryTester<
         this.unknownKey = unknownKey;
     }
 
-    Collection<DynamicTest> getDynamicTests()
+    public Collection<DynamicTest> getDynamicTests()
     {
         return new ArrayList<>(Arrays.asList(
                 createGetTest(),

@@ -1,6 +1,7 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.repositories.base;
 
 import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
+import com.group3.sem3exam.data.repositories.base.JpaReadRepositoryTester;
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.junit.jupiter.api.DynamicTest;
 
@@ -26,7 +27,7 @@ public class JpaCrudRepositoryTester<
         super(constructor, dataProducer, unknownKey);
     }
 
-    Collection<DynamicTest> getDynamicTests()
+    public Collection<DynamicTest> getDynamicTests()
     {
         Collection<DynamicTest> tests = super.getDynamicTests();
         tests.add(createUpdateTest());

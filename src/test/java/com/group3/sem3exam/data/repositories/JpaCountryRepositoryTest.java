@@ -2,6 +2,7 @@ package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.JpaTestConnection;
 import com.group3.sem3exam.data.entities.Country;
+import com.group3.sem3exam.data.repositories.base.JpaReadRepositoryTester;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
