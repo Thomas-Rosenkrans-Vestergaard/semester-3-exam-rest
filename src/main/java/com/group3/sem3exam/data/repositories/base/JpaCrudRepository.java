@@ -4,6 +4,10 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An implementation of {@code ReadRepository}, implementing common read and write operations for some entity type
@@ -12,7 +16,7 @@ import javax.persistence.EntityManagerFactory;
  * @param <E> The type of the entity managed by the repository.
  * @param <K> The type of the key of the entities managed by the repository.
  */
-public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
+public abstract class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparable<K>>
         extends JpaReadRepository<E, K>
         implements CrudRepository<E, K>
 {
@@ -81,5 +85,52 @@ public class JpaCrudRepository<E extends RepositoryEntity<K>, K extends Comparab
 
         entityManager.remove(find);
         return find;
+    }
+
+    /**
+     * Deletes the provided entity.
+     *
+     * @param entity The entity to delete.
+     * @return The deleted entity.
+     */
+    @Override
+    public E delete(E entity)
+    {
+        return delete(entity.getId());
+    }
+
+    /**
+     * Deletes the entities with keys matching one of the provided keys.
+     *
+     * @param keys The keys of the entities to delete.
+     * @return The map of the deleted entities. The key of the deleted entity is mapped to its id.
+     */
+    @Override
+    public Map<K, E> delete(Collection<K> keys)
+    {
+        Map<K, E> results = new HashMap<>(keys.size());
+        for (K key : keys) {
+            E deleted = delete(key);
+            results.put(key, deleted);
+        }
+
+        return results;
+    }
+
+    /**
+     * Deletes all the provided entities.
+     * <p>
+     * The provided list instance is the same as the returned instance.
+     *
+     * @param entities The entities to delete from the repository.
+     * @return A list with the updated entities.
+     */
+    @Override
+    public List<E> delete(List<E> entities)
+    {
+        for (E entity : entities)
+            delete(entity);
+
+        return entities;
     }
 }

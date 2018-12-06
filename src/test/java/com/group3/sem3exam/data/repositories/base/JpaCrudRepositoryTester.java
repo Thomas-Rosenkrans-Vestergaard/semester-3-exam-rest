@@ -1,12 +1,8 @@
 package com.group3.sem3exam.data.repositories.base;
 
-import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
-import com.group3.sem3exam.data.repositories.base.JpaReadRepositoryTester;
-import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import org.junit.jupiter.api.DynamicTest;
 
-import java.util.Collection;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -32,6 +28,9 @@ public class JpaCrudRepositoryTester<
         Collection<DynamicTest> tests = super.getDynamicTests();
         tests.add(createUpdateTest());
         tests.add(createDeleteTest());
+        tests.add(createDeleteEntityTest());
+        tests.add(createDeleteKeyCollection());
+        tests.add(createDeleteListOfEntitiesTest());
 
         return tests;
     }
@@ -49,7 +48,7 @@ public class JpaCrudRepositoryTester<
 
     private DynamicTest createDeleteTest()
     {
-        return DynamicTest.dynamicTest("delete", () -> {
+        return DynamicTest.dynamicTest("delete(K)", () -> {
             try (I instance = constructor.get()) {
                 instance.begin();
                 TreeMap<K, E> data = dataProducer.apply(instance);
@@ -60,6 +59,53 @@ public class JpaCrudRepositoryTester<
                 }
 
                 assertNull(instance.delete(unknownKey));
+            }
+        });
+    }
+
+
+    public DynamicTest createDeleteEntityTest()
+    {
+        return DynamicTest.dynamicTest("delete(E)", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                List<E> data = new ArrayList<>(dataProducer.apply(instance).values());
+                for (E e : data) {
+                    assertTrue(instance.exists(e.getId()));
+                    assertEquals(e, instance.delete(e));
+                    assertFalse(instance.exists(e.getId()));
+                }
+            }
+        });
+    }
+
+    public DynamicTest createDeleteKeyCollection()
+    {
+
+        return DynamicTest.dynamicTest("delete(K...)", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                Map<K, E> data    = dataProducer.apply(instance);
+                Map<K, E> deleted = instance.delete(data.keySet());
+
+                for (Map.Entry<K, E> entry : deleted.entrySet())
+                    assertFalse(instance.exists(entry.getKey()));
+            }
+        });
+    }
+
+    public DynamicTest createDeleteListOfEntitiesTest()
+    {
+
+        return DynamicTest.dynamicTest("delete(E...)", () -> {
+            try (I instance = constructor.get()) {
+                instance.begin();
+                Map<K, E> data = dataProducer.apply(instance);
+                for (E entity : data.values())
+                    assertTrue(instance.exists(entity.getId()));
+                instance.delete(new ArrayList<>(data.values()));
+                for (E entity : data.values())
+                    assertFalse(instance.exists(entity.getId()));
             }
         });
     }
