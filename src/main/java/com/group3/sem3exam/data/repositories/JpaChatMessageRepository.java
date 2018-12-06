@@ -2,7 +2,7 @@ package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.ChatMessage;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.base.JpaReadRepository;
+import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class JpaChatMessageRepository extends JpaReadRepository<ChatMessage, Integer> implements ChatMessageRepository
+public class JpaChatMessageRepository extends JpaCrudRepository<ChatMessage, Integer> implements ChatMessageRepository
 {
 
     /**

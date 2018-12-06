@@ -2,11 +2,11 @@ package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.ChatMessage;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.base.ReadRepository;
+import com.group3.sem3exam.data.repositories.base.CrudRepository;
 
 import java.util.List;
 
-public interface ChatMessageRepository extends ReadRepository<ChatMessage, Integer>
+public interface ChatMessageRepository extends CrudRepository<ChatMessage, Integer>
 {
 
     /**
