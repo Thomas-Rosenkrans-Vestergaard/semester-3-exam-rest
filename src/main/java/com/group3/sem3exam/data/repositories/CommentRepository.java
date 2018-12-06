@@ -11,6 +11,16 @@ public interface CommentRepository extends CrudRepository<Comment, Integer>
 {
 
     /**
+     * Creates a new comment, attaches the comment to the parent.
+     *
+     * @param user     The author of the comment.
+     * @param contents The contents of the comment.
+     * @param parent   The parent to attach the comment to.
+     * @return The newly created comment.
+     */
+    Comment create(User user, String contents, CommentParent parent);
+
+    /**
      * Returns the comment parent with the provided id.
      *
      * @param id The parent with the provided id.
@@ -34,16 +44,6 @@ public interface CommentRepository extends CrudRepository<Comment, Integer>
      * @return The comments on the provided comment parent.
      */
     List<Comment> getAll(CommentParent parent);
-
-    /**
-     * Creates a new comment, attaches the comment to the parent.
-     *
-     * @param user     The author of the comment.
-     * @param contents The contents of the comment.
-     * @param parent   The parent to attach the comment to.
-     * @return The newly created comment.
-     */
-    Comment create(User user, String contents, CommentParent parent);
 
     /**
      * Returns a paginated view of the comments on the comment parent with the provided id.

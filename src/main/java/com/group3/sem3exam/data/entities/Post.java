@@ -9,11 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "posts")
 public class Post extends CommentParent implements RepositoryEntity<Integer>
 {
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1024)
     private String contents;
 
     @ManyToOne(optional = false)

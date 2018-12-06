@@ -2,10 +2,14 @@ package com.group3.sem3exam;
 
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.PostRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -26,6 +30,16 @@ public class TestingUtils
                 city,
                 randomEnum(Gender.class),
                 LocalDate.now()
+        );
+    }
+
+    public static Post randomPost(PostRepository repository, User user)
+    {
+        return repository.create(
+                user,
+                randomString(),
+                new ArrayList<>(),
+                LocalDateTime.now()
         );
     }
 

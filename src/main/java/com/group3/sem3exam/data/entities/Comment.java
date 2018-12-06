@@ -17,7 +17,7 @@ public class Comment implements RepositoryEntity<Integer>
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(length = 65535, columnDefinition = "TEXT")
+    @Column(nullable = false, length = 1024)
     private String contents;
 
     @ManyToOne
@@ -27,7 +27,10 @@ public class Comment implements RepositoryEntity<Integer>
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @ManyToOne
+    // Must be fetch type LAZY.
+    // The derby query generated from the above code fails, since derby performs a UNION operation
+    //  to retrieve the results.
+    @ManyToOne(fetch = FetchType.LAZY)
     private CommentParent parent;
 
     public Comment()

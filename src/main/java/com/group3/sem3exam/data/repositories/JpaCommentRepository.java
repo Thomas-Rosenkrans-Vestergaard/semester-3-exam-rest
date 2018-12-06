@@ -1,14 +1,11 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.Comment;
-import com.group3.sem3exam.data.entities.CommentParent;
-import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.entities.*;
 import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.NoResultException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -50,24 +47,22 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
     @Override
     public CommentParent getParent(Integer id)
     {
-        try {
-            return getEntityManager()
-                    .createQuery("SELECT cp FROM CommentParent cp WHERE cp.id = :parent", CommentParent.class)
-                    .setParameter("parent", id)
-                    .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+        // The below code should be `return getEntityMananger().find(CommentParent.class, id)`.
+        // The derby query generated from the above code fails, since derby performs a UNION operation
+        //  to retrieve the results.
+
+        Post post = getEntityManager().find(Post.class, id);
+        if (post == null)
+            return getEntityManager().find(Image.class, id);
+
+        return post;
     }
 
 
     @Override
     public boolean parentExists(Integer parent)
     {
-        return getEntityManager()
-                       .createQuery("SELECT count(p) FROM CommentParent p WHERE p.id = :parent")
-                       .setParameter("parent", parent)
-                       .getFirstResult() > 0;
+        return getParent(parent) != null;
     }
 
     @Override
