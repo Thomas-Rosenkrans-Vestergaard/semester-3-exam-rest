@@ -57,22 +57,22 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
     }
 
     @Override
-    public List<Image> getByUser(Integer user)
+    public List<Image> getByUser(User user)
     {
         return getEntityManager()
-                .createQuery("SELECT i FROM Image i WHERE i.user.id = :user", Image.class)
+                .createQuery("SELECT i FROM Image i WHERE i.user = :user", Image.class)
                 .setParameter("user", user)
                 .getResultList();
     }
 
     @Override
-    public List<Image> getByUserPaginated(Integer user, int pageSize, int pageNumber)
+    public List<Image> getByUserPaginated(User user, int pageSize, int pageNumber)
     {
         pageSize = Math.max(pageSize, 0);
         pageNumber = Math.max(pageNumber, 1);
 
         return getEntityManager()
-                .createQuery("SELECT i FROM Image i WHERE i.user.id = :user", Image.class)
+                .createQuery("SELECT i FROM Image i WHERE i.user = :user", Image.class)
                 .setFirstResult((pageNumber - 1) * pageSize)
                 .setMaxResults(pageSize)
                 .setParameter("user", user)
@@ -82,9 +82,9 @@ public class JpaImageRepository extends JpaCrudRepository<Image, Integer> implem
     @Override
     public int countByUser(User user)
     {
-        return getEntityManager()
-                .createQuery("SELECT count(i) FROM Image i WHERE i.user = :user")
+        return (int) (long) getEntityManager()
+                .createQuery("SELECT count(i) FROM Image i WHERE i.user = :user", Long.class)
                 .setParameter("user", user)
-                .getFirstResult();
+                .getSingleResult();
     }
 }

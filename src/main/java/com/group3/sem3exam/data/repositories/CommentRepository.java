@@ -3,11 +3,11 @@ package com.group3.sem3exam.data.repositories;
 import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.CommentParent;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.base.ReadRepository;
+import com.group3.sem3exam.data.repositories.base.CrudRepository;
 
 import java.util.List;
 
-public interface CommentRepository extends ReadRepository<Comment, Integer>
+public interface CommentRepository extends CrudRepository<Comment, Integer>
 {
 
     /**
@@ -62,7 +62,4 @@ public interface CommentRepository extends ReadRepository<Comment, Integer>
      * @return The number of comments on the provided parent.
      */
     int count(CommentParent commentParent);
-
-
-    Object delete(Comment comment);
 }

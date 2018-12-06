@@ -14,16 +14,33 @@ import java.util.List;
 public class JpaChatMessageRepository extends JpaReadRepository<ChatMessage, Integer> implements ChatMessageRepository
 {
 
+    /**
+     * Creates a new {@link JpaChatMessageRepository}.
+     *
+     * @param entityManager The entity manager that operations are performed upon.
+     */
     public JpaChatMessageRepository(EntityManager entityManager)
     {
         super(entityManager, ChatMessage.class);
     }
 
+    /**
+     * Creates a new {@link JpaChatMessageRepository}.
+     *
+     * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
+     *                             performed upon - is created.
+     */
     public JpaChatMessageRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, ChatMessage.class);
     }
 
+    /**
+     * Creates a new {@link JpaChatMessageRepository}.
+     *
+     * @param transaction The transaction from which the entity manager - that operations are performed upon - is
+     *                    created.
+     */
     public JpaChatMessageRepository(JpaTransaction transaction)
     {
         super(transaction, ChatMessage.class);

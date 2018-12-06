@@ -2,9 +2,9 @@ package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.CommentParent;
-import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CommentRepository;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
+import com.group3.sem3exam.logic.authorization.AuthorizationException;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -112,16 +112,18 @@ public class CommentFacade
         }
     }
 
-    public Comment delete(AuthenticationContext auth, Integer comment) throws ResourceNotFoundException
+    public Comment delete(AuthenticationContext auth, Integer comment) throws ResourceNotFoundException, AuthorizationException
     {
-        try(CommentRepository commentRepository = commentRepositoryFactory.get()){
+        try (CommentRepository commentRepository = commentRepositoryFactory.get()) {
             commentRepository.begin();
-            User user = auth.getUser();
             Comment commentToDelete = commentRepository.get(comment);
-            if(commentToDelete == null){
+            if (commentToDelete == null) {
                 throw new ResourceNotFoundException(Comment.class, comment);
             }
-            commentRepository.delete(commentToDelete);
+            if (commentToDelete.getAuthor().getId() != auth.getUserId())
+                throw new AuthorizationException("You do not own that comment.");
+
+            commentRepository.delete(comment);
             commentRepository.commit();
             return commentToDelete;
         }

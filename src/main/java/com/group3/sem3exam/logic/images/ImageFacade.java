@@ -78,12 +78,13 @@ public class ImageFacade<T extends Transaction>
     public List<Image> getByUser(Integer user) throws ResourceNotFoundException
     {
         try (T transaction = transactionFactory.get()) {
-            UserRepository  ur = userRepositoryFactory.apply(transaction);
-            ImageRepository ir = imageRepositoryFactory.apply(transaction);
-            if (!ur.exists(user))
+            UserRepository  ur          = userRepositoryFactory.apply(transaction);
+            ImageRepository ir          = imageRepositoryFactory.apply(transaction);
+            User            fetchedUser = ur.get(user);
+            if (fetchedUser == null)
                 throw new ResourceNotFoundException(User.class, user);
 
-            return ir.getByUser(user);
+            return ir.getByUser(fetchedUser);
         }
     }
 
@@ -123,12 +124,13 @@ public class ImageFacade<T extends Transaction>
         pageNumber = Math.max(pageNumber, 1);
 
         try (T transaction = transactionFactory.get()) {
-            UserRepository  ur = userRepositoryFactory.apply(transaction);
-            ImageRepository ir = imageRepositoryFactory.apply(transaction);
-            if (!ur.exists(user))
+            UserRepository  ur          = userRepositoryFactory.apply(transaction);
+            ImageRepository ir          = imageRepositoryFactory.apply(transaction);
+            User            fetchedUser = ur.get(user);
+            if (fetchedUser == null)
                 throw new ResourceNotFoundException(User.class, user);
 
-            return ir.getByUserPaginated(user, pageSize, pageNumber);
+            return ir.getByUserPaginated(fetchedUser, pageSize, pageNumber);
         }
     }
 

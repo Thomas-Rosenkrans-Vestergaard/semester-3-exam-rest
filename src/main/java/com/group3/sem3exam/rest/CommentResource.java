@@ -8,6 +8,7 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
+import com.group3.sem3exam.logic.authorization.AuthorizationException;
 import com.group3.sem3exam.rest.dto.CommentDTO;
 
 import javax.ws.rs.*;
@@ -72,9 +73,9 @@ public class CommentResource
     public Response createComment(@HeaderParam("Authorization") String auth, @PathParam("post") Integer post, String json)
     throws ResourceNotFoundException, AuthenticationException
     {
-        AuthenticationContext        authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
+        AuthenticationContext           authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
         CommentResource.ReceivedComment receivedComment       = gson.fromJson(json, CommentResource.ReceivedComment.class);
-        Comment                      comment               = commentFacade.create(authenticationContext, receivedComment.contents, post);
+        Comment                         comment               = commentFacade.create(authenticationContext, receivedComment.contents, post);
         return Response.status(CREATED).entity(gson.toJson(CommentDTO.basic(comment))).build();
     }
 
@@ -82,25 +83,18 @@ public class CommentResource
     @DELETE
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
-    @Path("/{id: [0-9]+}")
-    public Response deleteComment (@HeaderParam("Authorization") String auth, @PathParam("id")Integer id) throws AuthenticationException, ResourceNotFoundException
+    @Path("{id: [0-9]+}")
+    public Response deleteComment(@HeaderParam("Authorization") String auth, @PathParam("id") Integer id)
+    throws AuthenticationException, ResourceNotFoundException, AuthorizationException
     {
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
-        Comment comment = commentFacade.delete(authenticationContext, id);
+        Comment               comment               = commentFacade.delete(authenticationContext, id);
         return Response.ok(gson.toJson(CommentDTO.basic(comment))).build();
-        // return Response.status(204).entity(gson.toJson(CommentDTO.basic(comment))).build();
-
     }
-
 
 
     private class ReceivedComment
     {
         public String contents;
     }
-
-
-
-
-
 }

@@ -115,12 +115,4 @@ public class JpaCommentRepository extends JpaCrudRepository<Comment, Integer> im
                 .setParameter("parent", commentParent)
                 .getSingleResult();
     }
-
-    @Override
-    public Integer delete(Comment comment)
-    {
-    return  getEntityManager().createQuery("DELETE FROM Comment c WHERE c.id = :id ")
-            .setParameter("id", comment.getId())
-            .executeUpdate();
-    }
 }
