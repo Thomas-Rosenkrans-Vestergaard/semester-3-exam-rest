@@ -1,6 +1,7 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.data.entities.*;
+import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -67,12 +68,6 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
         return user;
     }
 
-    /**
-     * Returns the user with the provided email.
-     *
-     * @param email The email fo the user to find and return.
-     * @return The user with the provided email, {@code null} when no such user exists.
-     */
     @Override
     public User getByEmail(String email)
     {

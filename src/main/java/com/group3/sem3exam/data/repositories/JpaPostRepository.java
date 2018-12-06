@@ -3,6 +3,7 @@ package com.group3.sem3exam.data.repositories;
 import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;

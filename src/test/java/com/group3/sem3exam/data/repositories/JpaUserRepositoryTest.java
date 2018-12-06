@@ -1,24 +1,20 @@
 package com.group3.sem3exam.data.repositories;
 
 import com.group3.sem3exam.JpaTestConnection;
+import com.group3.sem3exam.TestingUtils;
 import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
+import com.group3.sem3exam.data.entities.ProfilePicture;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.TreeMap;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class JpaUserRepositoryTest
 {
@@ -72,6 +68,35 @@ public class JpaUserRepositoryTest
             assertNull(tur.getByEmail("some@email.com"));
             User user = tur.createUser("email-user", "some@email.com", "pass", city, Gender.FEMALE, LocalDate.now());
             assertEquals(user, tur.getByEmail("some@email.com"));
+        }
+    }
+
+    @Test
+    void updateProfilePicture()
+    {
+        try (JpaUserRepository tur = new JpaUserRepository(JpaTestConnection.create())) {
+            tur.begin();
+            City city = new JpaCityRepository(tur.getEntityManager()).get(1);
+            User user = TestingUtils.randomUser(tur, city);
+            assertNull(user.getProfilePicture());
+            tur.updateProfilePicture(user, "full", "thumbnail");
+            ProfilePicture profilePicture = user.getProfilePicture();
+            assertNotNull(profilePicture);
+            assertEquals("full", profilePicture.getFull());
+            assertEquals(user, profilePicture.getUser());
+            assertEquals("thumbnail", profilePicture.getThumbnail());
+        }
+    }
+
+    @Test
+    void searchUsers()
+    {
+        try (JpaUserRepository tur = new JpaUserRepository(JpaTestConnection.create())) {
+            tur.begin();
+            City city = new JpaCityRepository(tur.getEntityManager()).get(1);
+            User user = TestingUtils.randomUser(tur, city);
+            assertEquals(1, tur.searchUsers(user.getName().substring(0, 1)).size());
+            assertEquals(0, tur.searchUsers(user.getName().substring(1)).size());
         }
     }
 }

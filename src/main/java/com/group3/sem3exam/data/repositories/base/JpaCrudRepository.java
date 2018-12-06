@@ -1,8 +1,5 @@
-package com.group3.sem3exam.data.repositories;
+package com.group3.sem3exam.data.repositories.base;
 
-import com.group3.sem3exam.data.repositories.base.CrudRepository;
-import com.group3.sem3exam.data.repositories.base.JpaReadRepository;
-import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;

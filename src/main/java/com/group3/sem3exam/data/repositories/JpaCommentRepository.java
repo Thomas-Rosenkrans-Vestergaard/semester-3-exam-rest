@@ -3,12 +3,12 @@ package com.group3.sem3exam.data.repositories;
 import com.group3.sem3exam.data.entities.Comment;
 import com.group3.sem3exam.data.entities.CommentParent;
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
-import javax.persistence.Query;
 import java.time.LocalDateTime;
 import java.util.List;
 
