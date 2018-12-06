@@ -1,6 +1,6 @@
 package com.group3.sem3exam.logic.services;
 
-import com.group3.sem3exam.data.services.Service;
+import com.group3.sem3exam.data.services.entities.Service;
 
 public class ServiceTransfer
 {

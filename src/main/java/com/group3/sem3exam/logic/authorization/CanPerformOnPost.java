@@ -1,9 +1,8 @@
 package com.group3.sem3exam.logic.authorization;
 
 import com.group3.sem3exam.data.entities.Post;
-import com.group3.sem3exam.data.services.Permission;
+import com.group3.sem3exam.data.services.entities.Permission;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
-import com.group3.sem3exam.logic.authentication.AuthenticationType;
 
 import static com.group3.sem3exam.logic.authentication.AuthenticationType.SERVICE;
 import static com.group3.sem3exam.logic.authentication.AuthenticationType.SERVICE_REPRESENTING_USER;

@@ -1,12 +1,14 @@
-package com.group3.sem3exam.data.services;
+package com.group3.sem3exam.data.services.entities;
 
 
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
+import com.group3.sem3exam.data.services.SecureRandomGenerator;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 @Entity
@@ -46,6 +48,7 @@ public class AuthRequest implements RepositoryEntity<String>
         this.callback = callback;
         this.status = Status.READY;
         this.template = template;
+        this.createdAt = LocalDateTime.now(); // Must be set because of the chosen @GeneratedValue strategy
     }
 
     @Override
@@ -118,5 +121,20 @@ public class AuthRequest implements RepositoryEntity<String>
     public void setTemplate(PermissionTemplate template)
     {
         this.template = template;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AuthRequest that = (AuthRequest) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(id);
     }
 }

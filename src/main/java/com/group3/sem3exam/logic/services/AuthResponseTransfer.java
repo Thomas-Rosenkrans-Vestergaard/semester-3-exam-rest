@@ -1,10 +1,9 @@
 package com.group3.sem3exam.logic.services;
 
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.services.AuthRequest;
-import com.group3.sem3exam.data.services.Permission;
+import com.group3.sem3exam.data.services.entities.AuthRequest;
+import com.group3.sem3exam.data.services.entities.Permission;
 
-import java.util.List;
 import java.util.Set;
 
 public class AuthResponseTransfer

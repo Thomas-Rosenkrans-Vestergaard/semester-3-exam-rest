@@ -2,12 +2,14 @@ package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.data.services.entities.AuthRequest;
+import com.group3.sem3exam.data.services.entities.PermissionTemplate;
+import com.group3.sem3exam.data.services.entities.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-public class JpaAuthRequestRepository extends JpaCrudRepository<AuthRequest, String>
-        implements AuthRequestRepository
+public class JpaAuthRequestRepository extends JpaCrudRepository<AuthRequest, String> implements AuthRequestRepository
 {
 
     /**

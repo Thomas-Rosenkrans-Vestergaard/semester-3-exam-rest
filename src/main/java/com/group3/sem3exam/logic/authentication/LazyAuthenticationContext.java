@@ -1,8 +1,8 @@
 package com.group3.sem3exam.logic.authentication;
 
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.services.Permission;
-import com.group3.sem3exam.data.services.Service;
+import com.group3.sem3exam.data.services.entities.Permission;
+import com.group3.sem3exam.data.services.entities.Service;
 
 import java.util.Set;
 import java.util.function.Supplier;

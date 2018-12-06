@@ -1,7 +1,8 @@
-package com.group3.sem3exam.data.services;
+package com.group3.sem3exam.data.services.entities;
 
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.RepositoryEntity;
+import com.group3.sem3exam.data.services.SecureRandomGenerator;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -29,7 +30,7 @@ public class PermissionRequest implements RepositoryEntity<String>
     private PermissionTemplate template;
 
     @Column(nullable = false)
-    private Status status;
+    private Status status = Status.PENDING;
 
     @Column
     @CreationTimestamp
@@ -45,7 +46,7 @@ public class PermissionRequest implements RepositoryEntity<String>
         this.user = user;
         this.callback = callback;
         this.template = template;
-        this.status = Status.PENDING;
+        this.createdAt = LocalDateTime.now(); // Must be set because of the chosen @GeneratedValue strategy
     }
 
     public String getId()

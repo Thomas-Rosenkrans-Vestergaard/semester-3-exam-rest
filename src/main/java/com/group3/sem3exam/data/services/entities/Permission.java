@@ -1,4 +1,4 @@
-package com.group3.sem3exam.data.services;
+package com.group3.sem3exam.data.services.entities;
 
 public enum Permission
 {

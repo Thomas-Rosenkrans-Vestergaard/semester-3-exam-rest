@@ -1,8 +1,7 @@
 package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.repositories.base.ReadRepository;
-
-import java.util.List;
+import com.group3.sem3exam.data.services.entities.Service;
 
 public interface ServiceRepository extends ReadRepository<Service, Integer>
 {
@@ -39,14 +38,4 @@ public interface ServiceRepository extends ReadRepository<Service, Integer>
      * @return The updated service entity.
      */
     Service enable(Service service);
-
-    /**
-     * Searches for the provided name in the repository, returning a paginated view of the results.
-     *
-     * @param name       The name to search for in the repository.
-     * @param pageSize   The number of elements in the view to return. Where {@code pageSize >= 0}.
-     * @param pageNumber The number of the page to return, starts at 1. Where {@code pageNumber > 0}.
-     * @return The paginated view of the results of the search.
-     */
-    List<Service> searchPaginated(String name, int pageSize, int pageNumber);
 }

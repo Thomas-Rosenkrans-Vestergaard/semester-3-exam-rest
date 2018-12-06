@@ -3,6 +3,8 @@ package com.group3.sem3exam.data.services;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.data.services.entities.PermissionRequest;
+import com.group3.sem3exam.data.services.entities.PermissionTemplate;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -47,7 +49,10 @@ public class JpaPermissionRequestRepository extends JpaCrudRepository<Permission
     public PermissionRequest updateStatus(PermissionRequest request, PermissionRequest.Status status)
     {
         request.setStatus(status);
-        update(request);
+        getEntityManager().createQuery("UPDATE PermissionRequest pr SET pr.status = :status")
+                          .setParameter("status", status)
+                          .executeUpdate();
+
         return request;
     }
 

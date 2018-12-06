@@ -2,13 +2,13 @@ package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.data.services.entities.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
-import java.util.List;
 
-import static com.group3.sem3exam.data.services.Service.Status.*;
+import static com.group3.sem3exam.data.services.entities.Service.Status.*;
 
 public class JpaServiceRepository extends JpaCrudRepository<Service, Integer> implements ServiceRepository
 {
@@ -78,19 +78,5 @@ public class JpaServiceRepository extends JpaCrudRepository<Service, Integer> im
     {
         service.setStatus(ENABLED);
         return update(service);
-    }
-
-    @Override
-    public List<Service> searchPaginated(String name, int pageSize, int pageNumber)
-    {
-        pageSize = Math.max(pageSize, 0);
-        pageNumber = Math.max(pageNumber, 1);
-
-        return getEntityManager()
-                .createQuery("SELECT s FROM Service s WHERE s.name LIKE :search")
-                .setParameter("search", '%' + name + '%')
-                .setFirstResult(pageSize * (pageNumber - 1))
-                .setMaxResults(pageSize)
-                .getResultList();
     }
 }
