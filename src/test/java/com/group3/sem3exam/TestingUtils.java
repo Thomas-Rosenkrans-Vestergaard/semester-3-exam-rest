@@ -6,6 +6,10 @@ import com.group3.sem3exam.data.entities.Post;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.PostRepository;
 import com.group3.sem3exam.data.repositories.UserRepository;
+import com.group3.sem3exam.data.services.PermissionTemplateRepository;
+import com.group3.sem3exam.data.services.ServiceRepository;
+import com.group3.sem3exam.data.services.entities.PermissionTemplate;
+import com.group3.sem3exam.data.services.entities.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -40,6 +44,28 @@ public class TestingUtils
                 randomString(),
                 new ArrayList<>(),
                 LocalDateTime.now()
+        );
+    }
+
+    private static Set<String> serviceNames = new HashSet<>();
+
+    public static Service randomService(ServiceRepository repository)
+    {
+        return repository.create(
+                randomUnique(TestingUtils::randomString, serviceNames),
+                "pass"
+        );
+    }
+
+    private static Set<String> permissionTemplateNames = new HashSet<>();
+
+    public static PermissionTemplate randomPermissionTemplate(PermissionTemplateRepository repository, Service service)
+    {
+        return repository.create(
+                randomUnique(TestingUtils::randomString, permissionTemplateNames),
+                "message",
+                new ArrayList<>(),
+                service
         );
     }
 

@@ -1,6 +1,9 @@
 package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.repositories.base.ReadRepository;
+import com.group3.sem3exam.data.services.entities.AuthRequest;
+import com.group3.sem3exam.data.services.entities.PermissionTemplate;
+import com.group3.sem3exam.data.services.entities.Service;
 
 public interface AuthRequestRepository extends ReadRepository<AuthRequest, String>
 {

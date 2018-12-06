@@ -1,6 +1,6 @@
 package com.group3.sem3exam.logic.services;
 
-import com.group3.sem3exam.data.services.AuthRequest;
+import com.group3.sem3exam.data.services.entities.AuthRequest;
 
 import java.time.LocalDateTime;
 

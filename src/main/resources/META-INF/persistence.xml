@@ -14,11 +14,11 @@
         <class>com.group3.sem3exam.data.entities.Image</class>
         <class>com.group3.sem3exam.data.entities.ProfilePicture</class>
         <class>com.group3.sem3exam.logic.authentication.jwt.JwtEntity</class>
-        <class>com.group3.sem3exam.data.services.Service</class>
-        <class>com.group3.sem3exam.data.services.AuthRequest</class>
-        <class>com.group3.sem3exam.data.services.PermissionRequest</class>
-        <class>com.group3.sem3exam.data.services.PermissionTemplate</class>
-        <class>com.group3.sem3exam.data.services.PermissionMapping</class>
+        <class>com.group3.sem3exam.data.services.entities.Service</class>
+        <class>com.group3.sem3exam.data.services.entities.AuthRequest</class>
+        <class>com.group3.sem3exam.data.services.entities.PermissionRequest</class>
+        <class>com.group3.sem3exam.data.services.entities.PermissionTemplate</class>
+        <class>com.group3.sem3exam.data.services.entities.PermissionMapping</class>
         <class>com.group3.sem3exam.data.entities.ChatMessage</class>
         <properties>
             <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>

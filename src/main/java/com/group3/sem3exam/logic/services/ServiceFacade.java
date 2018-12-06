@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
 import com.group3.sem3exam.data.repositories.transactions.Transaction;
 import com.group3.sem3exam.data.services.*;
+import com.group3.sem3exam.data.services.entities.*;
 import com.group3.sem3exam.logic.ResourceConflictException;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
 import com.group3.sem3exam.logic.SpecializedGson;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static com.group3.sem3exam.data.services.PermissionRequest.Status.ACCEPTED;
+import static com.group3.sem3exam.data.services.entities.PermissionRequest.Status.ACCEPTED;
 import static com.group3.sem3exam.logic.authentication.LazyAuthenticationContext.service;
 import static com.group3.sem3exam.logic.authentication.LazyAuthenticationContext.serviceUser;
 
@@ -117,6 +118,7 @@ public class ServiceFacade<T extends Transaction>
                 throw new ResourceConflictException(Service.class, "A service account with the provided name exists.");
 
             Service service = serviceRepository.create(name, hash(password));
+            service = serviceRepository.enable(service);
             transaction.commit();
             return service;
         }
@@ -276,7 +278,7 @@ public class ServiceFacade<T extends Transaction>
                 throw new ResourceAccessException(PermissionTemplate.class, template);
 
             AuthRequest authRequest = requestRepository.create(service.getService(), callback, fetchedTemplate);
-            authRequest.getTemplate().getPermissions().size();
+            authRequest.getTemplate().getPermissionMappings().size();
             transaction.commit();
             return authRequest;
         }

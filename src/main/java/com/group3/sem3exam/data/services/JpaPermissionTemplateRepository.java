@@ -2,6 +2,10 @@ package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.data.services.entities.Permission;
+import com.group3.sem3exam.data.services.entities.PermissionMapping;
+import com.group3.sem3exam.data.services.entities.PermissionTemplate;
+import com.group3.sem3exam.data.services.entities.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -36,7 +40,7 @@ public class JpaPermissionTemplateRepository extends JpaCrudRepository<Permissio
         for (Permission permission : permissions)
             mappings.add(new PermissionMapping(template, permission));
 
-        template.setPermissions(mappings);
+        template.setPermissionMappings(mappings);
         getEntityManager().persist(template);
         return template;
     }

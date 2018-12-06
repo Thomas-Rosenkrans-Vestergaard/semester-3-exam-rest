@@ -73,7 +73,7 @@ public class JpaReadRepository<E extends RepositoryEntity<K>, K extends Comparab
     public List<E> get()
     {
         return getEntityManager()
-                .createQuery("SELECT e FROM " +  c.getSimpleName() + " e", c)
+                .createQuery("SELECT e FROM " +  c.getSimpleName() + " e ORDER BY e.id", c)
                 .getResultList();
     }
 
@@ -92,7 +92,7 @@ public class JpaReadRepository<E extends RepositoryEntity<K>, K extends Comparab
         pageNumber = Math.max(pageNumber, 1);
 
         return getEntityManager()
-                .createQuery("SELECT e FROM " + c.getSimpleName() + " e", c)
+                .createQuery("SELECT e FROM " + c.getSimpleName() + " e ORDER BY e.id", c)
                 .setFirstResult((pageNumber - 1) * pageSize)
                 .setMaxResults(pageSize)
                 .getResultList();

@@ -3,6 +3,10 @@ package com.group3.sem3exam.data.services;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.AbstractJpaRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
+import com.group3.sem3exam.data.services.entities.Permission;
+import com.group3.sem3exam.data.services.entities.PermissionRequest;
+import com.group3.sem3exam.data.services.entities.PermissionUpdate;
+import com.group3.sem3exam.data.services.entities.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

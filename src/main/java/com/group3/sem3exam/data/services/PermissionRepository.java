@@ -2,6 +2,8 @@ package com.group3.sem3exam.data.services;
 
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.Repository;
+import com.group3.sem3exam.data.services.entities.Permission;
+import com.group3.sem3exam.data.services.entities.Service;
 
 import java.time.LocalDateTime;
 import java.util.Set;

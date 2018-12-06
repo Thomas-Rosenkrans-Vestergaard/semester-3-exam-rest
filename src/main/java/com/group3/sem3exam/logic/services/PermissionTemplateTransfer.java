@@ -1,7 +1,7 @@
 package com.group3.sem3exam.logic.services;
 
-import com.group3.sem3exam.data.services.Permission;
-import com.group3.sem3exam.data.services.PermissionTemplate;
+import com.group3.sem3exam.data.services.entities.Permission;
+import com.group3.sem3exam.data.services.entities.PermissionTemplate;
 
 import java.util.List;
 
