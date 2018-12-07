@@ -4,105 +4,116 @@ import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.FriendRequest;
 import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.JpaCityRepository;
-import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
-import com.group3.sem3exam.data.repositories.JpaImageRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
-import com.group3.sem3exam.logic.AuthenticationFacade;
-import com.group3.sem3exam.logic.FriendshipFacade;
-import com.group3.sem3exam.logic.ResourceNotFoundException;
-import com.group3.sem3exam.logic.UserFacade;
+import com.group3.sem3exam.logic.*;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
-import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
+import com.group3.sem3exam.logic.authorization.AuthorizationException;
+import com.group3.sem3exam.rest.dto.DTO;
 import com.group3.sem3exam.rest.dto.FriendRequestDTO;
+import com.group3.sem3exam.rest.dto.FriendshipDTO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
-import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.CREATED;
 
 @Path("friendship")
 public class FriendshipResource
 {
-    private static Gson                             gson             = SpecializedGson.create();
-    private static UserFacade<JpaTransaction>       userFacade       = new UserFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaCityRepository(transaction),
-            transaction -> new JpaImageRepository(transaction)
-    );
-    private static FriendshipFacade<JpaTransaction> friendshipFacade = new FriendshipFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaFriendshipRepository(transaction)
-    );
+    private static Gson                             gson                 = SpecializedGson.create();
+    private static FriendshipFacade<JpaTransaction> friendshipFacade     = Facades.friendship;
+    private static AuthenticationFacade             authenticationFacade = Facades.authentication;
 
-    private static AuthenticationFacade authenticationFacade;
+    @POST
+    @Path("requests")
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    public Response friendRequest(@HeaderParam("Authorization") String token, String contents)
+    throws ResourceNotFoundException, AuthenticationException, IllegalOperationException
+    {
+        PostedFriendship      post                  = gson.fromJson(contents, PostedFriendship.class);
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
+        FriendRequest         friendRequest         = friendshipFacade.createRequest(authenticationContext, post.receiver);
+        FriendRequestDTO      friendRequestDTO      = FriendRequestDTO.complete(friendRequest);
 
-    static {
-        try {
-            authenticationFacade = new AuthenticationFacade(
-                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
-                    () -> new JpaUserRepository(JpaConnection.create())
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return Response.status(CREATED).entity(gson.toJson(friendRequestDTO)).build();
     }
 
-    //uses auth
-    @POST
-    @Path("friend-request")
-    @Produces(APPLICATION_JSON)
-    @Consumes(APPLICATION_JSON)
-    public Response friendRequest(@HeaderParam("Authorization") String token, String content) throws ResourceNotFoundException, AuthenticationException
+    private class PostedFriendship
     {
-        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
-
-        if (authenticationContext.getType() == USER) {
-            RecievedClass    recievedClass    = gson.fromJson(content, RecievedClass.class);
-            User             requester        = authenticationContext.getUser();
-            User             reciever         = userFacade.get(recievedClass.id);
-            FriendRequest    friendRequest    = new FriendRequest(requester, reciever);
-            FriendRequestDTO friendRequestDTO = FriendRequestDTO.basicFriendRequest(friendRequest, FriendRequest.FRIENDSHIP_STATUS.PENDING);
-
-            return Response.status(CREATED).entity(friendRequestDTO).build();
-        }
-
-        throw new AuthenticationException("Please login fucktard");
+        public Integer receiver;
     }
 
     @POST
+    @Path("requests/{request: [0-9]+}/accept")
     @Produces(APPLICATION_JSON)
-    @Consumes(APPLICATION_JSON)
-    public Response friendship(@HeaderParam("Authorization") String token, String content) throws AuthenticationException, ResourceNotFoundException
+    public Response accept(@HeaderParam("Authorization") String token, @PathParam("request") Integer request)
+    throws AuthenticationException, AuthorizationException, ResourceNotFoundException, ResourceConflictException
     {
         AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
-
-        if (authenticationContext.getType() == USER) {
-            RecievedClass recievedClass = gson.fromJson(content, RecievedClass.class);
-            Friendship    friendship    = friendshipFacade.createFriendship(recievedClass.id);
-            return Response.ok(CREATED).entity(friendship).build();
-        }
-
-        throw new AuthenticationException("unable to generate friendship, you must be logged in");
+        Friendship            friendship            = friendshipFacade.accept(authenticationContext, request);
+        return Response.status(CREATED).entity(gson.toJson(FriendshipDTO.complete(friendship))).build();
     }
 
-
-    private class RecievedClass
+    @POST
+    @Path("requests/{request: [0-9]+}/reject")
+    @Produces(APPLICATION_JSON)
+    public Response reject(@HeaderParam("Authorization") String token, @PathParam("request") Integer request)
+    throws AuthenticationException, AuthorizationException, ResourceNotFoundException, ResourceConflictException
     {
-        public Integer id;
-        /* alternative if you don't want a class
-        JsonElement json = gson.toJsonTree(content);
-        int id = json.getAsJsonObject().get("reciever").getAsJsonPrimitive().getAsInt();
-        */
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
+        FriendRequest         created               = friendshipFacade.reject(authenticationContext, request);
+        return Response.status(CREATED).entity(gson.toJson(FriendRequestDTO.complete(created))).build();
     }
-/*
-Friendship fs = friendshipshipFacade.createFriendship(friendRequest);
-        return Response.ok(gson.toJson(fs)).build();
- */
+
+    @GET
+    @Path("receiver/{receiver: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getFriendship(@HeaderParam("Authorization") String token, @PathParam("receiver") Integer other)
+    throws AuthenticationException, ResourceNotFoundException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
+        Friendship            friendship            = friendshipFacade.getFriendship(authenticationContext, other);
+        return Response.ok(gson.toJson(FriendshipDTO.complete(friendship))).build();
+    }
+
+    @GET
+    @Path("requests/receiver/{receiver: [0-9]+}")
+    @Produces(APPLICATION_JSON)
+    public Response getRequest(@HeaderParam("Authorization") String token, @PathParam("receiver") Integer other)
+    throws AuthenticationException, ResourceNotFoundException, AuthorizationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
+        FriendRequest         request               = friendshipFacade.getRequest(authenticationContext, other);
+        return Response.ok(gson.toJson(FriendRequestDTO.complete(request))).build();
+    }
+
+    @GET
+    @Path("requests/received")
+    @Produces(APPLICATION_JSON)
+    public Response getReceivedRequests(@HeaderParam("Authorization") String token) throws AuthenticationException, AuthorizationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
+        List<FriendRequest>   requests              = friendshipFacade.getReceivedRequests(authenticationContext);
+        return Response.ok(gson.toJson(DTO.map(requests, FriendRequestDTO::complete))).build();
+    }
+
+    @DELETE
+    @Path("target/{id}")
+    @Produces(APPLICATION_JSON)
+    @Consumes(APPLICATION_JSON)
+    public Response deletePost(@HeaderParam("Authorization") String token, @PathParam("id") Integer friendship) throws AuthenticationException, ResourceNotFoundException, ResourceConflictException, AuthorizationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(token);
+        User                  other                 = authenticationContext.getUser();
+        Friendship            friendship1           = friendshipFacade.getFriendship(authenticationContext, friendship);
+        friendshipFacade.unfriend(authenticationContext, other);
+        return Response.status(404).entity(FriendshipDTO.complete(friendship1)).build();
+
+
+    }
+
 }

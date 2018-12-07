@@ -2,28 +2,28 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.group3.sem3exam.data.entities.Friendship;
 import com.group3.sem3exam.data.entities.Gender;
-import com.group3.sem3exam.data.entities.ProfilePicture;
+import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
-import com.group3.sem3exam.data.repositories.JpaCityRepository;
-import com.group3.sem3exam.data.repositories.JpaFriendshipRepository;
-import com.group3.sem3exam.data.repositories.JpaImageRepository;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 import com.group3.sem3exam.logic.*;
+import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
-import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.logic.images.CropArea;
 import com.group3.sem3exam.logic.images.ImageCropperException;
 import com.group3.sem3exam.logic.images.ImageThumbnailerException;
 import com.group3.sem3exam.logic.images.UnsupportedImageFormatException;
 import com.group3.sem3exam.logic.validation.ResourceValidationException;
+import com.group3.sem3exam.rest.dto.DTO;
+import com.group3.sem3exam.rest.dto.FriendshipDTO;
 import com.group3.sem3exam.rest.dto.ImageDTO;
 import com.group3.sem3exam.rest.dto.UserDTO;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -33,32 +33,10 @@ import static javax.ws.rs.core.Response.Status.CREATED;
 public class UserResource
 {
 
-    private static Gson                       gson       = SpecializedGson.create();
-    private static UserFacade<JpaTransaction> userFacade = new UserFacade<>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaCityRepository(transaction),
-            transaction -> new JpaImageRepository(transaction)
-    );
-
-    private static AuthenticationFacade authenticationFacade;
-
-    static {
-        try {
-            authenticationFacade = new AuthenticationFacade(
-                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
-                    () -> new JpaUserRepository(JpaConnection.create())
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static FriendshipFacade<JpaTransaction> friendshipFacade = new FriendshipFacade<JpaTransaction>(
-            () -> new JpaTransaction(JpaConnection.create()),
-            transaction -> new JpaUserRepository(transaction),
-            transaction -> new JpaFriendshipRepository(transaction)
-    );
+    private static Gson                             gson                 = SpecializedGson.create();
+    private static UserFacade<JpaTransaction>       userFacade           = Facades.user;
+    private static AuthenticationFacade             authenticationFacade = Facades.authentication;
+    private static FriendshipFacade<JpaTransaction> friendshipFacade     = Facades.friendship;
 
     @POST
     @Produces(APPLICATION_JSON)
@@ -76,7 +54,7 @@ public class UserResource
                                                  receivedUser.gender,
                                                  receivedUser.dateOfBirth);
 
-        return Response.status(CREATED).entity(gson.toJson(UserDTO.basic(createdUser))).build();
+        return Response.status(CREATED).entity(gson.toJson(UserDTO.complete(createdUser))).build();
     }
 
     private class ReceivedCreateUser
@@ -95,7 +73,7 @@ public class UserResource
     public Response getUserById(@PathParam("id") int id) throws ResourceNotFoundException
     {
         User   user    = userFacade.get(id);
-        String jsonDTO = gson.toJson(UserDTO.basic(user));
+        String jsonDTO = gson.toJson(UserDTO.complete(user));
         return Response.ok(jsonDTO).build();
     }
 
@@ -121,13 +99,13 @@ public class UserResource
             String json) throws AuthenticationException, ResourceNotFoundException, ImageCropperException, UnsupportedImageFormatException, ImageThumbnailerException
     {
         UpdateProfileImagePost post = gson.fromJson(json, UpdateProfileImagePost.class);
-        ProfilePicture profileImage = userFacade.updateProfileImage(
+        Image profileImage = userFacade.updateProfileImage(
                 authenticationFacade.authenticateBearerHeader(token),
                 user,
                 post.data,
                 post.crop);
 
-        return Response.ok(gson.toJson(ImageDTO.basic(profileImage))).build();
+        return Response.ok(gson.toJson(ImageDTO.complete(profileImage))).build();
     }
 
     private class UpdateProfileImagePost
@@ -142,7 +120,7 @@ public class UserResource
     public Response getFriends(@PathParam("user") Integer userId) throws ResourceNotFoundException
     {
         List<User> friends = friendshipFacade.getFriends(userId);
-        return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
+        return Response.ok(gson.toJson(DTO.map(friends, UserDTO::publicView))).build();
     }
 
     @GET
@@ -156,6 +134,17 @@ public class UserResource
     throws ResourceNotFoundException
     {
         List<User> friends = friendshipFacade.searchFriends(userId, pageSize, pageNumber, search);
-        return Response.ok(gson.toJson(UserDTO.list(friends, UserDTO::hideSensitive))).build();
+        return Response.ok(gson.toJson(DTO.map(friends, UserDTO::publicView))).build();
+    }
+
+    @GET
+    @Path("search")
+    @Produces(APPLICATION_JSON)
+    public Response searchUsers(@QueryParam("name") String input)
+    {
+        if (input == null || input.isEmpty())
+            return Response.ok(gson.toJson(new ArrayList())).build();
+        List<User> users = userFacade.searchUsers(input);
+        return Response.ok(gson.toJson(DTO.map(users, UserDTO::publicView))).build();
     }
 }

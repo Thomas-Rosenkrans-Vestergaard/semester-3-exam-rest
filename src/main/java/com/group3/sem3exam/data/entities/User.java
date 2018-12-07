@@ -6,13 +6,10 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.CascadeType.MERGE;
-import static javax.persistence.FetchType.LAZY;
+import static javax.persistence.FetchType.EAGER;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -47,16 +44,8 @@ public class User implements RepositoryEntity<Integer>
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(fetch = LAZY, cascade = MERGE, mappedBy = "author", orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
-
-    @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "pk.owner")
-    private List<Friendship> friendships = new ArrayList<>();
-
-    @OneToMany(fetch = LAZY, cascade = ALL, mappedBy = "user")
-    private List<GalleryImage> images = new ArrayList<>();
-
-    @OneToOne(fetch = LAZY, cascade = ALL, mappedBy = "user")
+    @OneToOne(fetch = EAGER, cascade = ALL, mappedBy = "user")
+    @JoinColumn(name = "profile_picture")
     private ProfilePicture profilePicture;
 
     public User(String name, String email, String passwordHash, City city, Gender gender, LocalDate dateOfBirth)
@@ -124,40 +113,6 @@ public class User implements RepositoryEntity<Integer>
         this.createdAt = createdAt;
     }
 
-    public List<Post> getPosts()
-    {
-        return this.posts;
-    }
-
-    public void setPosts(List<Post> posts)
-    {
-        this.posts = posts;
-        for (Post post : posts)
-            post.setAuthor(this);
-    }
-
-    public void addPost(Post post)
-    {
-        this.posts.add(post);
-        post.setAuthor(this);
-    }
-
-    public List<Friendship> getFriendships()
-    {
-        return this.friendships;
-    }
-
-    public void setFriendships(List<Friendship> friendships)
-    {
-        this.friendships = friendships;
-    }
-
-    public void addFriendship(Friendship friendship)
-    {
-        this.friendships.add(friendship);
-        friendship.setOwner(this);
-    }
-
     public City getCity()
     {
         return city;
@@ -188,29 +143,15 @@ public class User implements RepositoryEntity<Integer>
         this.dateOfBirth = dateOfBirth;
     }
 
-    public List<GalleryImage> getImages()
-    {
-        return this.images;
-    }
-
-    public void setImages(List<GalleryImage> images)
-    {
-        this.images = images;
-    }
-
-    public void addImage(GalleryImage image)
-    {
-        this.images.add(image);
-    }
-
     public ProfilePicture getProfilePicture()
     {
         return this.profilePicture;
     }
 
-    public void setProfilePicture(ProfilePicture profilePicture)
+    public User setProfilePicture(ProfilePicture profilePicture)
     {
         this.profilePicture = profilePicture;
+        return this;
     }
 
     @Override

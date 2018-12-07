@@ -17,30 +17,59 @@ public class Comment implements RepositoryEntity<Integer>
     @GeneratedValue(strategy = IDENTITY)
     private Integer id;
 
-    @Column(length = 65535, columnDefinition = "TEXT")
+    @Column(nullable = false, length = 1024)
     private String contents;
 
     @ManyToOne
     private User author;
 
-    @ManyToOne
-    private Post post;
+    @Column
+    private String emoji;
+
+    @Column
+    private int count;
 
     @Column
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    // Must be fetch type LAZY.
+    // The derby query generated from the above code fails, since derby performs a UNION operation
+    //  to retrieve the results.
+    @ManyToOne(fetch = FetchType.LAZY)
+    private CommentParent parent;
 
     public Comment()
     {
 
     }
 
-    public Comment(String contents, User author, Post post, LocalDateTime createdAt)
+    public String getEmoji()
+    {
+        return emoji;
+    }
+
+    public void setEmoji(String emoji)
+    {
+        this.emoji = emoji;
+    }
+
+    public int getCount()
+    {
+        return count;
+    }
+
+    public void setCount(int count)
+    {
+        this.count = count;
+    }
+
+    public Comment(String contents, User author, LocalDateTime createdAt, CommentParent parent)
     {
         this.contents = contents;
         this.author = author;
-        this.post = post;
         this.createdAt = createdAt;
+        this.parent = parent;
     }
 
     public Integer getId()
@@ -73,16 +102,6 @@ public class Comment implements RepositoryEntity<Integer>
         this.author = author;
     }
 
-    public Post getPost()
-    {
-        return this.post;
-    }
-
-    public void setPost(Post post)
-    {
-        this.post = post;
-    }
-
     public LocalDateTime getCreatedAt()
     {
         return this.createdAt;
@@ -91,5 +110,16 @@ public class Comment implements RepositoryEntity<Integer>
     public void setCreatedAt(LocalDateTime createdAt)
     {
         this.createdAt = createdAt;
+    }
+
+    public CommentParent getParent()
+    {
+        return this.parent;
+    }
+
+    public Comment setParent(CommentParent parent)
+    {
+        this.parent = parent;
+        return this;
     }
 }

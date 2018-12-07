@@ -1,7 +1,6 @@
 package com.group3.sem3exam.rest.dto;
 
-import com.group3.sem3exam.data.entities.GalleryImage;
-import com.group3.sem3exam.data.entities.ProfilePicture;
+import com.group3.sem3exam.data.entities.Image;
 
 import javax.ejb.Stateless;
 import java.util.ArrayList;
@@ -19,42 +18,61 @@ public class ImageDTO
     public String  thumbnail;
     public UserDTO user;
 
-    // Used by profile picture
-    public String  src;
-
-    public ImageDTO(GalleryImage image, boolean withUser)
+    public ImageDTO(Integer id, String description, String full, String thumbnail, UserDTO user)
     {
-        this.id = image.getId();
-        this.description = image.getDescription();
-        this.full = image.getFull();
-        this.thumbnail = image.getThumbnail();
-        if (withUser)
-            this.user = UserDTO.basic(image.getUser());
+        this.id = id;
+        this.description = description;
+        this.full = full;
+        this.thumbnail = thumbnail;
+        this.user = user;
     }
 
-    public ImageDTO(ProfilePicture profilePicture, boolean withUser)
+    public static ImageDTO complete(Image image)
     {
-        if (profilePicture != null) {
-            this.src = profilePicture.getSrc();
-            if (withUser)
-                this.user = UserDTO.basic(profilePicture.getUser());
-        }
+        if (image == null)
+            return null;
+
+        return new ImageDTO(
+                image.getId(),
+                image.getDescription(),
+                image.getFull(),
+                image.getThumbnail(),
+                UserDTO.publicView(image.getUser())
+        );
     }
 
-    public static ImageDTO basic(GalleryImage image)
+    public static ImageDTO withoutUser(Image image)
     {
-        return new ImageDTO(image, false);
+        if (image == null)
+            return null;
+
+        return new ImageDTO(
+                image.getId(),
+                image.getDescription(),
+                image.getFull(),
+                image.getThumbnail(),
+                null
+        );
     }
 
-    public static ImageDTO basic(ProfilePicture profilePicture)
+    public static ImageDTO thumbnail(Image image)
     {
-        return new ImageDTO(profilePicture, false);
+        if (image == null)
+            return null;
+
+        return new ImageDTO(
+                image.getId(),
+                image.getDescription(),
+                null,
+                image.getThumbnail(),
+                UserDTO.publicView(image.getUser())
+        );
     }
 
-    public static List<ImageDTO> list(List<GalleryImage> images, Function<GalleryImage, ImageDTO> f)
+    public static List<ImageDTO> list(List<Image> images, Function<Image, ImageDTO> f)
     {
         List<ImageDTO> results = new ArrayList<>();
-        for (GalleryImage image : images)
+        for (Image image : images)
             results.add(f.apply(image));
 
         return results;

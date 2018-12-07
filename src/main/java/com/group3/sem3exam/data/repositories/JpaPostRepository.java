@@ -1,6 +1,9 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.*;
+import com.group3.sem3exam.data.entities.Image;
+import com.group3.sem3exam.data.entities.Post;
+import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
@@ -13,65 +16,63 @@ import java.util.List;
 public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implements PostRepository
 {
 
+    /**
+     * Creates a new {@link JpaPostRepository}.
+     *
+     * @param entityManager The entity manager that operations are performed upon.
+     */
     public JpaPostRepository(EntityManager entityManager)
     {
         super(entityManager, Post.class);
     }
 
-
+    /**
+     * Creates a new {@link JpaPostRepository}.
+     *
+     * @param entityManagerFactory The entity manager factory from which the entity manager - that operations are
+     *                             performed upon - is created.
+     */
     public JpaPostRepository(EntityManagerFactory entityManagerFactory)
     {
         super(entityManagerFactory, Post.class);
     }
 
+    /**
+     * Creates a new {@link JpaCityRepository}.
+     *
+     * @param transaction The transaction from which the entity manager - that operations are performed upon - is
+     *                    created.
+     */
     public JpaPostRepository(JpaTransaction transaction)
     {
         super(transaction, Post.class);
     }
 
     @Override
-    public TextPost createTextPost(User user, String title, String body, LocalDateTime createdAt)
+    public Post create(User user, String body, List<Image> images, LocalDateTime time)
     {
-        TextPost post = new TextPost(body, title, user, createdAt);
+        Post post = new Post(body, images, user, time);
         getEntityManager().persist(post);
         return post;
     }
 
     @Override
-    public ImagePost createImagePost(User user, String title, String body, LocalDateTime time, List<ImagePostImage> images)
+    public List<Post> getByAuthor(User author)
     {
-        ImagePost post = new ImagePost(title, body, user, time, images);
-        getEntityManager().persist(post);
-        return post;
-    }
-
-    /*
-        @Override
-        public Post createPost(User user, String title, String body, LocalDateTime createdAt)
-        {
-            Post post = new Post(body, title, user, createdAt);
-            getEntityManager().persist(post);
-            return post;
-        }
-        */
-
-    @Override
-    public List<Post> getByUser(User author)
-    {
-        return getEntityManager().createQuery("SELECT Post FROM Post p where p.author = :author", Post.class)
+        return getEntityManager().createQuery("SELECT p FROM Post p where p.author = :author", Post.class)
                                  .setParameter("author", author)
                                  .getResultList();
     }
 
     @Override
-    public List<Post> getTimelinePosts(Integer userId, Integer pageSize, Integer cutoff)
+    public List<Post> getTimeline(User user, Integer pageSize, Integer cutoff)
     {
         try {
             EntityManager em = getEntityManager();
             Query query = em.createQuery("SELECT p FROM Post p WHERE p.id < :cutoff AND p.author IN " +
-                                         "(SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner.id = :userId) " +
+                                         "(SELECT f.pk.friend FROM Friendship f WHERE f.pk.owner = :user) " +
                                          "ORDER BY p.id DESC", Post.class);
-            query.setParameter("userId", userId);
+            query.setParameter("user", user);
             query.setParameter("cutoff", cutoff == null ? Integer.MAX_VALUE : cutoff);
             query.setMaxResults(pageSize);
             List<Post> posts = query.getResultList();
@@ -82,7 +83,7 @@ public class JpaPostRepository extends JpaCrudRepository<Post, Integer> implemen
     }
 
     @Override
-    public List<Post> getRollingPosts(User user, Integer pageSize, Integer last)
+    public List<Post> getByAuthorRolling(User user, Integer pageSize, Integer last)
     {
         try {
             EntityManager em = getEntityManager();

@@ -2,7 +2,7 @@ package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.entities.City;
 import com.group3.sem3exam.data.entities.Gender;
-import com.group3.sem3exam.data.entities.ProfilePicture;
+import com.group3.sem3exam.data.entities.Image;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.CityRepository;
 import com.group3.sem3exam.data.repositories.ImageRepository;
@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.Temporal;
 import java.util.Base64;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -207,7 +208,7 @@ public class UserFacade<T extends Transaction>
      * @param crop                  The crop details of the profile picture.
      * @return The new image entity.
      */
-    public ProfilePicture updateProfileImage(AuthenticationContext authenticationContext, Integer userId, String base64data, CropArea crop)
+    public Image updateProfileImage(AuthenticationContext authenticationContext, Integer userId, String base64data, CropArea crop)
     throws ResourceNotFoundException,
            ImageCropperException,
            UnsupportedImageFormatException,
@@ -222,25 +223,47 @@ public class UserFacade<T extends Transaction>
             if (user == null)
                 throw new ResourceNotFoundException(User.class, userId);
 
-            ur.updateProfilePicture(user, createProfilePicture(base64data, crop));
+            byte[]           data    = Base64.getDecoder().decode(base64data);
+            ProfileImagePair images  = createProfilePicture(data, crop);
+            DataUriEncoder   encoder = new DataUriEncoder();
+            ImageType        type    = ImageType.fromData(data);
+            ur.updateProfilePicture(user, encoder.encode(images.full, type), encoder.encode(images.thumbnail, type));
             ur.commit();
-            return user.getProfilePicture();
+            return user.getProfilePicture() == null ? null : user.getProfilePicture().getImage();
         }
     }
 
+    private class ProfileImagePair
+    {
+        public final BufferedImage full;
+        public final BufferedImage thumbnail;
 
-    private String createProfilePicture(String base64, CropArea crop) throws ImageCropperException, UnsupportedImageFormatException, ImageThumbnailerException
+        public ProfileImagePair(BufferedImage full, BufferedImage thumbnail)
+        {
+            this.full = full;
+            this.thumbnail = thumbnail;
+        }
+    }
+
+    private ProfileImagePair createProfilePicture(byte[] data, CropArea crop) throws ImageCropperException, UnsupportedImageFormatException, ImageThumbnailerException
     {
         try {
-            byte[]           data                = Base64.getDecoder().decode(base64);
-            DataUriEncoder   encoder             = new DataUriEncoder();
-            ImageCropper     cropper             = new ImageCropper(crop);
-            BufferedImage    bufferedImage       = ImageIO.read(new ByteArrayInputStream(data));
-            BufferedImage    largeProfilePicture = cropper.crop(bufferedImage);
-            ImageThumbnailer imageThumbnailer    = new ImageThumbnailer(250, 250);
-            return encoder.encode(imageThumbnailer.create(largeProfilePicture), ImageType.fromData(data));
+            ImageCropper  cropper        = new ImageCropper(crop);
+            BufferedImage bufferedImage  = ImageIO.read(new ByteArrayInputStream(data));
+            BufferedImage profilePicture = cropper.crop(bufferedImage);
+            profilePicture = new ImageThumbnailer(250, 250).create(profilePicture);
+            BufferedImage thumbnail = new ImageThumbnailer(50, 50).create(profilePicture);
+            return new ProfileImagePair(profilePicture, thumbnail);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public List<User> searchUsers(String input)
+    {
+        try (UserRepository userRepo = userRepositoryFactory.apply(transactionFactory.get())) {
+            List<User> userList = userRepo.searchUsers(input);
+            return userList;
         }
     }
 }

@@ -1,10 +1,9 @@
 package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
-import com.group3.sem3exam.data.repositories.JpaUserRepository;
 import com.group3.sem3exam.logic.AuthenticationFacade;
+import com.group3.sem3exam.logic.SpecializedGson;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
-import com.group3.sem3exam.logic.authentication.jwt.JpaJwtSecret;
 import com.group3.sem3exam.rest.dto.AuthenticationDTO;
 
 import javax.ws.rs.Consumes;
@@ -19,18 +18,7 @@ public class AuthenticationResource
 {
 
     private static Gson                 gson = SpecializedGson.create();
-    private static AuthenticationFacade authenticationFacade;
-
-    static {
-        try {
-            authenticationFacade = new AuthenticationFacade(
-                    new JpaJwtSecret(JpaConnection.create().createEntityManager(), 512 / 8),
-                    () -> new JpaUserRepository(JpaConnection.create())
-            );
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static AuthenticationFacade authenticationFacade = Facades.authentication;
 
     @POST
     @Path("user")

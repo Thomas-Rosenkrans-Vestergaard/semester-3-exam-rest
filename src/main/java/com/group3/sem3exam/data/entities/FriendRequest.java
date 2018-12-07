@@ -27,8 +27,8 @@ public class FriendRequest implements RepositoryEntity<Integer>
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column
-    private FRIENDSHIP_STATUS status;
+    @Column(nullable = false)
+    private Status status;
 
     public FriendRequest()
     {
@@ -39,7 +39,7 @@ public class FriendRequest implements RepositoryEntity<Integer>
     {
         this.requester = requester;
         this.receiver = receiver;
-        this.status = FRIENDSHIP_STATUS.PENDING;
+        this.status = Status.PENDING;
     }
 
     public Integer getId()
@@ -82,12 +82,25 @@ public class FriendRequest implements RepositoryEntity<Integer>
         this.createdAt = createdAt;
     }
 
-    public void setFriendship(FRIENDSHIP_STATUS status)
+    public void setFriendship(Status status)
     {
         this.status = status;
     }
 
-    public enum FRIENDSHIP_STATUS {
-        PENDING, ACCEPTED, REJECTED
+    public Status getStatus()
+    {
+        return this.status;
+    }
+
+    public void setStatus(Status status)
+    {
+        this.status = status;
+    }
+
+    public enum Status
+    {
+        PENDING,
+        ACCEPTED,
+        REJECTED
     }
 }

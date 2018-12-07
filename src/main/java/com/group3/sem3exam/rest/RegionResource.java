@@ -2,9 +2,9 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.Region;
-import com.group3.sem3exam.data.repositories.JpaRegionRepository;
 import com.group3.sem3exam.logic.RegionFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.SpecializedGson;
 import com.group3.sem3exam.rest.dto.RegionDTO;
 
 import javax.ws.rs.GET;
@@ -23,7 +23,7 @@ public class RegionResource
 {
 
     private static Gson         gson         = SpecializedGson.create();
-    private static RegionFacade regionFacade = new RegionFacade(() -> new JpaRegionRepository(JpaConnection.create()));
+    private static RegionFacade regionFacade = Facades.region;
 
     @GET
     @Path("{id: [0-9]+}")

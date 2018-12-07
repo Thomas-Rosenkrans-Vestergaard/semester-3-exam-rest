@@ -14,7 +14,8 @@ public interface ReadRepository<E extends RepositoryEntity<K>, K extends Compara
 {
 
     /**
-     * Returns all the entities in the repository.
+     * Returns all the entities in the repository. The results are returned in ascending order
+     * of the entity keys.
      *
      * @return All the entities in the repository.
      */
@@ -22,7 +23,8 @@ public interface ReadRepository<E extends RepositoryEntity<K>, K extends Compara
 
     /**
      * Returns a *page* of entities in the repository. The entities retrieved, in a zero-based manor, are defined
-     * from <code> (pageNumber - 1) * pageSize</code> to <code>(pageSize) * perPage</code>.
+     * from <code> (pageNumber - 1) * pageSize</code> to <code>(pageSize) * perPage</code>. The results are returned
+     * in ascending order of the entity keys.
      *
      * @param pageSize   The number of entities per page.
      * @param pageNumber The page number to getCities. Starts at 1.

@@ -26,6 +26,19 @@ public class DataUriEncoder
         return String.format("data:%s;base64,%s", type.getMime(), Base64.getEncoder().encodeToString(data));
     }
 
+
+    /**
+     * Converts a image byte array to a data uri.
+     *
+     * @param data The data to convert to a data uri.
+     * @return The generated data uri.
+     * @throws UnsupportedImageFormatException When the provided data is not of the provided type.
+     */
+    public String encode(byte[] data) throws UnsupportedImageFormatException
+    {
+        return encode(data, ImageType.fromData(data));
+    }
+
     /**
      * Converts a provided buffered image to a data uri.
      *

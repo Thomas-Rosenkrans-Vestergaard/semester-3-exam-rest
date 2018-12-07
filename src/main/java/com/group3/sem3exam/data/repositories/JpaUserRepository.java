@@ -1,15 +1,15 @@
 package com.group3.sem3exam.data.repositories;
 
-import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.entities.Gender;
-import com.group3.sem3exam.data.entities.ProfilePicture;
-import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.entities.*;
+import com.group3.sem3exam.data.repositories.base.JpaCrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
+import javax.persistence.Query;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * An implementation of the {@code UserRepository} interface, backed by a JPA data source.
@@ -68,12 +68,6 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
         return user;
     }
 
-    /**
-     * Returns the user with the provided email.
-     *
-     * @param email The email fo the user to find and return.
-     * @return The user with the provided email, {@code null} when no such user exists.
-     */
     @Override
     public User getByEmail(String email)
     {
@@ -87,18 +81,32 @@ public class JpaUserRepository extends JpaCrudRepository<User, Integer> implemen
         }
     }
 
+
     @Override
-    public User updateProfilePicture(User user, String src)
+    public User updateProfilePicture(User user, String full, String thumbnail)
     {
         ProfilePicture existing = user.getProfilePicture();
-        if (existing != null)
-            existing.setSrc(src);
-        else {
-            ProfilePicture profilePicture = new ProfilePicture(src, user);
+        if (existing != null) {
+            existing.setFull(full);
+            existing.setThumbnail(thumbnail);
+        } else {
+            Image          image          = new Image("Profile picture.", full, thumbnail, user);
+            ProfilePicture profilePicture = new ProfilePicture(user, image);
+            getEntityManager().persist(image);
             getEntityManager().persist(profilePicture);
             user.setProfilePicture(profilePicture);
         }
 
         return user;
+    }
+
+    @Override
+    public List<User> searchUsers(String input)
+    {
+        EntityManager em    = getEntityManager();
+        Query         query = em.createQuery("SELECT u FROM User u WHERE u.name LIKE :input", User.class);
+        query.setMaxResults(5);
+        query.setParameter("input", input + "%");
+        return query.getResultList();
     }
 }

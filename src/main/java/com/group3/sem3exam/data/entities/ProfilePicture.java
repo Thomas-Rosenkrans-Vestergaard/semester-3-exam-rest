@@ -2,33 +2,60 @@ package com.group3.sem3exam.data.entities;
 
 import javax.persistence.*;
 
-import static javax.persistence.FetchType.LAZY;
-import static javax.persistence.GenerationType.IDENTITY;
-
 @Entity
-@Table(name = "profile_image")
+@Table(name = "profile_picture")
 public class ProfilePicture
 {
+
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Lob
-    @Column(nullable = false)
-    private String src;
-
-    @OneToOne(optional = false, fetch = LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     private User user;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    private Image image;
 
     public ProfilePicture()
     {
 
     }
 
-    public ProfilePicture(String src, User user)
+    public ProfilePicture(User user, Image image)
     {
-        this.src = src;
         this.user = user;
+        this.image = image;
+    }
+
+    public String getDescription()
+    {
+        return image.getDescription();
+    }
+
+    public void setDescription(String description)
+    {
+        image.setDescription(description);
+    }
+
+    public String getFull()
+    {
+        return image.getFull();
+    }
+
+    public void setFull(String full)
+    {
+        image.setFull(full);
+    }
+
+    public String getThumbnail()
+    {
+        return image.getThumbnail();
+    }
+
+    public void setThumbnail(String thumbnail)
+    {
+        image.setThumbnail(thumbnail);
     }
 
     public Integer getId()
@@ -41,16 +68,6 @@ public class ProfilePicture
         this.id = id;
     }
 
-    public String getSrc()
-    {
-        return this.src;
-    }
-
-    public void setSrc(String src)
-    {
-        this.src = src;
-    }
-
     public User getUser()
     {
         return this.user;
@@ -59,5 +76,15 @@ public class ProfilePicture
     public void setUser(User user)
     {
         this.user = user;
+    }
+
+    public Image getImage()
+    {
+        return this.image;
+    }
+
+    public void setImage(Image image)
+    {
+        this.image = image;
     }
 }

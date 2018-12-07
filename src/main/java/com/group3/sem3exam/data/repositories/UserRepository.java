@@ -7,6 +7,7 @@ import com.group3.sem3exam.data.repositories.base.CrudRepository;
 import com.group3.sem3exam.data.repositories.transactions.TransactionalRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Represents a data source of users. Defines read and write operations on the data source.
@@ -35,12 +36,7 @@ public interface UserRepository extends CrudRepository<User, Integer>, Transacti
      */
     User getByEmail(String email);
 
-    /**
-     * Updates the profile picture of the provided user to the provided profile picture.
-     *
-     * @param user The user to update the profile picture of.
-     * @param src  The src of the new profile picture.
-     * @return The updated user entity.
-     */
-    User updateProfilePicture(User user, String src);
+    List<User> searchUsers(String input);
+
+    User updateProfilePicture(User user, String full, String thumbnail);
 }

@@ -3,9 +3,9 @@ package com.group3.sem3exam.rest;
 
 import com.google.gson.Gson;
 import com.group3.sem3exam.data.entities.City;
-import com.group3.sem3exam.data.repositories.JpaCityRepository;
 import com.group3.sem3exam.logic.CityFacade;
 import com.group3.sem3exam.logic.ResourceNotFoundException;
+import com.group3.sem3exam.logic.SpecializedGson;
 import com.group3.sem3exam.rest.dto.CityDTO;
 
 import javax.ws.rs.GET;
@@ -22,8 +22,8 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 public class CityResource
 {
 
-    private static Gson       gson       = SpecializedGson.create();
-    private static CityFacade cityFacade = new CityFacade(() -> new JpaCityRepository(JpaConnection.create()));
+    private static Gson gson = SpecializedGson.create();
+    private static CityFacade cityFacade = Facades.city;
 
 
     @GET

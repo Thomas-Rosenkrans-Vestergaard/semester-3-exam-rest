@@ -1,11 +1,13 @@
 package com.group3.sem3exam.logic.authentication;
 
 import com.group3.sem3exam.data.entities.User;
+import com.group3.sem3exam.data.services.entities.Permission;
+import com.group3.sem3exam.data.services.entities.Service;
 
-import java.util.Objects;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.group3.sem3exam.logic.authentication.AuthenticationType.THIRD_PARTY_REPRESENTING_USER;
-import static com.group3.sem3exam.logic.authentication.AuthenticationType.USER;
+import static com.group3.sem3exam.logic.authentication.AuthenticationType.*;
 
 public class EagerAuthenticationContext implements AuthenticationContext
 {
@@ -17,38 +19,71 @@ public class EagerAuthenticationContext implements AuthenticationContext
 
     /**
      * The authenticated user, must not be null when the {@code type} of the {@link AuthenticationContext} is
-     * {@link AuthenticationType#USER} or {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * {@code USER} or {@code SERVICE_REPRESENTING_USER}.
      */
     private User user;
 
     /**
+     * The authenticated service, must not be null when the {@code type} of the {@link AuthenticationContext} is
+     * {@code SERVICE} or {@code SERVICE_REPRESENTING_USER}.
+     */
+    private Service service;
+
+    /**
+     * The permissions granted by a user to a service. Only non-null when the type of the authentication
+     * context is {@code SERVICE_REPRESENTING_USER}.
+     */
+    private Set<Permission> permissions;
+
+    /**
      * Creates a new {@link AuthenticationContext}.
      *
-     * @param type The type of the authenticated entity.
-     * @param user The authenticated user, must not be null when the {@code type} of the {@link AuthenticationContext} is
-     *             * {@link AuthenticationType#USER} or {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * @param type        The type of the authenticated entity.
+     * @param user        The authenticated user, must not be null when the {@code type} of the {@link AuthenticationContext} is
+     *                    {@code USER} or {@code SERVICE_REPRESENTING_USER}.
+     * @param service     The authenticated service, must not be null when the {@code type} of the {@link AuthenticationContext} is
+     *                    {@code SERVICE} or {@code SERVICE_REPRESENTING_USER}.
+     * @param permissions The permissions granted by a user to a service. Only non-null when the type of the authentication
+     *                    context is {@code SERVICE_REPRESENTING_USER}.
      */
-    private EagerAuthenticationContext(AuthenticationType type, User user)
+    private EagerAuthenticationContext(AuthenticationType type, User user, Service service, Set<Permission> permissions)
     {
         if (type == null)
             throw new IllegalArgumentException("AuthenticationType must not be null.");
 
-        if ((type == USER || type == THIRD_PARTY_REPRESENTING_USER) && user == null)
+        if ((type == USER || type == SERVICE_REPRESENTING_USER) && user == null)
             throw new IllegalArgumentException("User must not be null.");
+        if ((type == SERVICE || type == SERVICE_REPRESENTING_USER) && service == null)
+            throw new IllegalArgumentException("Service must not be null.");
+        if (type == SERVICE_REPRESENTING_USER && permissions == null)
+            throw new IllegalArgumentException("Permissions must not be null.");
 
         this.type = type;
         this.user = user;
+        this.service = service;
+        this.permissions = permissions;
     }
 
     /**
-     * Creates a new authentication context of the type {@link AuthenticationType#USER} using the provided user.
+     * Creates a new authentication context of the type {@code USER} using the provided user.
      *
      * @param user The authenticated user.
      * @return The newly created authentication context.
      */
     public static EagerAuthenticationContext user(User user)
     {
-        return new EagerAuthenticationContext(USER, user);
+        return new EagerAuthenticationContext(USER, user, null, new HashSet<>());
+    }
+
+    /**
+     * Creates a new authentication context of the type {@code SERVICE} using the provided service.
+     *
+     * @param service The authenticated service.
+     * @return The newly created authentication context.
+     */
+    public static EagerAuthenticationContext service(Service service)
+    {
+        return new EagerAuthenticationContext(SERVICE, null, service, new HashSet<>());
     }
 
     /**
@@ -63,24 +98,27 @@ public class EagerAuthenticationContext implements AuthenticationContext
 
     /**
      * Returns the id of the authenticated user, or the id of the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * {@code SERVICE_REPRESENTING_USER}.
      *
      * @return The id of the authenticated user, or the id of the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}. In all other cases this method returns
+     * {@code SERVICE_REPRESENTING_USER}. In all other cases this method returns
      * {@code null} to indicate that this authentication context does not contain user information.
      */
     @Override
     public Integer getUserId()
     {
+        if (user == null)
+            return null;
+
         return user.getId();
     }
 
     /**
      * Returns the authenticated user, or the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}.
+     * {@code SERVICE_REPRESENTING_USER}.
      *
      * @return The authenticated user, or the represented user when {@code type} is
-     * {@link AuthenticationType#THIRD_PARTY_REPRESENTING_USER}. In all other cases this method returns
+     * {@code SERVICE_REPRESENTING_USER}. In all other cases this method returns
      * {@code null} to indicate that this authentication context does not contain user information.
      */
     @Override
@@ -90,18 +128,23 @@ public class EagerAuthenticationContext implements AuthenticationContext
     }
 
     @Override
-    public boolean equals(Object o)
+    public Integer getServiceId()
     {
-        if (this == o) return true;
-        if (!(o instanceof AuthenticationContext)) return false;
-        AuthenticationContext that = (AuthenticationContext) o;
-        return getType() == that.getType() &&
-               Objects.equals(getUser(), that.getUser());
+        if (service == null)
+            return null;
+
+        return service.getId();
     }
 
     @Override
-    public int hashCode()
+    public Service getService()
     {
-        return Objects.hash(getType(), getUser());
+        return service;
+    }
+
+    @Override
+    public Set<Permission> getServicePermissions()
+    {
+        return permissions;
     }
 }

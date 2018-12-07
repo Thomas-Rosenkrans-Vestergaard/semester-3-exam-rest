@@ -1,10 +1,12 @@
 package com.group3.sem3exam.logic;
 
 import com.group3.sem3exam.data.repositories.UserRepository;
+import com.group3.sem3exam.data.services.ServiceRepository;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authentication.TokenAuthenticator;
 import com.group3.sem3exam.logic.authentication.UserAuthenticator;
+import com.group3.sem3exam.logic.authentication.jwt.JwtGenerationException;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenGenerator;
 
@@ -24,15 +26,25 @@ public class AuthenticationFacade
     private final Supplier<UserRepository> userRepositoryFactory;
 
     /**
+     * The factory that produces service repositories used by this facade.
+     */
+    private final Supplier<ServiceRepository> serviceRepositoryFactory;
+
+    /**
      * Creates a new {@link AuthenticationFacade}.
      *
-     * @param jwtSecret             The jwt secret used to generate jwt tokens.
-     * @param userRepositoryFactory The factory that produces user repositories used by this facade.
+     * @param jwtSecret                The jwt secret used to generate jwt tokens.
+     * @param userRepositoryFactory    The factory that produces user repositories used by this facade.
+     * @param serviceRepositoryFactory The factory that produces service repositories used by this facade.
      */
-    public AuthenticationFacade(JwtSecret jwtSecret, Supplier<UserRepository> userRepositoryFactory)
+    public AuthenticationFacade(
+            JwtSecret jwtSecret,
+            Supplier<UserRepository> userRepositoryFactory,
+            Supplier<ServiceRepository> serviceRepositoryFactory)
     {
         this.jwtSecret = jwtSecret;
         this.userRepositoryFactory = userRepositoryFactory;
+        this.serviceRepositoryFactory = serviceRepositoryFactory;
     }
 
     /**
@@ -40,9 +52,9 @@ public class AuthenticationFacade
      *
      * @param authenticationContext The authentication context to generate the JWT token from.
      * @return The resulting JWT token.
-     * @throws Exception When
+     * @throws JwtGenerationException When the jwt token cannot be generated.
      */
-    public String generateAuthenticationToken(AuthenticationContext authenticationContext) throws Exception
+    public String generateAuthenticationToken(AuthenticationContext authenticationContext) throws JwtGenerationException
     {
         JwtTokenGenerator generator = new JwtTokenGenerator(jwtSecret);
         return generator.generate(authenticationContext);
@@ -71,8 +83,11 @@ public class AuthenticationFacade
      */
     public AuthenticationContext authenticateToken(String token) throws AuthenticationException
     {
-        TokenAuthenticator tokenAuthenticator = new TokenAuthenticator(jwtSecret, userRepositoryFactory);
-        return tokenAuthenticator.authenticate(token);
+        return new TokenAuthenticator(
+                jwtSecret,
+                userRepositoryFactory,
+                serviceRepositoryFactory)
+                .authenticate(token);
     }
 
     /**
@@ -84,6 +99,9 @@ public class AuthenticationFacade
      */
     public AuthenticationContext authenticateBearerHeader(String header) throws AuthenticationException
     {
+        if (header == null)
+            throw new AuthenticationException("Requires Authorization: Bearer <token>");
+
         header = header.trim();
         if (header.startsWith("Bearer ")) {
             header = header.substring(7);
