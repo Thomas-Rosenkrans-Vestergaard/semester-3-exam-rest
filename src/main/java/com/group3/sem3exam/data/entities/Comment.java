@@ -24,6 +24,12 @@ public class Comment implements RepositoryEntity<Integer>
     private User author;
 
     @Column
+    private String emoji;
+
+    @Column
+    private int count;
+
+    @Column
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -36,6 +42,26 @@ public class Comment implements RepositoryEntity<Integer>
     public Comment()
     {
 
+    }
+
+    public String getEmoji()
+    {
+        return emoji;
+    }
+
+    public void setEmoji(String emoji)
+    {
+        this.emoji = emoji;
+    }
+
+    public int getCount()
+    {
+        return count;
+    }
+
+    public void setCount(int count)
+    {
+        this.count = count;
     }
 
     public Comment(String contents, User author, LocalDateTime createdAt, CommentParent parent)

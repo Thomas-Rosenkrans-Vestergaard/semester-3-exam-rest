@@ -10,6 +10,7 @@ import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authentication.AuthenticationException;
 import com.group3.sem3exam.logic.authorization.AuthorizationException;
 import com.group3.sem3exam.rest.dto.CommentDTO;
+import sun.font.CreatedFontTracker;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
@@ -80,6 +81,19 @@ public class CommentResource
     }
 
 
+    @POST
+    @Consumes(APPLICATION_JSON)
+    @Produces(APPLICATION_JSON)
+    @Path("emoji/{id: [0-9]+}")
+    public Response addEmoji(@HeaderParam("Authorization") String auth, @PathParam("id") Integer id, String json) throws AuthenticationException, ResourceNotFoundException, AuthorizationException
+    {
+        AuthenticationContext authenticationContext = authenticationFacade.authenticateBearerHeader(auth);
+        CommentResource.Emoji emoji = gson.fromJson(json, CommentResource.Emoji.class);
+        Comment comment =       commentFacade.addEmoji(emoji.name, emoji.count, id, authenticationContext);
+        return Response.status(CREATED).entity(gson.toJson(CommentDTO.withEmoji(comment))).build();
+
+    }
+
     @DELETE
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
@@ -92,6 +106,10 @@ public class CommentResource
         return Response.ok(gson.toJson(CommentDTO.basic(comment))).build();
     }
 
+    private class Emoji{
+        private String name;
+        private int count;
+    }
 
     private class ReceivedComment
     {

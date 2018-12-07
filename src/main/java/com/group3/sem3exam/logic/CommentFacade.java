@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.entities.CommentParent;
 import com.group3.sem3exam.data.repositories.CommentRepository;
 import com.group3.sem3exam.logic.authentication.AuthenticationContext;
 import com.group3.sem3exam.logic.authorization.AuthorizationException;
+import com.group3.sem3exam.rest.CommentResource;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -127,6 +128,26 @@ public class CommentFacade
             commentRepository.commit();
             return commentToDelete;
         }
+    }
+
+    public Comment addEmoji(String name, Integer count, Integer comment, AuthenticationContext auth) throws ResourceNotFoundException, AuthorizationException
+    {
+        try(CommentRepository commentRepository = commentRepositoryFactory.get()){
+            commentRepository.begin();
+            Comment commentToAdd = commentRepository.get(comment);
+            commentToAdd.setEmoji(name);
+            commentToAdd.setCount(count);
+            if(commentToAdd == null){
+                throw new ResourceNotFoundException(Comment.class, comment);
+            }
+            if (commentToAdd.getAuthor().getId() != auth.getUserId())
+                throw new AuthorizationException("You do not own that comment.");
+
+            commentRepository.update(commentToAdd);
+            commentRepository.commit();
+            return commentToAdd;
+        }
+
     }
 
 }

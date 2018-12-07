@@ -15,18 +15,26 @@ public class CommentDTO
     public final String  contents;
     public final LocalDateTime createdAt;
     public final UserDTO author;
+    public String emoji = null;
+    public final Integer count;
 
-    private CommentDTO(Comment comment)
+    private CommentDTO(Comment comment, boolean withEmojis)
     {
         this.id = comment.getId();
         this.contents = comment.getContents();
         this.createdAt = comment.getCreatedAt();
         this.author = new UserDTO(comment.getAuthor());
-    }
+        if(withEmojis)
+            this.emoji = comment.getEmoji();
+            this.count = comment.getCount();         }
 
     public static CommentDTO basic(Comment comment)
     {
-        return new CommentDTO(comment);
+        return new CommentDTO(comment, false);
+    }
+
+    public static CommentDTO withEmoji(Comment comment){
+        return new CommentDTO(comment, true);
     }
 
     public static List<CommentDTO> list(List<Comment> comments, Function<Comment, CommentDTO> f)
