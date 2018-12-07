@@ -12,6 +12,7 @@ public class ChatMessage implements RepositoryEntity<Integer>
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Lob
     @Column(nullable = false)
     private String contents;
 
