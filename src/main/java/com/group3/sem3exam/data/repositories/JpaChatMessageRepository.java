@@ -7,9 +7,7 @@ import com.group3.sem3exam.data.repositories.transactions.JpaTransaction;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class JpaChatMessageRepository extends JpaCrudRepository<ChatMessage, Integer> implements ChatMessageRepository
 {
@@ -87,5 +85,36 @@ public class JpaChatMessageRepository extends JpaCrudRepository<ChatMessage, Int
 
         Collections.sort(messages, Comparator.comparingInt(ChatMessage::getId));
         return messages;
+    }
+
+    @Override
+    public Map<User, Integer> countUnreadMessages(User self, List<User> friends)
+    {
+        List<CountUnreadResult> list = getEntityManager()
+                .createQuery("SELECT new com.group3.sem3exam.data.repositories.JpaChatMessageRepository$CountUnreadResult(" +
+                             "u, " +
+                             "(SELECT count(cm) FROM ChatMessage cm WHERE cm.seen = false AND cm.sender = u AND cm.receiver = :self)) " +
+                             "FROM User u WHERE u IN :friends", CountUnreadResult.class)
+                .setParameter("friends", friends)
+                .setParameter("self", self)
+                .getResultList();
+
+        Map<User, Integer> map = new HashMap<>();
+        for (CountUnreadResult result : list)
+            map.put(result.user, result.count);
+
+        return map;
+    }
+
+    public static class CountUnreadResult
+    {
+        public final User    user;
+        public final Integer count;
+
+        public CountUnreadResult(User user, Long count)
+        {
+            this.user = user;
+            this.count = (int) (long) count;
+        }
     }
 }

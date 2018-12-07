@@ -11,10 +11,9 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JpaChatMessageRepositoryTest
@@ -70,6 +69,7 @@ class JpaChatMessageRepositoryTest
             assertEquals(sender, message.getSender());
             assertEquals(receiver, message.getReceiver());
             assertEquals("contents", message.getContents());
+            assertFalse(message.getSeen());
         }
     }
 
@@ -138,6 +138,29 @@ class JpaChatMessageRepositoryTest
             results = messageRepository.getHistory(sender, receiver, messageFour.getId(), 5);
             assertEquals(3, results.size());
             assertEquals(messageOne, results.get(0));
+        }
+    }
+
+    @Test
+    void countUnreadMessages()
+    {
+        try (JpaTransaction transaction = new JpaTransaction(JpaTestConnection.create())) {
+            transaction.begin();
+            JpaChatMessageRepository messageRepository = new JpaChatMessageRepository(transaction);
+            JpaUserRepository        userRepository    = new JpaUserRepository(transaction);
+            JpaCityRepository        cityRepository    = new JpaCityRepository(transaction);
+
+            City city     = cityRepository.get(1);
+            User sender   = TestingUtils.randomUser(userRepository, city);
+            User receiver = TestingUtils.randomUser(userRepository, city);
+
+            messageRepository.write(sender, receiver, "contents1");
+
+            Map<User, Integer> unread;
+
+            unread = messageRepository.countUnreadMessages(receiver, Arrays.asList(sender));
+            assertEquals(1, unread.size());
+            assertEquals(1, (int) unread.get(sender));
         }
     }
 }

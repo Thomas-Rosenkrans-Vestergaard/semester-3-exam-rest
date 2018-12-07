@@ -5,6 +5,7 @@ import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.base.CrudRepository;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ChatMessageRepository extends CrudRepository<ChatMessage, Integer>
 {
@@ -44,4 +45,12 @@ public interface ChatMessageRepository extends CrudRepository<ChatMessage, Integ
      */
     List<ChatMessage> getHistory(User one, User two, Integer last, Integer pageSize);
 
+    /**
+     * Counts the unread messages from the list of users send to {@code self}.
+     *
+     * @param self    The user to count the unread messages of.
+     * @param friends The senders of the unread messages.
+     * @return A map containing a provided user and the number of unread messages sent by that user.
+     */
+    Map<User, Integer> countUnreadMessages(User self, List<User> friends);
 }

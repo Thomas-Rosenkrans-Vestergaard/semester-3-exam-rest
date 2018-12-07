@@ -21,6 +21,9 @@ public class ChatMessage implements RepositoryEntity<Integer>
     @ManyToOne
     private User receiver;
 
+    @Column(nullable = false)
+    private boolean seen = false;
+
     public ChatMessage()
     {
 
@@ -72,5 +75,16 @@ public class ChatMessage implements RepositoryEntity<Integer>
     public void setReceiver(User receiver)
     {
         this.receiver = receiver;
+    }
+
+    public boolean getSeen()
+    {
+        return this.seen;
+    }
+
+    public ChatMessage setSeen(boolean seen)
+    {
+        this.seen = seen;
+        return this;
     }
 }
