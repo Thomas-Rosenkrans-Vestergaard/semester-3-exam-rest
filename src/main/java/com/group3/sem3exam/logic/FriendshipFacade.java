@@ -142,26 +142,42 @@ public class FriendshipFacade<T extends Transaction>
         try (FriendshipRepository repository = friendshipRepositoryFactory.apply(transactionFactory.get())) {
             repository.begin();
             FriendRequest fetchedRequest = retrieveRequest(repository, auth, request);
-            Friendship created = repository.accept(fetchedRequest);
+            Friendship    created        = repository.accept(fetchedRequest);
             repository.commit();
             return created;
         }
     }
 
-
-    public Friendship unfriend(AuthenticationContext auth, User other) throws AuthorizationException, ResourceNotFoundException, ResourceConflictException
+    /**
+     * Deletes the friendship between the authenticated user and the {@code other} user.
+     *
+     * @param auth  The authenticated user.
+     * @param other The id of the other user.
+     * @return The updated friendship entity.
+     */
+    public Friendship unfriend(AuthenticationContext auth, Integer other) throws AuthorizationException, ResourceNotFoundException, ResourceConflictException
     {
 
         new Authorizator(auth).check(new IsUser());
 
-        try(FriendshipRepository friendshipRepository = friendshipRepositoryFactory.apply(transactionFactory.get())){
-            friendshipRepository.begin();
-            Friendship friendship = friendshipRepository.deleteFriendship(auth.getUser(), other);
-            if(friendship == null){
-                throw new ResourceNotFoundException(Friendship.class, auth.getUserId() + "+" + other.getId());
-            }
+        try (T transaction = transactionFactory.get()) {
+
+            transaction.begin();
+
+            FriendshipRepository friendshipRepository = friendshipRepositoryFactory.apply(transaction);
+            UserRepository       userRepository       = userRepositoryFactory.apply(transaction);
+
+            User fetchedOther = userRepository.get(other);
+            if (fetchedOther == null)
+                throw new ResourceNotFoundException(User.class, other);
+            Friendship friendship = friendshipRepository.deleteFriendship(auth.getUser(), fetchedOther);
+            if (friendship == null)
+                throw new ResourceNotFoundException(Friendship.class, auth.getUserId() + "+" + other);
+
+            transaction.commit();
+
+            return friendship;
         }
-        return null;
     }
 
     /**
