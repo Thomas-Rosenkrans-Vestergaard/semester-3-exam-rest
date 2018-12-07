@@ -64,7 +64,7 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
      * @param authenticated The authenticated user.
      * @param receiver      The id of the receiver.
      * @return The chat history between the two chatUsers. The list is returned in an ascending order, with
-     * the oldest messages first.
+     * the oldest messages first. Note that all messages returned from this method, are marked as {@code seen}.
      * @throws ResourceNotFoundException When the provided receiver does not exist.
      */
     public List<ChatMessage> getHistory(AuthenticationContext authenticated, Integer receiver) throws ResourceNotFoundException
@@ -72,6 +72,9 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
         // TODO: Add authorization
 
         try (T transaction = transactionFactory.get()) {
+
+            transaction.begin();
+
             ChatMessageRepository messageRepository = messageRepositoryFactory.apply(transaction);
             UserRepository        userRepository    = userRepositoryFactory.apply(transaction);
 
@@ -79,7 +82,13 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
             if (fetchedReceiver == null)
                 throw new ResourceNotFoundException(User.class, receiver);
 
-            return messageRepository.getHistory(authenticated.getUser(), fetchedReceiver);
+            List<ChatMessage> messages = messageRepository.getHistory(authenticated.getUser(), fetchedReceiver);
+            for (ChatMessage message : messages)
+                messageRepository.markSeen(message);
+
+            messageRepository.commit();
+
+            return messages;
         }
     }
 
@@ -94,7 +103,8 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
      * @param last          The id of the last message retrieved. Only chat messages with {@code chatMessage.id < last} are
      *                      retrieved. When {@code last == null} the last newest message is instead used.
      * @param pageSize      The number of results to retrieve. Where {@code pageSize > 0}.
-     * @return The chat history. The list is returned in an ascending order, with the oldest messages first.
+     * @return The chat history. The list is returned in an ascending order, with the oldest messages first. Note that
+     * all messages returned from this method, are marked as {@code seen}.
      * @throws ResourceNotFoundException When the provided receiver does not exist.
      */
     public List<ChatMessage> getHistory(AuthenticationContext authenticated, Integer receiver, Integer last, Integer pageSize)
@@ -105,6 +115,9 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
         last = last == null ? Integer.MAX_VALUE : last;
 
         try (T transaction = transactionFactory.get()) {
+
+            transaction.begin();
+
             ChatMessageRepository messageRepository = messageRepositoryFactory.apply(transaction);
             UserRepository        userRepository    = userRepositoryFactory.apply(transaction);
 
@@ -112,17 +125,26 @@ public class ChatFacade<T extends Transaction> implements ChatTransportInput, Ch
             if (fetchedReceiver == null)
                 throw new ResourceNotFoundException(User.class, receiver);
 
-            return messageRepository.getHistory(authenticated.getUser(), fetchedReceiver, last, pageSize);
+            List<ChatMessage> messages = messageRepository.getHistory(authenticated.getUser(), fetchedReceiver, last, pageSize);
+            for (ChatMessage message : messages)
+                messageRepository.markSeen(message);
+
+            messageRepository.commit();
+
+            return messages;
         }
     }
 
     public List<ChatMember> getUsers(AuthenticationContext auth)
     {
         List<ChatMember> result = new ArrayList<>();
-        try (FriendshipRepository friendshipRepository = friendshipRepositoryFactory.apply(transactionFactory.get())) {
-            List<User> friends = friendshipRepository.getFriends(auth.getUserId());
+        try (T transaction = transactionFactory.get()) {
+            FriendshipRepository  friendshipRepository = friendshipRepositoryFactory.apply(transaction);
+            ChatMessageRepository messageRepository    = messageRepositoryFactory.apply(transaction);
+            List<User>            friends              = friendshipRepository.getFriends(auth.getUserId());
+            Map<User, Integer>    unread               = messageRepository.countUnreadMessages(auth.getUser(), friends);
             for (User friend : friends)
-                result.add(new ChatMemberData(friend, isOnline(friend), -1));
+                result.add(new ChatMemberData(friend, isOnline(friend), unread.get(friend)));
 
             return result;
         }

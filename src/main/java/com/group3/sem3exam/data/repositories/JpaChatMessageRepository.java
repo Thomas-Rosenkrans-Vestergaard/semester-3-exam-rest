@@ -117,4 +117,12 @@ public class JpaChatMessageRepository extends JpaCrudRepository<ChatMessage, Int
             this.count = (int) (long) count;
         }
     }
+
+    @Override
+    public ChatMessage markSeen(ChatMessage message)
+    {
+        message.setSeen(true);
+        update(message);
+        return message;
+    }
 }

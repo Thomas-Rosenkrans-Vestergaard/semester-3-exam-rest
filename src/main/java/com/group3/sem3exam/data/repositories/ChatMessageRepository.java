@@ -53,4 +53,12 @@ public interface ChatMessageRepository extends CrudRepository<ChatMessage, Integ
      * @return A map containing a provided user and the number of unread messages sent by that user.
      */
     Map<User, Integer> countUnreadMessages(User self, List<User> friends);
+
+    /**
+     * Marks the provided message as seen.
+     *
+     * @param message The message to mark as seen.
+     * @return The newly updated message entity.
+     */
+    ChatMessage markSeen(ChatMessage message);
 }

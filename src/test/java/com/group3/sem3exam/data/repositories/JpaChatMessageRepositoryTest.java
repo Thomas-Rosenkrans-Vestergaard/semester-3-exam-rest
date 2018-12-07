@@ -14,6 +14,7 @@ import org.junit.jupiter.api.TestFactory;
 import java.util.*;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JpaChatMessageRepositoryTest
@@ -161,6 +162,26 @@ class JpaChatMessageRepositoryTest
             unread = messageRepository.countUnreadMessages(receiver, Arrays.asList(sender));
             assertEquals(1, unread.size());
             assertEquals(1, (int) unread.get(sender));
+        }
+    }
+
+    @Test
+    void markSeen()
+    {
+        try (JpaTransaction transaction = new JpaTransaction(JpaTestConnection.create())) {
+            transaction.begin();
+            JpaChatMessageRepository messageRepository = new JpaChatMessageRepository(transaction);
+            JpaUserRepository        userRepository    = new JpaUserRepository(transaction);
+            JpaCityRepository        cityRepository    = new JpaCityRepository(transaction);
+
+            City city     = cityRepository.get(1);
+            User sender   = TestingUtils.randomUser(userRepository, city);
+            User receiver = TestingUtils.randomUser(userRepository, city);
+
+            ChatMessage message = messageRepository.write(sender, receiver, "contents1");
+            assertFalse(message.getSeen());
+            messageRepository.markSeen(message);
+            assertTrue(message.getSeen());
         }
     }
 }

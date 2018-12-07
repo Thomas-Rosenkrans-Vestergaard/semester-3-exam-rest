@@ -1,11 +1,12 @@
 package com.group3.sem3exam.logic.authentication;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.group3.sem3exam.data.entities.User;
 import com.group3.sem3exam.data.repositories.UserRepository;
+import com.group3.sem3exam.data.services.ServiceRepository;
 import com.group3.sem3exam.data.services.entities.Permission;
 import com.group3.sem3exam.data.services.entities.Service;
-import com.group3.sem3exam.data.services.ServiceRepository;
 import com.group3.sem3exam.logic.authentication.jwt.JwtSecret;
 import com.group3.sem3exam.logic.authentication.jwt.JwtTokenUnpacker;
 
@@ -57,31 +58,35 @@ public class TokenAuthenticator
      */
     public AuthenticationContext authenticate(String token) throws AuthenticationException
     {
-        JwtTokenUnpacker   unpacker = new JwtTokenUnpacker(jwtSecret);
-        DecodedJWT         jwt      = unpacker.unpack(token);
-        AuthenticationType type     = AuthenticationType.valueOf(jwt.getClaim("type").asString());
+        try {
+            JwtTokenUnpacker   unpacker = new JwtTokenUnpacker(jwtSecret);
+            DecodedJWT         jwt      = unpacker.unpack(token);
+            AuthenticationType type     = AuthenticationType.valueOf(jwt.getClaim("type").asString());
 
-        if (type == AuthenticationType.USER) {
-            Integer userId = jwt.getClaim("user").asInt();
-            return LazyAuthenticationContext.user(userId, createUserRetriever(userId));
+            if (type == AuthenticationType.USER) {
+                Integer userId = jwt.getClaim("user").asInt();
+                return LazyAuthenticationContext.user(userId, createUserRetriever(userId));
+            }
+
+            if (type == AuthenticationType.SERVICE) {
+                Integer serviceId = jwt.getClaim("service").asInt();
+                return LazyAuthenticationContext.service(serviceId, createServiceRetriever(serviceId));
+            }
+
+            if (type == AuthenticationType.SERVICE_REPRESENTING_USER) {
+                Integer userId    = jwt.getClaim("user").asInt();
+                Integer serviceId = jwt.getClaim("service").asInt();
+                return LazyAuthenticationContext.serviceUser(
+                        serviceId, createServiceRetriever(serviceId),
+                        userId, createUserRetriever(userId),
+                        new HashSet<>(jwt.getClaim("permissions").asList(Permission.class))
+                );
+            }
+
+            throw new AuthenticationException("Unsupported authentication type.");
+        } catch (JWTVerificationException e) {
+            throw new AuthenticationException("Could not verify authentication token.", e);
         }
-
-        if (type == AuthenticationType.SERVICE) {
-            Integer serviceId = jwt.getClaim("service").asInt();
-            return LazyAuthenticationContext.service(serviceId, createServiceRetriever(serviceId));
-        }
-
-        if (type == AuthenticationType.SERVICE_REPRESENTING_USER) {
-            Integer userId    = jwt.getClaim("user").asInt();
-            Integer serviceId = jwt.getClaim("service").asInt();
-            return LazyAuthenticationContext.serviceUser(
-                    serviceId, createServiceRetriever(serviceId),
-                    userId, createUserRetriever(userId),
-                    new HashSet<>(jwt.getClaim("permissions").asList(Permission.class))
-            );
-        }
-
-        throw new AuthenticationException("Unsupported authentication type.");
     }
 
     private Supplier<User> createUserRetriever(Integer id)
