@@ -79,7 +79,7 @@ class JpaPermissionRequestRepositoryTest
             assertEquals("callback", permissionRequest.getCallback());
             assertEquals(template, permissionRequest.getTemplate());
             assertTrue(LocalDateTime.now().minusMinutes(1).isBefore(permissionRequest.getCreatedAt()));
-            assertTrue(permissionRequest.getCreatedAt().isBefore(LocalDateTime.now()));
+            assertTrue(permissionRequest.getCreatedAt().isBefore(LocalDateTime.now().plusSeconds(5)));
         }
     }
 

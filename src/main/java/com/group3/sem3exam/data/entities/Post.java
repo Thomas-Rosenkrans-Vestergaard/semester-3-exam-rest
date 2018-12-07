@@ -13,7 +13,7 @@ import java.util.List;
 public class Post extends CommentParent implements RepositoryEntity<Integer>
 {
 
-    @Column(nullable = false, length = 65536)
+    @Column(nullable = false, length =  32672)
     private String contents;
 
     @ManyToOne(optional = false)
