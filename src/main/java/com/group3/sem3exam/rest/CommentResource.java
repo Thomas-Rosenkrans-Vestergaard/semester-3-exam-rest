@@ -81,7 +81,7 @@ public class CommentResource
     }
 
 
-    @POST
+    @PUT
     @Consumes(APPLICATION_JSON)
     @Produces(APPLICATION_JSON)
     @Path("emoji/{id: [0-9]+}")
