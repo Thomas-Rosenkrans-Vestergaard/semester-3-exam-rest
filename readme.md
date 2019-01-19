@@ -1,1 +1,1 @@
-3Semester REST
+3Semester REST - Backend for an application imitating facebook
